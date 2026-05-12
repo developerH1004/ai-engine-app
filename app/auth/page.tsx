@@ -1,0 +1,54 @@
+'use client'
+import { useState } from 'react'
+import { supabase } from '@/lib/supabase'
+import Header from '@/components/Header'
+
+export default function AuthPage() {
+  const [code, setCode]     = useState('')
+  const [email, setEmail]   = useState('')
+  const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState<{ok:boolean,msg:string}|null>(null)
+
+  async function handleAuth() {
+    if (!code.trim() || !email.trim()) { setResult({ok:false,msg:'코드와 이메일을 모두 입력해주세요.'}); return }
+    setLoading(true)
+    try {
+      const { data: serial, error } = await supabase.from('serial_codes').select('*').eq('code', code.trim().toUpperCase()).single()
+      if (error || !serial) { setResult({ok:false,msg:'유효하지 않은 시리얼 코드입니다.'}); return }
+      if (serial.is_used) { setResult({ok:false,msg:'이미 사용된 코드입니다.'}); return }
+      const { error: authError } = await supabase.auth.signInWithOtp({ email: email.trim(), options: { data: { serial_code: code.trim().toUpperCase() } } })
+      if (authError) throw authError
+      setResult({ok:true,msg:`${email}로 인증 링크를 발송했습니다!`})
+    } catch(e:any) { setResult({ok:false,msg:e.message||'오류가 발생했습니다.'}) }
+    finally { setLoading(false) }
+  }
+
+  return (
+    <div className="min-h-screen grid-bg">
+      <Header />
+      <div className="max-w-md mx-auto px-4 py-20">
+        <div className="card p-8">
+          <h1 className="font-display text-3xl mb-2" style={{color:'var(--accent)'}}>시리얼 코드 인증</h1>
+          <p className="text-gray-500 text-sm mb-8">책 내부 시리얼 코드로 무제한 이용권을 활성화하세요.</p>
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs text-gray-500 font-mono mb-1 block">시리얼 코드</label>
+              <input className="input-field font-mono tracking-widest uppercase" value={code} onChange={e=>setCode(e.target.value)} placeholder="XXXX-XXXX-XXXX" maxLength={20}/>
+            </div>
+            <div>
+              <label className="text-xs text-gray-500 font-mono mb-1 block">이메일</label>
+              <input className="input-field" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="your@email.com"/>
+            </div>
+            <button className="btn-primary w-full" onClick={handleAuth} disabled={loading}>{loading ? '처리 중...' : '인증하기'}</button>
+            {result && (
+              <div className={`p-4 rounded-lg text-sm fade-in ${result.ok ? 'bg-green-500/10 border border-green-500/30 text-green-400' : 'bg-red-500/10 border border-red-500/30 text-red-400'}`}>
+                {result.msg}
+              </div>
+            )}
+          </div>
+          <p className="text-xs text-gray-600 mt-8 text-center">시리얼 코드는 1회만 사용 가능합니다.</p>
+        </div>
+      </div>
+    </div>
+  )
+}
