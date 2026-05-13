@@ -1,0 +1,45 @@
+name: AI Database Auto Update
+
+on:
+  schedule:
+    # 매일 자정 UTC (한국시간 오전 9시)
+    - cron: '0 0 * * *'
+    # 세계 주요 시간대 추가
+    # UTC 03:00 = 한국 정오
+    - cron: '0 3 * * *'
+    # UTC 15:00 = 한국 자정
+    - cron: '0 15 * * *'
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  update-ai-database:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests pandas supabase python-dotenv groq
+
+      - name: Run AI update collector
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          python scripts/auto_update.py
+
+      - name: Commit update log
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add logs/
+          git diff --staged --quiet || git commit -m "Auto update: $(date +'%Y-%m-%d')"
+          git push
