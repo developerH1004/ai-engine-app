@@ -1,11 +1,12 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
-// 마스터 코드 (관리자용)
 const MASTER_CODE = 'MASTER-DEVEL-OPER-H004'
 
 export default function AuthPage() {
+  const router = useRouter()
   const [code, setCode]       = useState('')
   const [email, setEmail]     = useState('')
   const [loading, setLoading] = useState(false)
@@ -16,27 +17,26 @@ export default function AuthPage() {
       setResult({ok: false, msg: '시리얼 코드를 입력해주세요.'})
       return
     }
-
     setLoading(true)
     const upperCode = code.trim().toUpperCase()
 
     try {
-      // 마스터 코드 확인 (관리자)
+      // 마스터 코드 (관리자)
       if (upperCode === MASTER_CODE) {
-        document.cookie = 'ai_map_verified=true; path=/; max-age=2592000' // 30일
-        setResult({ok: true, msg: '관리자 인증 완료! 이동 중...'})
-        setTimeout(() => { window.location.href = '/' }, 1000)
+        document.cookie = 'ai_map_verified=true; path=/; max-age=2592000'
+        setResult({ok: true, msg: '관리자 인증 완료!'})
+        setTimeout(() => router.push('/'), 800)
         return
       }
 
-      // 이메일 필수 확인
+      // 이메일 확인
       if (!email.trim()) {
         setResult({ok: false, msg: '이메일을 입력해주세요.'})
         setLoading(false)
         return
       }
 
-      // Supabase에서 시리얼 코드 확인
+      // 시리얼 코드 확인
       const { data: serial, error } = await supabase
         .from('serial_codes')
         .select('*')
@@ -45,30 +45,31 @@ export default function AuthPage() {
 
       if (error || !serial) {
         setResult({ok: false, msg: '유효하지 않은 시리얼 코드입니다.'})
+        setLoading(false)
         return
       }
 
       if (serial.is_used && serial.user_id) {
         setResult({ok: false, msg: '이미 다른 기기에서 사용된 코드입니다.'})
+        setLoading(false)
         return
       }
 
-      // 코드 사용 처리
+      // 사용 처리
       await supabase.from('serial_codes').update({
         is_used: true,
         used_at: new Date().toISOString(),
       }).eq('code', upperCode)
 
-      // 인증 쿠키 설정 (30일)
+      // 쿠키 설정
       document.cookie = 'ai_map_verified=true; path=/; max-age=2592000'
       document.cookie = `ai_map_code=${upperCode}; path=/; max-age=2592000`
 
-      setResult({ok: true, msg: '인증 완료! 이동 중...'})
-      setTimeout(() => { window.location.href = '/' }, 1000)
+      setResult({ok: true, msg: '인증 완료!'})
+      setTimeout(() => router.push('/'), 800)
 
     } catch(e: any) {
       setResult({ok: false, msg: e.message || '오류가 발생했습니다.'})
-    } finally {
       setLoading(false)
     }
   }
@@ -89,9 +90,8 @@ export default function AuthPage() {
         borderRadius: '16px',
         padding: '40px 32px',
       }}>
-        {/* 로고 */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '40px', color: '#00ff88', lineHeight: 1 }}>
+          <div style={{ fontFamily: 'sans-serif', fontSize: '36px', color: '#00ff88', fontWeight: 900, lineHeight: 1 }}>
             AI MAP
           </div>
           <div style={{ fontSize: '12px', color: '#555', marginTop: '4px', fontFamily: 'monospace' }}>
@@ -116,20 +116,20 @@ export default function AuthPage() {
                 width: '100%', height: '44px',
                 background: '#1a1d26', border: '1px solid rgba(255,255,255,0.08)',
                 borderRadius: '8px', color: '#fff', padding: '0 16px',
-                fontSize: '14px', fontFamily: 'monospace', letterSpacing: '0.1em',
+                fontSize: '14px', fontFamily: 'monospace', letterSpacing: '0.05em',
                 outline: 'none', textTransform: 'uppercase', boxSizing: 'border-box',
               }}
               value={code}
               onChange={e => setCode(e.target.value)}
               placeholder="XXXX-XXXX-XXXX-XXXX"
-              maxLength={20}
+              maxLength={30}
               onKeyDown={e => e.key === 'Enter' && handleAuth()}
             />
           </div>
 
           <div>
             <label style={{ fontSize: '11px', color: '#666', fontFamily: 'monospace', display: 'block', marginBottom: '6px' }}>
-              이메일 (시리얼 코드 인증 시 필요)
+              이메일
             </label>
             <input
               style={{
@@ -154,7 +154,8 @@ export default function AuthPage() {
               background: loading || !code.trim() ? '#1a4d35' : '#00ff88',
               color: loading || !code.trim() ? '#555' : '#000',
               border: 'none', borderRadius: '8px',
-              fontSize: '15px', fontWeight: 700, cursor: loading || !code.trim() ? 'not-allowed' : 'pointer',
+              fontSize: '15px', fontWeight: 700,
+              cursor: loading || !code.trim() ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s',
             }}
           >
