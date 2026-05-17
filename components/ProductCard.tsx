@@ -1,6 +1,8 @@
 'use client'
 import { AIProduct } from '@/lib/supabase'
 import { useState } from 'react'
+import { useLang } from '@/lib/LangContext'
+import { t } from '@/lib/i18n'
 
 export default function ProductCard({ product, isComparing, onCompare }: {
   product: AIProduct
@@ -8,6 +10,9 @@ export default function ProductCard({ product, isComparing, onCompare }: {
   onCompare: (p: AIProduct) => void
 }) {
   const [expanded, setExpanded] = useState(false)
+  const { lang } = useLang()
+  const tx = (key: string) => t[key]?.[lang] ?? key
+
   const active = product.versions?.filter(v => v.is_active) || []
   const depr   = product.versions?.filter(v => !v.is_active) || []
   const desc   = product.description && product.description !== 'nan' ? product.description : ''
@@ -29,9 +34,9 @@ export default function ProductCard({ product, isComparing, onCompare }: {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end', flexShrink: 0 }}>
           {product.is_research_model && (
-            <span className="badge badge-orange" style={{ fontSize: '10px' }}>연구모델</span>
+            <span className="badge badge-orange" style={{ fontSize: '10px' }}>{tx('researchModel')}</span>
           )}
-          <span className="badge badge-gray" style={{ fontSize: '10px', maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span className="badge badge-gray" style={{ fontSize: '10px', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {(product.category_sub || '').replace(/^\d+-\d+\.\s/, '')}
           </span>
         </div>
@@ -56,7 +61,7 @@ export default function ProductCard({ product, isComparing, onCompare }: {
               onClick={() => setExpanded(!expanded)}
               style={{ fontSize: '11px', color: 'var(--accent-dim)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginTop: '2px' }}
             >
-              {expanded ? '접기 ▲' : '더보기 ▼'}
+              {expanded ? tx('collapse') : tx('expand')}
             </button>
           )}
         </div>
@@ -105,7 +110,7 @@ export default function ProductCard({ product, isComparing, onCompare }: {
               textDecoration: 'none',
             }}
           >
-            🔗 공식 사이트
+            🔗 {tx('officialSite')}
           </a>
         )}
         <button
@@ -121,7 +126,7 @@ export default function ProductCard({ product, isComparing, onCompare }: {
             whiteSpace: 'nowrap',
           }}
         >
-          {isComparing ? '✓ 비교중' : '+ 비교'}
+          {isComparing ? tx('comparing') : tx('addCompare')}
         </button>
       </div>
     </div>

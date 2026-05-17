@@ -1,15 +1,21 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { supabase, AIProduct } from '@/lib/supabase'
+import { useLang } from '@/lib/LangContext'
+import { t } from '@/lib/i18n'
 import Header from '@/components/Header'
 import SearchBar from '@/components/SearchBar'
 import CategoryNav from '@/components/CategoryNav'
 import ProductCard from '@/components/ProductCard'
 import ComparePanel from '@/components/ComparePanel'
 
-const PAGE_SIZE = 48
+const PAGE_SIZE   = 48
+const MAX_COMPARE = 10
 
 export default function Home() {
+  const { lang } = useLang()
+  const tx = (key: string) => t[key]?.[lang] ?? key
+
   const [products, setProducts]           = useState<AIProduct[]>([])
   const [loading, setLoading]             = useState(true)
   const [searchQuery, setSearchQuery]     = useState('')
@@ -76,7 +82,10 @@ export default function Home() {
   function toggleCompare(product: AIProduct) {
     setCompareList(prev => {
       if (prev.find(p => p.id === product.id)) return prev.filter(p => p.id !== product.id)
-      if (prev.length >= 5) { alert('최대 5개까지 비교 가능합니다.'); return prev }
+      if (prev.length >= MAX_COMPARE) {
+        alert(tx('compareMax'))
+        return prev
+      }
       return [...prev, product]
     })
   }
@@ -88,16 +97,19 @@ export default function Home() {
   const displayCount = (selectedMain || selectedSub || searchQuery) ? filteredCount : totalCount
   const displayLabel = searchQuery
     ? `"${searchQuery}"`
-    : selectedSub ? selectedSub.replace(/^\d+-\d+\.\s/, '')
-    : selectedMain ? selectedMain.replace(/^\d+\.\s/, '')
-    : '전체'
+    : selectedSub
+      ? (selectedSub.replace(/^\d+-\d+\.\s/, ''))
+      : selectedMain
+        ? (selectedMain.replace(/^\d+\.\s/, ''))
+        : tx('allCategory')
 
   return (
     <div className="min-h-screen grid-bg">
       <Header />
 
+      {/* 비교 선택 바 */}
       {compareList.length > 0 && (
-        <div style={{
+        <div className="no-print" style={{
           position: 'sticky', top: '56px', zIndex: 39,
           background: 'rgba(0,20,10,0.95)', backdropFilter: 'blur(12px)',
           borderBottom: '1px solid rgba(0,255,136,0.3)',
@@ -106,7 +118,9 @@ export default function Home() {
           flexWrap: 'wrap', gap: '8px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '12px', color: '#00ff88', fontFamily: 'monospace' }}>⚖️ 비교 선택:</span>
+            <span style={{ fontSize: '12px', color: '#00ff88', fontFamily: 'monospace' }}>
+              {tx('compareSelected')}
+            </span>
             {compareList.map(p => (
               <span key={p.id} style={{
                 fontSize: '11px', padding: '2px 8px', borderRadius: '99px',
@@ -120,6 +134,9 @@ export default function Home() {
                 >✕</button>
               </span>
             ))}
+            <span style={{ fontSize: '11px', color: '#555', fontFamily: 'monospace' }}>
+              {compareList.length}/{MAX_COMPARE}
+            </span>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
@@ -127,31 +144,29 @@ export default function Home() {
               className="btn-primary"
               style={{ padding: '6px 16px', fontSize: '12px' }}
             >
-              비교하기 ({compareList.length}개)
+              {tx('compareBtn')} ({compareList.length})
             </button>
-            <button
-              onClick={resetCompare}
-              className="btn-ghost"
-              style={{ padding: '6px 12px', fontSize: '12px' }}
-            >
-              초기화
+            <button onClick={resetCompare} className="btn-ghost" style={{ padding: '6px 12px', fontSize: '12px' }}>
+              {tx('compareReset')}
             </button>
           </div>
         </div>
       )}
 
       <main className="max-w-screen-xl mx-auto px-4 pb-20">
+        {/* 히어로 */}
         <section className="py-10 text-center">
           <p className="font-mono text-xs text-green-400 tracking-widest mb-3 pulse">
-            LIVE DATABASE · 매일 자정 자동 업데이트
+            {tx('liveUpdate')}
           </p>
-          <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-2">이거봐!</h1>
+          <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-2">
+            {tx('heroLine1')}
+          </h1>
           <h2 className="font-display text-4xl md:text-5xl glow-text mb-4" style={{ color: 'var(--accent)' }}>
-            AI가 모두 모였어
+            {tx('heroLine2')}
           </h2>
-          <p className="text-gray-400 text-base max-w-xl mx-auto leading-relaxed mb-6">
-            전 세계 실존하는 모든 AI를 한눈에.<br />
-            대분류·세분류별 탐색, 전문가 분석, 실시간 업데이트.
+          <p className="text-gray-400 text-base max-w-xl mx-auto leading-relaxed mb-6" style={{ whiteSpace: 'pre-line' }}>
+            {tx('heroDesc')}
           </p>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <div style={{
@@ -163,18 +178,21 @@ export default function Home() {
                 {displayCount.toLocaleString()}
               </span>
               <span className="font-mono" style={{ color: '#888', fontSize: '13px' }}>
-                {displayLabel} · {(selectedMain || selectedSub || searchQuery) ? '검색 결과' : '개 AI 등록됨'}
+                {displayLabel} · {(selectedMain || selectedSub || searchQuery) ? tx('searchResult') : tx('totalRegistered')}
               </span>
             </div>
           </div>
         </section>
 
+        {/* 검색 */}
         <div className="mb-6">
-          <SearchBar value={searchQuery} onChange={handleSearch} placeholder="AI 이름, 제조사, 기능으로 검색... (전체 DB 검색)" />
+          <SearchBar value={searchQuery} onChange={handleSearch} placeholder={tx('searchPlaceholder')} />
         </div>
 
+        {/* 카테고리 */}
         <CategoryNav selectedMain={selectedMain} selectedSub={selectedSub} onSelect={handleCategory} />
 
+        {/* 필터 정보 */}
         <div className="flex items-center justify-between mt-6 mb-4">
           <div className="flex items-center gap-3">
             {(selectedMain || searchQuery) && (
@@ -182,16 +200,17 @@ export default function Home() {
                 onClick={() => { setSelectedMain(''); setSelectedSub(''); setSearchQuery(''); setPage(0) }}
                 className="btn-ghost text-xs"
               >
-                ✕ 초기화
+                {tx('resetFilter')}
               </button>
             )}
             <span className="text-gray-500 text-sm font-mono">
-              {displayCount.toLocaleString()}개 중 {products.length}개 표시
-              {page > 0 && ` · 페이지 ${page + 1}`}
+              {displayCount.toLocaleString()} {tx('showing')} {products.length} {tx('shown')}
+              {page > 0 && ` · ${tx('page')} ${page + 1}`}
             </span>
           </div>
         </div>
 
+        {/* 카드 그리드 */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 12 }).map((_, i) => (
@@ -206,7 +225,7 @@ export default function Home() {
         ) : products.length === 0 ? (
           <div className="text-center py-20 text-gray-500">
             <div className="text-5xl mb-4">🔍</div>
-            <p>검색 결과가 없습니다.</p>
+            <p>{tx('noResult')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
@@ -221,13 +240,14 @@ export default function Home() {
           </div>
         )}
 
+        {/* 페이지네이션 */}
         {filteredCount > PAGE_SIZE && (
           <div className="flex justify-center gap-3 mt-10">
             <button
               onClick={() => setPage(p => Math.max(0, p - 1))}
               disabled={page === 0}
               className="btn-ghost disabled:opacity-30"
-            >← 이전</button>
+            >{tx('prevPage')}</button>
             <span className="flex items-center text-gray-500 font-mono text-sm">
               {page + 1} / {Math.ceil(filteredCount / PAGE_SIZE)}
             </span>
@@ -235,11 +255,35 @@ export default function Home() {
               onClick={() => setPage(p => p + 1)}
               disabled={(page + 1) * PAGE_SIZE >= filteredCount}
               className="btn-ghost disabled:opacity-30"
-            >다음 →</button>
+            >{tx('nextPage')}</button>
           </div>
         )}
       </main>
 
+      {/* 푸터 */}
+      <footer className="no-print border-t border-white/5 py-8 text-center" style={{ background: 'rgba(8,10,15,0.8)' }}>
+        <div className="max-w-screen-xl mx-auto px-4 space-y-2">
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <a
+              href="https://zenodo.org/records/20248631"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: '12px', color: '#00cc6a', fontFamily: 'monospace', textDecoration: 'none' }}
+            >
+              📄 {tx('doiName')}
+            </a>
+            <span style={{ color: '#333', fontSize: '12px' }}>|</span>
+            <span style={{ fontSize: '12px', color: '#555', fontFamily: 'monospace' }}>
+              {tx('zenodoLabel')}: 10.5281/zenodo.20248631
+            </span>
+          </div>
+          <p style={{ fontSize: '11px', color: '#444', fontFamily: 'monospace' }}>
+            {tx('copyright')}
+          </p>
+        </div>
+      </footer>
+
+      {/* 비교 패널 */}
       {showCompare && compareList.length > 0 && (
         <ComparePanel products={compareList} onClose={() => setShowCompare(false)} />
       )}
