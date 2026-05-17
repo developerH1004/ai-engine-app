@@ -10,12 +10,31 @@ export default function ProductCard({ product, isComparing, onCompare }: {
   onCompare: (p: AIProduct) => void
 }) {
   const [expanded, setExpanded] = useState(false)
+  const [showDetail, setShowDetail] = useState(false)
   const { lang } = useLang()
   const tx = (key: string) => t[key]?.[lang] ?? key
+  const ko = lang === 'ko'
 
   const active = product.versions?.filter(v => v.is_active) || []
   const depr   = product.versions?.filter(v => !v.is_active) || []
-  const desc   = product.description && product.description !== 'nan' ? product.description : ''
+
+  // 언어에 맞는 설명문
+  const desc = ko
+    ? (product.description_ko || product.description || '')
+    : (product.description || '')
+  const cleanDesc = desc && desc !== 'nan' ? desc : ''
+
+  // 언어에 맞는 분류명
+  const subLabel = ko
+    ? (product.category_sub_ko || product.category_sub || '').replace(/^\d+-\d+\.\s/, '')
+    : (product.category_sub || '').replace(/^\d+-\d+\.\s/, '')
+
+  // 추가 정보
+  const pricing    = product.pricing_type || ''
+  const modality   = ko ? (product.modality_ko || product.modality || '') : (product.modality || '')
+  const region     = ko ? (product.service_region_ko || product.service_region || '') : (product.service_region || '')
+  const svcType    = ko ? (product.service_type_ko || product.service_type || '') : (product.service_type || '')
+  const monthlyFee = product.monthly_fee_usd
 
   return (
     <div
@@ -29,34 +48,48 @@ export default function ProductCard({ product, isComparing, onCompare }: {
             {product.product_name}
           </h3>
           <p style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>
-            {product.manufacturer} · {product.country}
+            {product.manufacturer} · {ko ? (product.country_ko || product.country) : product.country}
           </p>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end', flexShrink: 0 }}>
           {product.is_research_model && (
             <span className="badge badge-orange" style={{ fontSize: '10px' }}>{tx('researchModel')}</span>
           )}
-          <span className="badge badge-gray" style={{ fontSize: '10px', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {(product.category_sub || '').replace(/^\d+-\d+\.\s/, '')}
+          <span className="badge badge-gray" style={{ fontSize: '10px', maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {subLabel}
           </span>
         </div>
       </div>
 
+      {/* 요금/모달리티 배지 */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+        {pricing && (
+          <span className="badge badge-blue" style={{ fontSize: '10px' }}>{pricing}</span>
+        )}
+        {monthlyFee && monthlyFee > 0 && (
+          <span className="badge badge-gray" style={{ fontSize: '10px' }}>${monthlyFee}/mo</span>
+        )}
+        {modality && (
+          <span className="badge badge-gray" style={{ fontSize: '10px' }}>{modality}</span>
+        )}
+        {region && (
+          <span className="badge badge-gray" style={{ fontSize: '10px' }}>🌐 {region}</span>
+        )}
+      </div>
+
       {/* 설명 */}
-      {desc && (
+      {cleanDesc && (
         <div>
           <p style={{
-            fontSize: '12px',
-            color: '#999',
-            lineHeight: 1.6,
+            fontSize: '12px', color: '#999', lineHeight: 1.6,
             display: expanded ? 'block' : '-webkit-box',
             WebkitLineClamp: expanded ? undefined : 2,
             WebkitBoxOrient: 'vertical' as const,
             overflow: expanded ? 'visible' : 'hidden',
           }}>
-            {desc}
+            {cleanDesc}
           </p>
-          {desc.length > 60 && (
+          {cleanDesc.length > 60 && (
             <button
               onClick={() => setExpanded(!expanded)}
               style={{ fontSize: '11px', color: 'var(--accent-dim)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginTop: '2px' }}
@@ -100,14 +133,9 @@ export default function ProductCard({ product, isComparing, onCompare }: {
             rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
             style={{
-              flex: 1,
-              textAlign: 'center',
-              fontSize: '11px',
-              color: '#777',
-              padding: '6px 8px',
-              borderRadius: '6px',
-              border: '1px solid rgba(255,255,255,0.08)',
-              textDecoration: 'none',
+              flex: 1, textAlign: 'center', fontSize: '11px', color: '#777',
+              padding: '6px 8px', borderRadius: '6px',
+              border: '1px solid rgba(255,255,255,0.08)', textDecoration: 'none',
             }}
           >
             🔗 {tx('officialSite')}
@@ -116,14 +144,11 @@ export default function ProductCard({ product, isComparing, onCompare }: {
         <button
           onClick={() => onCompare(product)}
           style={{
-            fontSize: '11px',
-            padding: '6px 12px',
-            borderRadius: '6px',
+            fontSize: '11px', padding: '6px 12px', borderRadius: '6px',
             border: isComparing ? '1px solid #00ff88' : '1px solid rgba(255,255,255,0.08)',
             color: isComparing ? '#00ff88' : '#777',
             background: isComparing ? 'rgba(0,255,136,0.1)' : 'transparent',
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
+            cursor: 'pointer', whiteSpace: 'nowrap',
           }}
         >
           {isComparing ? tx('comparing') : tx('addCompare')}

@@ -40,7 +40,7 @@ export default function Home() {
       if (selectedSub)  countQ = countQ.eq('category_sub', selectedSub)
       if (searchQuery.trim()) {
         const q = `%${searchQuery.trim()}%`
-        countQ = countQ.or(`product_name.ilike.${q},manufacturer.ilike.${q},description.ilike.${q}`)
+        countQ = countQ.or(`product_name.ilike.${q},manufacturer.ilike.${q},description.ilike.${q},description_ko.ilike.${q}`)
       }
       const { count } = await countQ
       setFilteredCount(count || 0)
@@ -52,7 +52,7 @@ export default function Home() {
       if (selectedSub)  dataQ = dataQ.eq('category_sub', selectedSub)
       if (searchQuery.trim()) {
         const q = `%${searchQuery.trim()}%`
-        dataQ = dataQ.or(`product_name.ilike.${q},manufacturer.ilike.${q},description.ilike.${q}`)
+        dataQ = dataQ.or(`product_name.ilike.${q},manufacturer.ilike.${q},description.ilike.${q},description_ko.ilike.${q}`)
       }
       const { data, error } = await dataQ
       if (error) throw error
