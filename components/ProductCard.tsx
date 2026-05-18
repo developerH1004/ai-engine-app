@@ -205,7 +205,7 @@ export default function ProductCard({ product, isComparing, onCompare }: {
       {detailOpen && (
         <>
           <div style={{ ...dimStyle, zIndex: 400 }} onClick={() => setDetailOpen(false)} />
-          <div style={{ ...popupBase, zIndex: 401, border: '1px solid rgba(255,255,255,0.12)', ...detailStyle }}>
+          <div ref={el => { if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" }) }} style={{ ...popupBase, zIndex: 401, border: "1px solid rgba(255,255,255,0.12)", ...detailStyle }}>
             <button onClick={() => setDetailOpen(false)}
               style={{ position: 'absolute', top: '14px', right: '16px', background: 'none', border: 'none', color: '#555', fontSize: '22px', cursor: 'pointer' }}>×</button>
 
