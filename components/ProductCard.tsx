@@ -5,39 +5,30 @@ import { useLang } from '@/lib/LangContext'
 import { t } from '@/lib/i18n'
 import { GlossaryTerm } from '@/lib/glossaryData'
 import { parseTextWithGlossary } from '@/lib/useGlossary'
-import GlossaryModal from './GlossaryModal'
 
 /**
- * 팝업 위치 계산 — fixed 기준 (뷰포트 좌표)
- * anchorRect: 클릭한 요소의 getBoundingClientRect()
- * popupW / popupH: 팝업 예상 크기
+ * 팝업 위치 계산
+ * clientY/clientX: 마우스 클릭 좌표 (뷰포트 기준, 스크롤 무관)
  */
 function calcPopupPos(
-  anchorRect: DOMRect,
+  clientX: number,
+  clientY: number,
   popupW: number,
   popupH: number,
 ): React.CSSProperties {
   const vw = window.innerWidth
   const vh = window.innerHeight
-  const m  = 12  // 화면 가장자리 여백
+  const m  = 12
 
-  // ── 세로 ──
-  // 1순위: 앵커 바로 아래
-  // 2순위: 앵커 바로 위
-  // 3순위: 화면 안에 맞게 클램프
-  let top: number
-  if (anchorRect.bottom + popupH + m <= vh) {
-    top = anchorRect.bottom + m            // 아래
-  } else if (anchorRect.top - popupH - m >= 0) {
-    top = anchorRect.top - popupH - m     // 위
-  } else {
-    top = Math.max(m, Math.min(anchorRect.top, vh - popupH - m))
+  // 세로: 클릭 아래 → 공간 없으면 위
+  let top = clientY + 16
+  if (top + popupH > vh - m) {
+    top = clientY - popupH - 8
   }
   top = Math.max(m, Math.min(top, vh - popupH - m))
 
-  // ── 가로 ──
-  // 앵커 왼쪽 정렬 기준, 오른쪽 잘리면 오른쪽 맞춤
-  let left = anchorRect.left
+  // 가로: 클릭 왼쪽 정렬, 오른쪽 잘리면 조정
+  let left = clientX
   if (left + popupW + m > vw) {
     left = Math.max(m, vw - popupW - m)
   }
@@ -63,8 +54,6 @@ export default function ProductCard({ product, isComparing, onCompare }: {
   isComparing: boolean
   onCompare: (p: AIProduct) => void
 }) {
-  const cardRef = useRef<HTMLDivElement>(null)
-
   const [detailOpen,    setDetailOpen]    = useState(false)
   const [detailStyle,   setDetailStyle]   = useState<React.CSSProperties>({})
   const [glossaryTerm,  setGlossaryTerm]  = useState<GlossaryTerm | null>(null)
@@ -90,24 +79,22 @@ export default function ProductCard({ product, isComparing, onCompare }: {
   const hasSetup   = !!(product.install_type)
   const instStyle  = installBadgeStyle(product.install_type)
 
-  function openDetail() {
-    if (!cardRef.current) { setDetailOpen(true); return }
-    const rect = cardRef.current.getBoundingClientRect()
-    setDetailStyle(calcPopupPos(rect, 620, 560))
+  // 카드 클릭 → 마우스 좌표 기준 팝업
+  function openDetail(e: React.MouseEvent) {
+    setDetailStyle(calcPopupPos(e.clientX, e.clientY, 620, 560))
     setDetailOpen(true)
   }
 
+  // 용어 클릭 → 마우스 좌표 기준 팝업
   function openGlossary(term: GlossaryTerm, e: React.MouseEvent) {
     e.stopPropagation()
-    const rect = (e.target as HTMLElement).getBoundingClientRect()
-    setGlossaryStyle(calcPopupPos(rect, 480, 400))
+    setGlossaryStyle(calcPopupPos(e.clientX, e.clientY, 480, 400))
     setGlossaryTerm(term)
   }
 
   function renderLines(text: string | null | undefined) {
     if (!text) return null
-    const cleaned = text.replace(/\\n/g, '\n')
-    return cleaned.split('\n').map((line, i, arr) => (
+    return text.replace(/\\n/g, '\n').split('\n').map((line, i, arr) => (
       <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
     ))
   }
@@ -140,7 +127,6 @@ export default function ProductCard({ product, isComparing, onCompare }: {
     <>
       {/* ── 카드 ── */}
       <div
-        ref={cardRef}
         className="card p-4 flex flex-col gap-2"
         style={{ cursor: 'pointer', ...(isComparing ? { borderColor: 'var(--accent)', background: 'rgba(0,255,136,0.05)' } : {}) }}
         onClick={openDetail}
@@ -254,7 +240,6 @@ export default function ProductCard({ product, isComparing, onCompare }: {
               </div>
             )}
 
-            {/* ── 설치 가이드 섹션 ── */}
             {hasSetup && (
               <div style={{ border: '1px solid rgba(251,191,36,0.3)', borderRadius: '10px', padding: '14px', marginBottom: '16px', background: 'rgba(251,191,36,0.04)' }}>
                 <div style={{ fontSize: '12px', fontWeight: 800, color: '#fbbf24', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -265,25 +250,21 @@ export default function ProductCard({ product, isComparing, onCompare }: {
                     </span>
                   )}
                 </div>
-
                 {(product.sys_req_en || product.sys_req_kr) && (
                   <SetupBlock label={ko ? '시스템 요구사항' : 'System Requirements'}>
                     {ko ? (product.sys_req_kr || product.sys_req_en) : (product.sys_req_en || product.sys_req_kr)}
                   </SetupBlock>
                 )}
-
                 {(product.setup_guide_en || product.setup_guide_kr) && (
                   <SetupBlock label={ko ? '설치 가이드' : 'Setup Guide'} preWrap>
                     {renderLines(ko ? (product.setup_guide_kr || product.setup_guide_en) : (product.setup_guide_en || product.setup_guide_kr))}
                   </SetupBlock>
                 )}
-
                 {(product.env_config_en || product.env_config_kr) && (
                   <SetupBlock label={ko ? '환경 설정' : 'Environment Config'}>
                     {ko ? (product.env_config_kr || product.env_config_en) : (product.env_config_en || product.env_config_kr)}
                   </SetupBlock>
                 )}
-
                 {(product.expert_focus_en || product.expert_focus_kr) && (
                   <SetupBlock label={ko ? '전문가 활용 포인트' : 'Expert Focus'} accent>
                     {ko ? (product.expert_focus_kr || product.expert_focus_en) : (product.expert_focus_en || product.expert_focus_kr)}
@@ -333,14 +314,9 @@ export default function ProductCard({ product, isComparing, onCompare }: {
       {glossaryTerm && (
         <>
           <div style={{ ...dimStyle, zIndex: 500 }} onClick={() => setGlossaryTerm(null)} />
-          <div style={{
-            ...popupBase, zIndex: 501,
-            border: '1px solid rgba(0,255,136,0.2)',
-            ...glossaryStyle,
-          }}>
+          <div style={{ ...popupBase, zIndex: 501, border: '1px solid rgba(0,255,136,0.2)', ...glossaryStyle }}>
             <button onClick={() => setGlossaryTerm(null)}
               style={{ position: 'absolute', top: '12px', right: '14px', background: 'none', border: 'none', color: '#555', fontSize: '20px', cursor: 'pointer' }}>×</button>
-
             <div style={{ display: 'inline-block', marginBottom: '10px', padding: '2px 8px', borderRadius: '4px', background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.2)', fontSize: '10px', fontFamily: 'monospace', color: '#00ff88' }}>
               📖 {ko ? 'AI 용어 해설' : 'AI Glossary'} · {glossaryTerm.id}
             </div>
@@ -376,10 +352,9 @@ function SetupBlock({ label, children, preWrap, accent }: {
       <div style={{
         fontSize: '12px', color: '#aaa', lineHeight: 1.65,
         background: accent ? 'transparent' : 'rgba(0,0,0,0.3)',
-        borderRadius: '6px', padding: '9px',
+        borderRadius: '6px', padding: accent ? '0 0 0 10px' : '9px',
         whiteSpace: preWrap ? 'pre-wrap' : 'normal',
         borderLeft: accent ? '2px solid rgba(251,191,36,0.5)' : 'none',
-        paddingLeft: accent ? '10px' : '9px',
       }}>
         {children}
       </div>
