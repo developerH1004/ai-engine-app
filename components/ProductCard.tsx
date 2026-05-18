@@ -31,10 +31,9 @@ function calcPopupPos(
 
 function calcPopupPosFromRect(rect: DOMRect, popupW: number): React.CSSProperties {
   const vw = window.innerWidth
-  const m = 12
-  let left = rect.left
-  if (left + popupW + m > vw) left = Math.max(m, vw - popupW - m)
-  return { position: "fixed", top: rect.top, left, width: popupW }
+  // 가로: 화면 중앙 고정
+  const left = Math.max(12, (vw - popupW) / 2)
+  return { position: 'fixed', top: rect.top, left, width: popupW }
 }
 
 function installBadgeStyle(type: string | null) {
@@ -205,7 +204,7 @@ export default function ProductCard({ product, isComparing, onCompare }: {
       {detailOpen && (
         <>
           <div style={{ ...dimStyle, zIndex: 400 }} onClick={() => setDetailOpen(false)} />
-          <div ref={el => { if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" }) }} style={{ ...popupBase, zIndex: 401, border: "1px solid rgba(255,255,255,0.12)", ...detailStyle }}>
+          <div ref={el => { if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }) }} style={{ ...popupBase, zIndex: 401, border: "1px solid rgba(255,255,255,0.12)", ...detailStyle }}>
             <button onClick={() => setDetailOpen(false)}
               style={{ position: 'absolute', top: '14px', right: '16px', background: 'none', border: 'none', color: '#555', fontSize: '22px', cursor: 'pointer' }}>×</button>
 
