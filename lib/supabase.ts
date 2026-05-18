@@ -7,56 +7,53 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 
 export type AIProduct = {
   id: number
-
-  // 영문 분류
   category_main: string
   category_sub:  string
-
-  // 기본
   country:      string
   manufacturer: string
   product_name: string
-
-  // 서비스
   service_type:    string
   parent_platform: string
   base_model:      string
   product_family:  string
   modality:        string
   service_region:  string
-
-  // 설명
-  description:  string   // Expert_Analysis (영문)
+  description:  string
   official_url: string
-
-  // 요금
-  verification_status:  string
-  pricing_type:         string
-  subscription_plan:    string
-  monthly_fee_usd:      number
-  api_pricing:          string
+  verification_status:   string
+  pricing_type:          string
+  subscription_plan:     string
+  monthly_fee_usd:       number
+  api_pricing:           string
   service_accessibility: string
-
-  // 한글 필드
   category_main_ko:  string
   category_sub_ko:   string
   country_ko:        string
   service_type_ko:   string
   modality_ko:       string
   service_region_ko: string
-  description_ko:    string   // 한글 전문가 분析
+  description_ko:    string
   verification_ko:   string
   pricing_type_ko:   string
   subscription_ko:   string
   api_pricing_ko:    string
   accessibility_ko:  string
-
-  // 메타
   is_research_model: boolean
   created_at:        string
   updated_at:        string
 
-  // 조인
+  // ── Setup / Install 필드 (v4 신규) ──
+  install_type:      string | null   // "SaaS (Web-Based)", "Local Native (On-Premise)", etc.
+  sys_req_en:        string | null
+  sys_req_kr:        string | null
+  setup_guide_en:    string | null
+  setup_guide_kr:    string | null
+  env_config_en:     string | null
+  env_config_kr:     string | null
+  expert_focus_en:   string | null
+  expert_focus_kr:   string | null
+  has_prompt_book:   boolean | null
+
   versions?: AIVersion[]
 }
 
