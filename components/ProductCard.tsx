@@ -29,26 +29,12 @@ function calcPopupPos(
   return { position: 'fixed', top, left, width: popupW }
 }
 
-function calcPopupPosFromRect(
-  rect: DOMRect,
-  popupW: number,
-  popupH: number,
-): React.CSSProperties {
+function calcPopupPosFromRect(rect: DOMRect, popupW: number): React.CSSProperties {
   const vw = window.innerWidth
-  const vh = window.innerHeight
   const m = 12
-
-  // 세로: 카드 바로 아래 → 공간 없으면 카드 위
-  let top = rect.bottom + 8
-  if (top + popupH > vh - m) top = Math.max(m, rect.top - popupH - 8)
-  top = Math.max(m, Math.min(top, vh - popupH - m))
-
-  // 가로: 카드 왼쪽 정렬 → 오른쪽 잘리면 조정
   let left = rect.left
   if (left + popupW + m > vw) left = Math.max(m, vw - popupW - m)
-  left = Math.max(m, left)
-
-  return { position: 'fixed', top, left, width: popupW }
+  return { position: "fixed", top: rect.top, left, width: popupW }
 }
 
 function installBadgeStyle(type: string | null) {
@@ -140,7 +126,7 @@ export default function ProductCard({ product, isComparing, onCompare }: {
         onClick={() => {
           const rect = cardRef.current?.getBoundingClientRect()
           if (rect) {
-            setDetailStyle(calcPopupPosFromRect(rect, 620, 560))
+            setDetailStyle(calcPopupPosFromRect(rect, 620))
           }
           setDetailOpen(true)
         }}
