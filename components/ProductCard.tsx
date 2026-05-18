@@ -6,10 +6,6 @@ import { t } from '@/lib/i18n'
 import { GlossaryTerm } from '@/lib/glossaryData'
 import { parseTextWithGlossary } from '@/lib/useGlossary'
 
-/**
- * 팝업 위치 계산
- * clientY/clientX: 마우스 클릭 좌표 (뷰포트 기준, 스크롤 무관)
- */
 function calcPopupPos(
   clientX: number,
   clientY: number,
@@ -18,20 +14,38 @@ function calcPopupPos(
 ): React.CSSProperties {
   const vw = window.innerWidth
   const vh = window.innerHeight
-  const m  = 12
+  const m = 12
 
   // 세로: 클릭 아래 → 공간 없으면 위
   let top = clientY + 16
-  if (top + popupH > vh - m) {
-    top = clientY - popupH - 8
-  }
+  if (top + popupH > vh - m) top = Math.max(m, clientY - popupH - 8)
   top = Math.max(m, Math.min(top, vh - popupH - m))
 
   // 가로: 클릭 왼쪽 정렬, 오른쪽 잘리면 조정
   let left = clientX
-  if (left + popupW + m > vw) {
-    left = Math.max(m, vw - popupW - m)
-  }
+  if (left + popupW + m > vw) left = Math.max(m, vw - popupW - m)
+  left = Math.max(m, left)
+
+  return { position: 'fixed', top, left, width: popupW }
+}
+
+function calcPopupPosFromRect(
+  rect: DOMRect,
+  popupW: number,
+  popupH: number,
+): React.CSSProperties {
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  const m = 12
+
+  // 세로: 카드 바로 아래 → 공간 없으면 카드 위
+  let top = rect.bottom + 8
+  if (top + popupH > vh - m) top = Math.max(m, rect.top - popupH - 8)
+  top = Math.max(m, Math.min(top, vh - popupH - m))
+
+  // 가로: 카드 왼쪽 정렬 → 오른쪽 잘리면 조정
+  let left = rect.left
+  if (left + popupW + m > vw) left = Math.max(m, vw - popupW - m)
   left = Math.max(m, left)
 
   return { position: 'fixed', top, left, width: popupW }
@@ -54,6 +68,8 @@ export default function ProductCard({ product, isComparing, onCompare }: {
   isComparing: boolean
   onCompare: (p: AIProduct) => void
 }) {
+  const cardRef = useRef<HTMLDivElement>(null)
+
   const [detailOpen,    setDetailOpen]    = useState(false)
   const [detailStyle,   setDetailStyle]   = useState<React.CSSProperties>({})
   const [glossaryTerm,  setGlossaryTerm]  = useState<GlossaryTerm | null>(null)
@@ -79,19 +95,6 @@ export default function ProductCard({ product, isComparing, onCompare }: {
   const hasSetup   = !!(product.install_type)
   const instStyle  = installBadgeStyle(product.install_type)
 
-  // 카드 클릭 → 마우스 좌표 기준 팝업
-  function openDetail(e: React.MouseEvent) {
-    setDetailStyle(calcPopupPos(e.clientX, e.clientY, 620, 560))
-    setDetailOpen(true)
-  }
-
-  // 용어 클릭 → 마우스 좌표 기준 팝업
-  function openGlossary(term: GlossaryTerm, e: React.MouseEvent) {
-    e.stopPropagation()
-    setGlossaryStyle(calcPopupPos(e.clientX, e.clientY, 480, 400))
-    setGlossaryTerm(term)
-  }
-
   function renderLines(text: string | null | undefined) {
     if (!text) return null
     return text.replace(/\\n/g, '\n').split('\n').map((line, i, arr) => (
@@ -106,7 +109,11 @@ export default function ProductCard({ product, isComparing, onCompare }: {
       ) : (
         <span
           key={i}
-          onMouseDown={e => openGlossary(seg.term, e as React.MouseEvent)}
+          onMouseDown={e => {
+            e.stopPropagation()
+            setGlossaryStyle(calcPopupPos(e.clientX, e.clientY, 480, 400))
+            setGlossaryTerm(seg.term)
+          }}
           title={ko ? seg.term.kr : seg.term.en}
           style={{ color: '#3b82f6', textDecoration: 'underline', textDecorationStyle: 'dotted', cursor: 'pointer', fontWeight: 500 }}
         >
@@ -127,9 +134,16 @@ export default function ProductCard({ product, isComparing, onCompare }: {
     <>
       {/* ── 카드 ── */}
       <div
+        ref={cardRef}
         className="card p-4 flex flex-col gap-2"
         style={{ cursor: 'pointer', ...(isComparing ? { borderColor: 'var(--accent)', background: 'rgba(0,255,136,0.05)' } : {}) }}
-        onClick={openDetail}
+        onClick={() => {
+          const rect = cardRef.current?.getBoundingClientRect()
+          if (rect) {
+            setDetailStyle(calcPopupPosFromRect(rect, 620, 560))
+          }
+          setDetailOpen(true)
+        }}
       >
         <div className="flex items-start justify-between gap-2">
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -181,8 +195,8 @@ export default function ProductCard({ product, isComparing, onCompare }: {
 
         <div
           style={{ display: 'flex', gap: '8px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.05)', marginTop: 'auto' }}
-          onClick={e => e.stopPropagation()}
-        >
+          onMouseDown={e => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}        >
           {product.official_url && (
             <a href={product.official_url} target="_blank" rel="noopener noreferrer"
               style={{ flex: 1, textAlign: 'center', fontSize: '11px', color: '#777', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', textDecoration: 'none' }}>
