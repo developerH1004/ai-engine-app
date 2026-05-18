@@ -315,11 +315,21 @@ export default function ProductCard({ product, isComparing, onCompare }: {
         </>
       )}
 
-      {/* ── 용어 해설 팝업 ── */}
+      {/* ── 용어 해설 팝업 (첫번째 팝업 위에 표시) ── */}
       {glossaryTerm && (
         <>
           <div style={{ ...dimStyle, zIndex: 500 }} onClick={() => setGlossaryTerm(null)} />
-          <div style={{ ...popupBase, zIndex: 501, border: '1px solid rgba(0,255,136,0.2)', ...glossaryStyle }}>
+          <div
+            ref={el => { if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }) }}
+            style={{
+              ...popupBase, zIndex: 501,
+              border: '1px solid rgba(0,255,136,0.3)',
+              position: 'fixed',
+              top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '480px',
+              maxHeight: '70vh',
+            }}>
             <button onClick={() => setGlossaryTerm(null)}
               style={{ position: 'absolute', top: '12px', right: '14px', background: 'none', border: 'none', color: '#555', fontSize: '20px', cursor: 'pointer' }}>×</button>
             <div style={{ display: 'inline-block', marginBottom: '10px', padding: '2px 8px', borderRadius: '4px', background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.2)', fontSize: '10px', fontFamily: 'monospace', color: '#00ff88' }}>
