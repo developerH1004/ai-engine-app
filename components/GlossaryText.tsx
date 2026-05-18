@@ -1,6 +1,4 @@
 // components/GlossaryText.tsx
-// 텍스트에서 용어를 자동 감지해 파란 링크로 렌더링
-
 'use client'
 import { parseTextWithGlossary } from '@/lib/useGlossary'
 import { GlossaryTerm } from '@/lib/glossaryData'
@@ -16,7 +14,7 @@ export default function GlossaryText({
   style?: React.CSSProperties
 }) {
   const { lang } = useLang()
-  const segments = parseTextWithGlossary(text, lang as 'ko' | 'en')
+  const segments = parseTextWithGlossary(text)  // v2: 인자 1개
 
   return (
     <span style={style}>
