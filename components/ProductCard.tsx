@@ -176,6 +176,17 @@ export default function ProductCard({ product, isComparing, onCompare }: {
         }}
       >
         <div className="flex items-start justify-between gap-2">
+          {/* 제조사 이니셜 아이콘 */}
+          <div style={{
+            width: '36px', height: '36px', borderRadius: '8px', flexShrink: 0,
+            background: `linear-gradient(135deg, rgba(0,255,136,0.15), rgba(0,200,100,0.05))`,
+            border: '1px solid rgba(0,255,136,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '13px', fontWeight: 800, color: 'var(--accent)',
+            fontFamily: 'JetBrains Mono, monospace', letterSpacing: '-0.5px',
+          }}>
+            {(product.manufacturer || '?').substring(0, 2).toUpperCase()}
+          </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <h3 style={{ fontWeight: 700, color: '#fff', fontSize: '13px', lineHeight: 1.3 }}>{product.product_name}</h3>
             <p style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>
@@ -414,7 +425,28 @@ export default function ProductCard({ product, isComparing, onCompare }: {
               </div>
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <button
-                  onClick={() => window.print()}
+                  onClick={() => {
+                    // 흰 배경 인쇄용 스타일 적용
+                    const style = document.createElement('style')
+                    style.id = 'print-style'
+                    style.innerHTML = `
+                      @media print {
+                        body * { visibility: hidden !important; }
+                        #prompt-print-area, #prompt-print-area * { visibility: visible !important; }
+                        #prompt-print-area {
+                          position: fixed !important; inset: 0 !important;
+                          background: #fff !important; color: #000 !important;
+                          padding: 24px !important; font-size: 13px !important;
+                          line-height: 1.7 !important; font-family: 'Noto Sans KR', sans-serif !important;
+                        }
+                        #prompt-print-area * { background: transparent !important; color: #111 !important; border: none !important; }
+                        #prompt-print-area .no-print { display: none !important; }
+                      }
+                    `
+                    document.head.appendChild(style)
+                    window.print()
+                    setTimeout(() => document.getElementById('print-style')?.remove(), 1000)
+                  }}
                   style={{
                     padding: '6px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700,
                     border: '1px solid rgba(0,255,136,0.3)', color: '#00cc6a',
@@ -431,7 +463,7 @@ export default function ProductCard({ product, isComparing, onCompare }: {
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', marginBottom: '14px' }} />
 
             {/* 프롬프트 목록 */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div id="prompt-print-area" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {activePrompt.items.map((p: any, i: number) => (
                 <div key={p.prompt_id} style={{
                   background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '14px',

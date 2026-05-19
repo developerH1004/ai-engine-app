@@ -182,8 +182,16 @@ export default function Home() {
 
       <main className="max-w-screen-xl mx-auto px-4 pb-20">
         {/* ── 히어로 (새 타이틀) ── */}
-        <section className="py-10 text-center">
-          <p className="font-mono text-xs text-green-400 tracking-widest mb-3 pulse">
+        <section className="py-10 text-center" style={{ position: 'relative', overflow: 'hidden' }}>
+          {/* 배경 글로우 효과 */}
+          <div style={{
+            position: 'absolute', top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '600px', height: '300px',
+            background: 'radial-gradient(ellipse, rgba(0,255,136,0.06) 0%, transparent 70%)',
+            pointerEvents: 'none', zIndex: 0,
+          }} />
+          <p className="font-mono text-xs text-green-400 tracking-widest mb-3 pulse" style={{ position: 'relative', zIndex: 1 }}>
             {tx('liveUpdate')}
           </p>
 
@@ -194,7 +202,7 @@ export default function Home() {
                 AI 지도 완전판
               </p>
               <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-2">
-                이거봐!!!
+                이거봐!!! <span style={{ color: '#666', fontSize: '0.5em', fontFamily: 'Noto Sans KR, sans-serif' }}>(Wait!)</span>
               </h1>
               <h2 className="font-display text-4xl md:text-5xl glow-text mb-4" style={{ color: 'var(--accent)' }}>
                 AI가 다 모였어
@@ -207,7 +215,7 @@ export default function Home() {
                 The Complete AI Atlas
               </p>
               <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-1">
-                Wait!
+                Wait! <span style={{ color: 'var(--accent)', fontSize: '0.6em', fontFamily: 'Noto Sans KR, sans-serif' }}>(이거봐!!!)</span>
               </h1>
               <h2 className="font-display text-4xl md:text-5xl glow-text mb-1" style={{ color: 'var(--accent)' }}>
                 They&apos;re ALL Here?!
