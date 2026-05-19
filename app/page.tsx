@@ -197,32 +197,23 @@ export default function Home() {
 
           {ko ? (
             /* 한국어 타이틀 */
-            <div>
-              <p style={{ fontSize: '14px', color: '#666', fontFamily: 'monospace', marginBottom: '2px', textAlign: 'left', maxWidth: '480px', margin: '0 auto 2px' }}>
+            <div style={{ display: 'inline-block', textAlign: 'left' }}>
+              <p style={{ fontSize: '13px', color: '#666', fontFamily: 'monospace', marginBottom: '0', lineHeight: 1 }}>
                 AI 지도 완전판
               </p>
-              <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-2">
-                이거봐!!! <span style={{ color: '#666', fontSize: '0.5em', fontFamily: 'Noto Sans KR, sans-serif' }}>(Wait!)</span>
+              <h1 className="font-display text-6xl md:text-7xl text-white leading-none">
+                이거봐!!! <span style={{ color: 'var(--accent)' }}>AI가 다 모였어</span>
               </h1>
-              <h2 className="font-display text-4xl md:text-5xl glow-text mb-4" style={{ color: 'var(--accent)' }}>
-                AI가 다 모였어
-              </h2>
             </div>
           ) : (
             /* 영문 타이틀 */
-            <div>
-              <p style={{ fontSize: '14px', color: '#666', fontFamily: 'monospace', marginBottom: '2px', textAlign: 'left', maxWidth: '560px', margin: '0 auto 2px' }}>
+            <div style={{ display: 'inline-block', textAlign: 'left' }}>
+              <p style={{ fontSize: '13px', color: '#666', fontFamily: 'monospace', marginBottom: '0', lineHeight: 1 }}>
                 The Complete AI Atlas
               </p>
-              <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-1">
-                Wait! <span style={{ color: 'var(--accent)', fontSize: '0.6em', fontFamily: 'Noto Sans KR, sans-serif' }}>(이거봐!!!)</span>
+              <h1 className="font-display text-6xl md:text-7xl text-white leading-none">
+                WAIT, <span style={{ color: 'var(--accent)' }}>THEY&apos;RE ALL HERE?!</span>
               </h1>
-              <h2 className="font-display text-4xl md:text-5xl glow-text mb-1" style={{ color: 'var(--accent)' }}>
-                They&apos;re ALL Here?!
-              </h2>
-              <p style={{ fontSize: '16px', color: '#666', fontFamily: 'monospace', marginBottom: '16px', textAlign: 'right', maxWidth: '560px', margin: '0 auto 16px' }}>
-                - Your Complete Guide to AIs
-              </p>
             </div>
           )}
 
