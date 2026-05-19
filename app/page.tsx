@@ -182,7 +182,7 @@ export default function Home() {
 
       <main className="max-w-screen-xl mx-auto px-4 pb-20">
         {/* ── 히어로 (새 타이틀) ── */}
-        <section className="py-10 text-center" style={{ position: 'relative', overflow: 'hidden' }}>
+        <section style={{ padding: "16px 0 12px", textAlign: "center", position: "relative", overflow: "hidden" }}>
           {/* 배경 글로우 효과 */}
           <div style={{
             position: 'absolute', top: '50%', left: '50%',
@@ -198,35 +198,35 @@ export default function Home() {
           {ko ? (
             /* 한국어 타이틀 */
             <div style={{ display: 'inline-block', textAlign: 'left' }}>
-              <p style={{ fontSize: '13px', color: '#666', fontFamily: 'monospace', marginBottom: '2px', lineHeight: 1 }}>
+              <p style={{ fontSize: '11px', color: 'rgba(230,237,243,0.5)', fontFamily: 'monospace', marginBottom: '2px', lineHeight: 1, letterSpacing: '0.08em' }}>
                 AI 지도 완전판
               </p>
-              <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(48px, 7vw, 80px)', color: '#ffffff', lineHeight: 1, marginBottom: '16px', letterSpacing: '1px' }}>
+              <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(28px, 3.2vw, 40px)', color: '#e6edf3', lineHeight: 1.1, marginBottom: '10px', letterSpacing: '1.5px' }}>
                 이거봐!!! AI가 다 모였어
               </h1>
             </div>
           ) : (
             /* 영문 타이틀 */
             <div style={{ display: 'inline-block', textAlign: 'left' }}>
-              <p style={{ fontSize: '13px', color: '#666', fontFamily: 'monospace', marginBottom: '2px', lineHeight: 1 }}>
+              <p style={{ fontSize: '11px', color: 'rgba(230,237,243,0.5)', fontFamily: 'monospace', marginBottom: '2px', lineHeight: 1, letterSpacing: '0.08em' }}>
                 The Complete AI Atlas
               </p>
-              <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(48px, 7vw, 80px)', color: '#ffffff', lineHeight: 1, marginBottom: '16px', letterSpacing: '1px' }}>
+              <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(28px, 3.2vw, 40px)', color: '#e6edf3', lineHeight: 1.1, marginBottom: '10px', letterSpacing: '1.5px' }}>
                 WAIT, THEY&apos;RE ALL HERE?!
               </h1>
             </div>
           )}
 
-          <p className="text-gray-400 text-base max-w-xl mx-auto leading-relaxed mb-6" style={{ whiteSpace: 'pre-line' }}>
+          <p style={{ color: "#6e7681", fontSize: "12px", maxWidth: "520px", margin: "0 auto 10px", lineHeight: 1.6 }} style={{ whiteSpace: 'pre-line' }}>
             {tx('heroDesc')}
           </p>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
-              padding: '8px 24px', borderRadius: '99px',
-              background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.2)',
+              padding: '5px 16px', borderRadius: '99px',
+              background: 'rgba(0,255,136,0.07)', border: '1px solid rgba(0,255,136,0.15)',
             }}>
-              <span className="font-display" style={{ color: 'var(--accent)', fontSize: '28px', lineHeight: 1 }}>
+              <span className="font-display" style={{ color: 'var(--accent)', fontSize: '20px', lineHeight: 1 }}>
                 {displayCount.toLocaleString()}
               </span>
               <span className="font-mono" style={{ color: '#888', fontSize: '13px' }}>
