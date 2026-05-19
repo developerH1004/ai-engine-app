@@ -261,7 +261,7 @@ export default function ProductCard({ product, isComparing, onCompare }: {
         <>
           <div style={{ ...dimStyle, zIndex: 400 }} onClick={() => setDetailOpen(false)} />
           <div ref={el => { if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }) }}
-            style={{ ...popupBase, zIndex: 401, border: '1px solid rgba(255,255,255,0.12)', ...detailStyle }}>
+            style={{ ...popupBase, zIndex: 401, border: '1px solid rgba(255,255,255,0.12)', maxWidth: 'calc(100vw - 24px)', ...detailStyle }}>
             <button onClick={() => setDetailOpen(false)}
               style={{ position: 'absolute', top: '14px', right: '16px', background: 'none', border: 'none', color: '#555', fontSize: '22px', cursor: 'pointer' }}>×</button>
 
@@ -376,7 +376,7 @@ export default function ProductCard({ product, isComparing, onCompare }: {
                         onClick={e => {
                           e.stopPropagation()
                           const rect = (e.target as HTMLElement).getBoundingClientRect()
-                          setPromptStyle({ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: Math.min(680, window.innerWidth - 24) })
+                          setPromptStyle({ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: Math.min(680, window.innerWidth - 24), maxWidth: 'calc(100vw - 24px)' })
                           setActivePrompt({ type, items, meta })
                           setPromptOpen(true)
                         }}
@@ -410,6 +410,7 @@ export default function ProductCard({ product, isComparing, onCompare }: {
               border: `1px solid ${activePrompt.meta.color}44`,
               maxHeight: '82vh',
               ...promptStyle,
+              width: promptStyle.width ? `min(${promptStyle.width}px, calc(100vw - 24px))` : 'calc(100vw - 24px)',
             }}
           >
             {/* 헤더 */}
