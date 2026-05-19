@@ -30,39 +30,62 @@ export default function Home() {
   const [filteredCount, setFilteredCount] = useState(0)
   const [page, setPage]                   = useState(0)
   const [pageSize, setPageSize]           = useState(DEFAULT_PAGE_SIZE)
-  const [isFiltered, setIsFiltered]       = useState(false)
+
+  useEffect(() => {
+    supabase.from('ai_products').select('id', { count: 'exact', head: true })
+      .then(({ count }) => setTotalCount(count || 0))
+  }, [])
+
+  function buildOrQuery(terms: string[]) {
+    return terms.flatMap(term => {
+      const q = `%${term}%`
+      return [
+        `product_name.ilike.${q}`,
+        `manufacturer.ilike.${q}`,
+        `description.ilike.${q}`,
+        `description_ko.ilike.${q}`,
+        `category_main.ilike.${q}`,
+        `category_sub.ilike.${q}`,
+      ]
+    }).join(',')
+  }
 
   const fetchProducts = useCallback(async () => {
     setLoading(true)
     try {
-      let query = supabase
-        .from('ai_products')
-        .select('*', { count: 'exact' })
+      const terms = searchQuery.trim() ? expandSearchTerms(searchQuery) : []
+      const orStr = terms.length ? buildOrQuery(terms) : ''
 
-      if (selectedMain) query = query.eq('category_main', selectedMain)
-      if (selectedSub) query = query.eq('category_sub', selectedSub)
+      let countQ = supabase.from('ai_products').select('id', { count: 'exact', head: true })
+      if (selectedMain) countQ = countQ.eq('category_main', selectedMain)
+      if (selectedSub)  countQ = countQ.eq('category_sub', selectedSub)
+      if (orStr)        countQ = countQ.or(orStr)
+      const { count } = await countQ
+      setFilteredCount(count || 0)
 
-      if (searchQuery.trim()) {
-        const terms = expandSearchTerms(searchQuery.trim())
-        const orConditions = terms.map(term => 
-          `name.ilike.%${term}%,manufacturer.ilike.%${term}%,description_kr.ilike.%${term}%,description_en.ilike.%${term}%`
-        ).join(',')
-        query = query.or(orConditions)
-      }
-
-      const { data, count, error } = await query
-        .order('name', { ascending: true })
+      let dataQ = supabase.from('ai_products').select('*')
+        .order('category_main').order('product_name')
         .range(page * pageSize, (page + 1) * pageSize - 1)
+      if (selectedMain) dataQ = dataQ.eq('category_main', selectedMain)
+      if (selectedSub)  dataQ = dataQ.eq('category_sub', selectedSub)
+      if (orStr)        dataQ = dataQ.or(orStr)
 
+      const { data, error } = await dataQ
       if (error) throw error
 
-      setProducts(data || [])
-      if (count !== null) {
-        setFilteredCount(count)
-        setIsFiltered(!!(selectedMain || selectedSub || searchQuery.trim()))
+      if (data && data.length > 0) {
+        const ids = data.map((p: any) => p.id)
+        const { data: versions } = await supabase
+          .from('ai_versions').select('*').in('product_id', ids).order('sort_order')
+        setProducts(data.map((p: any) => ({
+          ...p,
+          versions: versions?.filter((v: any) => v.product_id === p.id) || []
+        })))
+      } else {
+        setProducts([])
       }
-    } catch (err) {
-      console.error(err)
+    } catch (e) {
+      console.error(e)
     } finally {
       setLoading(false)
     }
@@ -70,56 +93,92 @@ export default function Home() {
 
   useEffect(() => { fetchProducts() }, [fetchProducts])
 
-  const handleToggleCompare = (product: AIProduct) => {
+  function handleSearch(val: string) { setSearchQuery(val); setPage(0) }
+  function handleCategory(main: string, sub: string) {
+    setSelectedMain(main); setSelectedSub(sub); setPage(0); setSearchQuery('')
+  }
+  function handlePageSize(n: number) { setPageSize(n); setPage(0) }
+
+  function toggleCompare(product: AIProduct) {
     setCompareList(prev => {
       if (prev.find(p => p.id === product.id)) return prev.filter(p => p.id !== product.id)
-      if (prev.length >= MAX_COMPARE) { alert(tx('compareLimitAlert')); return prev }
+      if (prev.length >= MAX_COMPARE) { alert(tx('compareMax')); return prev }
       return [...prev, product]
     })
   }
+  function resetCompare() { setCompareList([]); setShowCompare(false) }
+
+  const isFiltered = !!(selectedMain || selectedSub || searchQuery)
+  const displayCount = isFiltered ? filteredCount : totalCount
+  const displayLabel = searchQuery
+    ? `"${searchQuery}"`
+    : selectedSub  ? selectedSub.replace(/^\d+-\d+\.\s/, '')
+    : selectedMain ? selectedMain.replace(/^\d+\.\s/, '')
+    : tx('allCategory')
+
+  const expandedTerms = searchQuery ? expandSearchTerms(searchQuery).filter(t => t !== searchQuery.toLowerCase()) : []
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--background)', color: '#fff' }}>
+    <div className="min-h-screen grid-bg">
+      <div style={{ background: 'rgba(0,255,136,0.06)', borderBottom: '1px solid rgba(0,255,136,0.15)', padding: '5px 16px', textAlign: 'center' }}>
+        <a href="https://zenodo.org/records/20248631" target="_blank" rel="noopener noreferrer" style={{ fontSize: '11px', color: '#00cc6a', fontFamily: 'monospace', textDecoration: 'none' }}>
+          📄 GAIT 69: Global AI Index Taxonomy &nbsp;·&nbsp; DOI: 10.5281/zenodo.20248631 &nbsp;·&nbsp; Author: DO HUN, KIM
+        </a>
+      </div>
+
       <Header />
-      <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '20px' }}>
-        <div style={{ textAlign: 'center', margin: '40px 0' }}>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '10px', color: 'var(--accent)' }}>GAIT 69 Master Database</h1>
-          <p style={{ fontSize: '1rem', color: '#8b949e', maxWidth: '600px', margin: '0 auto 10px', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
-            {tx('subTitleDescription')}
-          </p>
+
+      {compareList.length > 0 && (
+        <div style={{ position: 'sticky', top: '56px', zIndex: 39, background: 'rgba(0,20,10,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(0,255,136,0.3)', padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '12px', color: '#00ff88', fontFamily: 'monospace' }}>{tx('compareSelected')}</span>
+            {compareList.map(p => (
+              <span key={p.id} style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '99px', background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)', color: '#00ff88', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                {p.product_name}
+                <button onClick={() => toggleCompare(p)} style={{ background: 'none', border: 'none', color: '#00cc6a', cursor: 'pointer', padding: 0, fontSize: '11px' }}>✕</button>
+              </span>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => setShowCompare(true)} className="btn-primary" style={{ padding: '6px 16px', fontSize: '12px' }}>{tx('compareBtn')} ({compareList.length})</button>
+            <button onClick={resetCompare} className="btn-ghost" style={{ padding: '6px 12px', fontSize: '12px' }}>{tx('compareReset')}</button>
+          </div>
+        </div>
+      )}
+
+      <main className="max-w-screen-xl mx-auto px-4 pb-20">
+        <section style={{ padding: "16px 0 12px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '600px', height: '300px', background: 'radial-gradient(ellipse, rgba(0,255,136,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
+          <p className="font-mono text-xs text-green-400 tracking-widest mb-3 pulse" style={{ position: 'relative', zIndex: 1 }}>{tx('liveUpdate')}</p>
+          <div style={{ display: 'inline-block', textAlign: 'left' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(230,237,243,0.5)', fontFamily: 'monospace', marginBottom: '2px', lineHeight: 1, letterSpacing: '0.08em' }}>{ko ? 'AI 지도 완전판' : 'The Complete AI Atlas'}</p>
+            <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(28px, 3.2vw, 40px)', color: '#e6edf3', lineHeight: 1.1, marginBottom: '10px', letterSpacing: '1.5px' }}>{ko ? '이거봐!!! AI가 다 모였어' : 'WAIT, THEY ARE ALL HERE?!'}</h1>
+          </div>
+          <p style={{ color: "#6e7681", fontSize: "12px", maxWidth: "520px", margin: "0 auto 10px", lineHeight: 1.6, whiteSpace: 'pre-line' }}>{tx('heroDesc')}</p>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '5px 16px', borderRadius: '99px', background: 'rgba(0,255,136,0.07)', border: '1px solid rgba(0,255,136,0.15)' }}>
+              <span className="font-display" style={{ color: 'var(--accent)', fontSize: '20px', lineHeight: 1 }}>{displayCount.toLocaleString()}</span>
+              <span className="font-mono" style={{ color: '#888', fontSize: '13px' }}>{displayLabel} · {isFiltered ? tx('searchResult') : tx('totalRegistered')}</span>
+            </div>
+          </div>
+        </section>
+
+        <div className="mb-2">
+          <SearchBar value={searchQuery} onChange={handleSearch} placeholder={tx('searchPlaceholder')} />
         </div>
 
-        <SearchBar value={searchQuery} onChange={v => { setSearchQuery(v); setPage(0); }} placeholder={tx('searchPlaceholder')} />
-
-        <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '30px', alignItems: 'start', marginTop: '24px' }}>
-          <aside style={{ position: 'sticky', top: '80px' }}>
-            <CategoryNav selectedMain={selectedMain} selectedSub={selectedSub} onSelect={(m, s) => { setSelectedMain(m); setSelectedSub(s); setPage(0); }} />
-          </aside>
-
-          <section>
-            {loading ? <div>{tx('loading')}</div> : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-                {products.map(product => (
-                  <ProductCard 
-                    key={product.id} 
-                    product={product} 
-                    onCompare={handleToggleCompare} 
-                    isComparing={!!compareList.find(p => p.id === product.id)}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
+        <div className="mb-6">
+          <CategoryNav selectedMain={selectedMain} selectedSub={selectedSub} onSelect={handleCategory} />
         </div>
 
-        {compareList.length > 0 && (
-          <button onClick={() => setShowCompare(true)} style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 50, padding: '12px 24px', borderRadius: '30px' }} className="btn-primary">
-            🔄 {tx('compareLabel')} ({compareList.length})
-          </button>
-        )}
-
-        {showCompare && <ComparePanel products={compareList} onClose={() => setShowCompare(false)} />}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
+          {products.map(p => (
+            <ProductCard key={p.id} product={p} isComparing={!!compareList.find(c => c.id === p.id)} onCompare={toggleCompare} />
+          ))}
+        </div>
       </main>
+      
+      {showCompare && <ComparePanel products={compareList} onClose={() => setShowCompare(false)} />}
     </div>
   )
 }
