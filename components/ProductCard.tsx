@@ -490,7 +490,7 @@ export default function ProductCard({ product, isComparing, onCompare }: {
         </>
       )}
 
-      {/* ── 용어 해설 팝업 (첫번째 팝업 위에 표시) ── */}}
+      {/* ── 용어 해설 팝업 (첫번째 팝업 위에 표시) ── */}
       {glossaryTerm && (
         <>
           <div style={{ ...dimStyle, zIndex: 500 }} onClick={() => setGlossaryTerm(null)} />
