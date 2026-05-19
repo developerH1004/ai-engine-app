@@ -17,6 +17,7 @@ const PAGE_SIZE_OPTIONS = [10, 20, 30, 50, 100]
 export default function Home() {
   const { lang } = useLang()
   const tx = (key: string) => t[key]?.[lang] ?? key
+  const ko = lang === 'ko'
 
   const [products, setProducts]           = useState<AIProduct[]>([])
   const [loading, setLoading]             = useState(true)
@@ -35,7 +36,6 @@ export default function Home() {
       .then(({ count }) => setTotalCount(count || 0))
   }, [])
 
-  // 검색어에서 OR 쿼리 문자열 생성
   function buildOrQuery(terms: string[]) {
     return terms.flatMap(term => {
       const q = `%${term}%`
@@ -53,11 +53,9 @@ export default function Home() {
   const fetchProducts = useCallback(async () => {
     setLoading(true)
     try {
-      // 검색어 확장 (한글→영문, 영문→한글 자동)
       const terms = searchQuery.trim() ? expandSearchTerms(searchQuery) : []
       const orStr = terms.length ? buildOrQuery(terms) : ''
 
-      // 카운트 쿼리
       let countQ = supabase.from('ai_products').select('id', { count: 'exact', head: true })
       if (selectedMain) countQ = countQ.eq('category_main', selectedMain)
       if (selectedSub)  countQ = countQ.eq('category_sub', selectedSub)
@@ -65,7 +63,6 @@ export default function Home() {
       const { count } = await countQ
       setFilteredCount(count || 0)
 
-      // 데이터 쿼리
       let dataQ = supabase.from('ai_products').select('*')
         .order('category_main').order('product_name')
         .range(page * pageSize, (page + 1) * pageSize - 1)
@@ -119,7 +116,6 @@ export default function Home() {
     : selectedMain ? selectedMain.replace(/^\d+\.\s/, '')
     : tx('allCategory')
 
-  // 확장된 검색 키워드 표시용
   const expandedTerms = searchQuery ? expandSearchTerms(searchQuery).filter(t => t !== searchQuery.toLowerCase()) : []
 
   return (
@@ -131,12 +127,8 @@ export default function Home() {
         padding: '5px 16px',
         textAlign: 'center',
       }}>
-        <a
-          href="https://zenodo.org/records/20248631"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ fontSize: '11px', color: '#00cc6a', fontFamily: 'monospace', textDecoration: 'none' }}
-        >
+        <a href="https://zenodo.org/records/20248631" target="_blank" rel="noopener noreferrer"
+          style={{ fontSize: '11px', color: '#00cc6a', fontFamily: 'monospace', textDecoration: 'none' }}>
           📄 GAIT 69: Global AI Index Taxonomy &nbsp;·&nbsp;
           DOI: 10.5281/zenodo.20248631 &nbsp;·&nbsp;
           Author: DO HUN, KIM &nbsp;·&nbsp;
@@ -168,9 +160,7 @@ export default function Home() {
               }}>
                 {p.product_name}
                 <button onClick={() => toggleCompare(p)}
-                  style={{ background: 'none', border: 'none', color: '#00cc6a', cursor: 'pointer', padding: 0, fontSize: '11px' }}>
-                  ✕
-                </button>
+                  style={{ background: 'none', border: 'none', color: '#00cc6a', cursor: 'pointer', padding: 0, fontSize: '11px' }}>✕</button>
               </span>
             ))}
             <span style={{ fontSize: '11px', color: '#555', fontFamily: 'monospace' }}>
@@ -191,17 +181,43 @@ export default function Home() {
       )}
 
       <main className="max-w-screen-xl mx-auto px-4 pb-20">
-        {/* 히어로 */}
+        {/* ── 히어로 (새 타이틀) ── */}
         <section className="py-10 text-center">
           <p className="font-mono text-xs text-green-400 tracking-widest mb-3 pulse">
             {tx('liveUpdate')}
           </p>
-          <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-2">
-            {tx('heroLine1')}
-          </h1>
-          <h2 className="font-display text-4xl md:text-5xl glow-text mb-4" style={{ color: 'var(--accent)' }}>
-            {tx('heroLine2')}
-          </h2>
+
+          {ko ? (
+            /* 한국어 타이틀 */
+            <div>
+              <p style={{ fontSize: '14px', color: '#666', fontFamily: 'monospace', marginBottom: '2px', textAlign: 'left', maxWidth: '480px', margin: '0 auto 2px' }}>
+                AI 지도 완전판
+              </p>
+              <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-2">
+                이거봐!!!
+              </h1>
+              <h2 className="font-display text-4xl md:text-5xl glow-text mb-4" style={{ color: 'var(--accent)' }}>
+                AI가 다 모였어
+              </h2>
+            </div>
+          ) : (
+            /* 영문 타이틀 */
+            <div>
+              <p style={{ fontSize: '14px', color: '#666', fontFamily: 'monospace', marginBottom: '2px', textAlign: 'left', maxWidth: '560px', margin: '0 auto 2px' }}>
+                The Complete AI Atlas
+              </p>
+              <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-1">
+                Wait!
+              </h1>
+              <h2 className="font-display text-4xl md:text-5xl glow-text mb-1" style={{ color: 'var(--accent)' }}>
+                They&apos;re ALL Here?!
+              </h2>
+              <p style={{ fontSize: '16px', color: '#666', fontFamily: 'monospace', marginBottom: '16px', textAlign: 'right', maxWidth: '560px', margin: '0 auto 16px' }}>
+                - Your Complete Guide to AIs
+              </p>
+            </div>
+          )}
+
           <p className="text-gray-400 text-base max-w-xl mx-auto leading-relaxed mb-6" style={{ whiteSpace: 'pre-line' }}>
             {tx('heroDesc')}
           </p>
@@ -226,7 +242,6 @@ export default function Home() {
           <SearchBar value={searchQuery} onChange={handleSearch} placeholder={tx('searchPlaceholder')} />
         </div>
 
-        {/* 검색 확장 키워드 표시 */}
         {searchQuery && expandedTerms.length > 0 && (
           <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '11px', color: '#555', fontFamily: 'monospace' }}>🔄 also searching:</span>
@@ -236,39 +251,28 @@ export default function Home() {
           </div>
         )}
 
-        {/* 카테고리 */}
         <div className="mb-6">
           <CategoryNav selectedMain={selectedMain} selectedSub={selectedSub} onSelect={handleCategory} />
         </div>
 
-        {/* 필터 정보 + 페이지 크기 설정 */}
         <div className="flex items-center justify-between mt-2 mb-4 flex-wrap gap-2">
           <div className="flex items-center gap-3">
             {(selectedMain || searchQuery) && (
-              <button
-                onClick={() => { setSelectedMain(''); setSelectedSub(''); setSearchQuery(''); setPage(0) }}
-                className="btn-ghost text-xs"
-              >
-                {tx('resetFilter')}
-              </button>
+              <button onClick={() => { setSelectedMain(''); setSelectedSub(''); setSearchQuery(''); setPage(0) }}
+                className="btn-ghost text-xs">{tx('resetFilter')}</button>
             )}
             <span className="text-gray-500 text-sm font-mono">
               {displayCount.toLocaleString()} {tx('showing')} {products.length} {tx('shown')}
               {page > 0 && ` · ${tx('page')} ${page + 1}`}
             </span>
           </div>
-
-          {/* 페이지당 표시 수 선택 */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontSize: '11px', color: '#555', fontFamily: 'monospace' }}>
-              {lang === 'ko' ? '페이지당' : 'Per page'}:
+              {ko ? '페이지당' : 'Per page'}:
             </span>
             {PAGE_SIZE_OPTIONS.map(n => (
-              <button
-                key={n}
-                onClick={() => handlePageSize(n)}
-                className={`badge cursor-pointer text-xs ${pageSize === n ? 'badge-green' : 'badge-gray'}`}
-              >
+              <button key={n} onClick={() => handlePageSize(n)}
+                className={`badge cursor-pointer text-xs ${pageSize === n ? 'badge-green' : 'badge-gray'}`}>
                 {n}
               </button>
             ))}
@@ -295,17 +299,13 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
             {products.map(p => (
-              <ProductCard
-                key={p.id}
-                product={p}
+              <ProductCard key={p.id} product={p}
                 isComparing={!!compareList.find(c => c.id === p.id)}
-                onCompare={toggleCompare}
-              />
+                onCompare={toggleCompare} />
             ))}
           </div>
         )}
 
-        {/* 페이지네이션 */}
         {filteredCount > pageSize && (
           <div className="flex justify-center gap-3 mt-10">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
@@ -313,13 +313,13 @@ export default function Home() {
             <span className="flex items-center text-gray-500 font-mono text-sm">
               {page + 1} / {Math.ceil((isFiltered ? filteredCount : totalCount) / pageSize)}
             </span>
-            <button onClick={() => setPage(p => p + 1)} disabled={(page + 1) * pageSize >= (isFiltered ? filteredCount : totalCount)}
+            <button onClick={() => setPage(p => p + 1)}
+              disabled={(page + 1) * pageSize >= (isFiltered ? filteredCount : totalCount)}
               className="btn-ghost disabled:opacity-30">{tx('nextPage')}</button>
           </div>
         )}
       </main>
 
-      {/* 푸터 */}
       <footer className="border-t border-white/5 py-8 text-center" style={{ background: 'rgba(8,10,15,0.8)' }}>
         <div className="max-w-screen-xl mx-auto px-4 space-y-2">
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -332,9 +332,7 @@ export default function Home() {
               {tx('zenodoLabel')}: 10.5281/zenodo.20248631
             </span>
           </div>
-          <p style={{ fontSize: '11px', color: '#444', fontFamily: 'monospace' }}>
-            {tx('copyright')}
-          </p>
+          <p style={{ fontSize: '11px', color: '#444', fontFamily: 'monospace' }}>{tx('copyright')}</p>
         </div>
       </footer>
 

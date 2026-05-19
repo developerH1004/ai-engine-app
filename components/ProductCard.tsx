@@ -1,6 +1,6 @@
 'use client'
 import { AIProduct } from '@/lib/supabase'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useLang } from '@/lib/LangContext'
 import { t } from '@/lib/i18n'
 import { GlossaryTerm } from '@/lib/glossaryData'
@@ -60,6 +60,10 @@ export default function ProductCard({ product, isComparing, onCompare }: {
   const [detailStyle,   setDetailStyle]   = useState<React.CSSProperties>({})
   const [glossaryTerm,  setGlossaryTerm]  = useState<GlossaryTerm | null>(null)
   const [glossaryStyle, setGlossaryStyle] = useState<React.CSSProperties>({})
+  const [prompts, setPrompts]             = useState<any[]>([])
+  const [promptOpen, setPromptOpen]       = useState(false)
+  const [promptStyle, setPromptStyle]     = useState<React.CSSProperties>({})
+  const [activePrompt, setActivePrompt]   = useState<any>(null)
 
   const { lang } = useLang()
   const tx = (key: string) => t[key]?.[lang] ?? key
@@ -80,6 +84,42 @@ export default function ProductCard({ product, isComparing, onCompare }: {
   const monthlyFee = product.monthly_fee_usd
   const hasSetup   = !!(product.install_type)
   const instStyle  = installBadgeStyle(product.install_type)
+
+  // 카드의 카테고리 코드 추출 (예: "01-01" or "01")
+  const catMainCode = (product.category_main || '').match(/^(\d+)/)?.[1] || ''
+  const catSubCode  = (product.category_sub  || '').match(/^(\d+-\d+)/)?.[1] || ''
+
+  // 상세팝업 열릴 때 해당 제품 프롬프트 로드
+  useEffect(() => {
+    if (!detailOpen) return
+    import('@/lib/supabase').then(({ supabase }) => {
+      // Category_Match 필드에 해당 대분류/세분류/제품명 포함된 프롬프트 조회
+      const filters = ['ALL', catMainCode, catSubCode, product.product_name].filter(Boolean)
+      const orStr = filters.map(f =>
+        `cat_match_1.eq.${f},cat_match_2.eq.${f},cat_match_3.eq.${f},cat_match_4.eq.${f},cat_match_5.eq.${f}`
+      ).join(',')
+      supabase.from('prompts').select('*').or(orStr).then(({ data }) => {
+        setPrompts(data || [])
+      })
+    })
+  }, [detailOpen, catMainCode, catSubCode, product.product_name])
+
+  // Prompt_Type → 버튼 라벨
+  const PROMPT_TYPE_MAP: Record<string, { ko: string; en: string; color: string }> = {
+    '일반(범용) 프롬프트 작성 방법': { ko: '📝 일반 작성법', en: '📝 General Method', color: '#3b82f6' },
+    '전문가용 프롬프트 작성 방법':   { ko: '🎯 전문가 작성법', en: '🎯 Expert Method',  color: '#8b5cf6' },
+    '특정분야 프롬프트 작성 방법':   { ko: '🔬 분야별 작성법', en: '🔬 Domain Method',  color: '#06b6d4' },
+    '일반(범용) 프롬프트 사례':      { ko: '💡 일반 사례', en: '💡 General Examples',    color: '#10b981' },
+    '전문가용 프롬프트 사례':        { ko: '⭐ 전문가 사례', en: '⭐ Expert Examples',    color: '#f59e0b' },
+    '특정분야 프롬프트 사례':        { ko: '🏷️ 분야별 사례', en: '🏷️ Domain Examples',   color: '#ec4899' },
+  }
+
+  // 프롬프트 타입별 그룹화
+  const promptGroups = prompts.reduce((acc: Record<string, any[]>, p) => {
+    if (!acc[p.prompt_type]) acc[p.prompt_type] = []
+    acc[p.prompt_type].push(p)
+    return acc
+  }, {})
 
   function renderLines(text: string | null | undefined) {
     if (!text) return null
@@ -311,11 +351,146 @@ export default function ProductCard({ product, isComparing, onCompare }: {
                 </a>
               </div>
             )}
+
+            {/* ── 프롬프트 가이드 버튼 그룹 ── */}
+            {Object.keys(promptGroups).length > 0 && (
+              <div style={{ marginTop: '16px', borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '14px' }}>
+                <Label>{ko ? '📋 프롬프트 가이드' : '📋 Prompt Guide'}</Label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {Object.entries(promptGroups).map(([type, items]) => {
+                    const meta = PROMPT_TYPE_MAP[type] || { ko: type, en: type, color: '#6b7280' }
+                    return (
+                      <button
+                        key={type}
+                        onClick={e => {
+                          e.stopPropagation()
+                          const rect = (e.target as HTMLElement).getBoundingClientRect()
+                          setPromptStyle({ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: Math.min(680, window.innerWidth - 24) })
+                          setActivePrompt({ type, items, meta })
+                          setPromptOpen(true)
+                        }}
+                        style={{
+                          padding: '5px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700,
+                          border: `1px solid ${meta.color}55`, color: meta.color,
+                          background: `${meta.color}18`, cursor: 'pointer',
+                        }}
+                      >
+                        {ko ? meta.ko : meta.en}
+                        <span style={{ marginLeft: '4px', opacity: 0.6 }}>({items.length})</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}
 
-      {/* ── 용어 해설 팝업 (첫번째 팝업 위에 표시) ── */}
+      {/* ── 프롬프트 가이드 팝업 ── */}
+      {promptOpen && activePrompt && (
+        <>
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 600 }}
+            onClick={() => { setPromptOpen(false); setActivePrompt(null) }} />
+          <div
+            ref={el => { if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }) }}
+            style={{
+              ...popupBase, zIndex: 601,
+              border: `1px solid ${activePrompt.meta.color}44`,
+              maxHeight: '82vh',
+              ...promptStyle,
+            }}
+          >
+            {/* 헤더 */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+              <div>
+                <div style={{ fontSize: '10px', color: activePrompt.meta.color, fontFamily: 'monospace', marginBottom: '4px' }}>
+                  📋 {ko ? '프롬프트 가이드' : 'Prompt Guide'} · {activePrompt.items.length}{ko ? '개' : ' items'}
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: 800, color: '#fff' }}>
+                  {ko ? activePrompt.meta.ko : activePrompt.meta.en}
+                </div>
+                <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>{product.product_name}</div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <button
+                  onClick={() => window.print()}
+                  style={{
+                    padding: '6px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700,
+                    border: '1px solid rgba(0,255,136,0.3)', color: '#00cc6a',
+                    background: 'rgba(0,255,136,0.08)', cursor: 'pointer',
+                  }}
+                >
+                  🖨️ {ko ? 'PDF 출력' : 'Print PDF'}
+                </button>
+                <button onClick={() => { setPromptOpen(false); setActivePrompt(null) }}
+                  style={{ background: 'none', border: 'none', color: '#555', fontSize: '20px', cursor: 'pointer' }}>×</button>
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', marginBottom: '14px' }} />
+
+            {/* 프롬프트 목록 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {activePrompt.items.map((p: any, i: number) => (
+                <div key={p.prompt_id} style={{
+                  background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '14px',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                }}>
+                  {/* ID + 번호 */}
+                  <div style={{ fontSize: '10px', color: '#444', fontFamily: 'monospace', marginBottom: '8px' }}>
+                    #{i+1} · {p.prompt_id}
+                  </div>
+
+                  {/* 프롬프트 본문 */}
+                  <div style={{ marginBottom: '10px' }}>
+                    <div style={{ fontSize: '10px', fontWeight: 700, color: activePrompt.meta.color, marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                      {ko ? '프롬프트' : 'Prompt'}
+                    </div>
+                    <div style={{
+                      fontSize: '12px', color: '#ddd', lineHeight: 1.7,
+                      background: 'rgba(0,0,0,0.3)', borderRadius: '6px', padding: '10px',
+                      whiteSpace: 'pre-wrap', fontFamily: 'monospace',
+                    }}>
+                      {ko ? (p.prompt_input_kr || p.prompt_input_en) : (p.prompt_input_en || p.prompt_input_kr)}
+                    </div>
+                  </div>
+
+                  {/* 출력 팁 */}
+                  {(p.output_tips_en || p.output_tips_kr) && (
+                    <div style={{ marginBottom: '8px' }}>
+                      <div style={{ fontSize: '10px', fontWeight: 700, color: '#555', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                        {ko ? '출력 팁' : 'Output Tips'}
+                      </div>
+                      <div style={{ fontSize: '11px', color: '#888', lineHeight: 1.6, padding: '0 4px',
+                        borderLeft: `2px solid ${activePrompt.meta.color}55` }}>
+                        {ko ? (p.output_tips_kr || p.output_tips_en) : (p.output_tips_en || p.output_tips_kr)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 고급 파라미터 */}
+                  {p.advanced_params && p.advanced_params !== '' && (
+                    <div>
+                      <div style={{ fontSize: '10px', fontWeight: 700, color: '#444', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                        {ko ? '고급 파라미터' : 'Advanced Params'}
+                      </div>
+                      <div style={{
+                        fontSize: '10px', color: '#666', fontFamily: 'monospace',
+                        background: 'rgba(0,0,0,0.4)', borderRadius: '4px', padding: '6px 8px',
+                      }}>
+                        {p.advanced_params}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── 용어 해설 팝업 (첫번째 팝업 위에 표시) ── */}}
       {glossaryTerm && (
         <>
           <div style={{ ...dimStyle, zIndex: 500 }} onClick={() => setGlossaryTerm(null)} />
