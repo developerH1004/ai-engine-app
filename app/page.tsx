@@ -198,20 +198,20 @@ export default function Home() {
           {ko ? (
             /* 한국어 타이틀 */
             <div style={{ display: 'inline-block', textAlign: 'left' }}>
-              <p style={{ fontSize: '13px', color: '#555', fontFamily: 'monospace', marginBottom: '0', lineHeight: 1.2 }}>
+              <p style={{ fontSize: '13px', color: '#666', fontFamily: 'monospace', marginBottom: '2px', lineHeight: 1 }}>
                 AI 지도 완전판
               </p>
-              <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-2">
+              <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(48px, 7vw, 80px)', color: '#ffffff', lineHeight: 1, marginBottom: '16px', letterSpacing: '1px' }}>
                 이거봐!!! AI가 다 모였어
               </h1>
             </div>
           ) : (
             /* 영문 타이틀 */
             <div style={{ display: 'inline-block', textAlign: 'left' }}>
-              <p style={{ fontSize: '13px', color: '#555', fontFamily: 'monospace', marginBottom: '0', lineHeight: 1.2 }}>
+              <p style={{ fontSize: '13px', color: '#666', fontFamily: 'monospace', marginBottom: '2px', lineHeight: 1 }}>
                 The Complete AI Atlas
               </p>
-              <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-2">
+              <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(48px, 7vw, 80px)', color: '#ffffff', lineHeight: 1, marginBottom: '16px', letterSpacing: '1px' }}>
                 WAIT, THEY&apos;RE ALL HERE?!
               </h1>
             </div>
