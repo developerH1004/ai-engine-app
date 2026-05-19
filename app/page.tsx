@@ -198,21 +198,21 @@ export default function Home() {
           {ko ? (
             /* 한국어 타이틀 */
             <div style={{ display: 'inline-block', textAlign: 'left' }}>
-              <p style={{ fontSize: '13px', color: '#666', fontFamily: 'monospace', marginBottom: '0', lineHeight: 1 }}>
+              <p style={{ fontSize: '13px', color: '#555', fontFamily: 'monospace', marginBottom: '0', lineHeight: 1.2 }}>
                 AI 지도 완전판
               </p>
-              <h1 className="font-display text-6xl md:text-7xl text-white leading-none">
-                이거봐!!! <span style={{ color: 'var(--accent)' }}>AI가 다 모였어</span>
+              <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-2">
+                이거봐!!! AI가 다 모였어
               </h1>
             </div>
           ) : (
             /* 영문 타이틀 */
             <div style={{ display: 'inline-block', textAlign: 'left' }}>
-              <p style={{ fontSize: '13px', color: '#666', fontFamily: 'monospace', marginBottom: '0', lineHeight: 1 }}>
+              <p style={{ fontSize: '13px', color: '#555', fontFamily: 'monospace', marginBottom: '0', lineHeight: 1.2 }}>
                 The Complete AI Atlas
               </p>
-              <h1 className="font-display text-6xl md:text-7xl text-white leading-none">
-                WAIT, <span style={{ color: 'var(--accent)' }}>THEY&apos;RE ALL HERE?!</span>
+              <h1 className="font-display text-6xl md:text-7xl text-white leading-none mb-2">
+                WAIT, THEY&apos;RE ALL HERE?!
               </h1>
             </div>
           )}
