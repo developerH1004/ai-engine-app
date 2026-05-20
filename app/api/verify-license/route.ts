@@ -10,29 +10,26 @@ export async function POST(req: NextRequest) {
   try {
     const { licenseKey, userId } = await req.json();
 
-    // 검로드 API: 이번에는 판매자 토큰 없이 순수 라이선스 키만 던지는 방식입니다.
-    // 만약 여기서 500이 난다면 검로드 측에서 해당 라이선스 키를 식별하지 못하는 것입니다.
+    // 검로드 API: 라이선스 키와 함께 반드시 permalink를 전달해야 합니다.
     const gumroadResponse = await fetch('https://api.gumroad.com/v2/licenses/verify', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0' // 검로드의 봇 차단 방지
-      },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        product_permalink: 'gait69',
+        product_permalink: 'gait69', // 이곳에 상품 슬러그를 명시합니다.
         license_key: licenseKey.trim(),
+        increment_uses_count: 'true',
       }).toString(),
     });
 
     const gumroadData = await gumroadResponse.json();
 
-    // 결과 확인
+    // 인증 실패 시 상세 로그 확인
     if (!gumroadData.success) {
-      console.error('Gumroad 응답 상세:', gumroadData);
-      return NextResponse.json({ success: false, message: '인증 거부' }, { status: 400 });
+      console.error('검로드 인증 실패:', gumroadData);
+      return NextResponse.json({ success: false, message: '인증 실패' }, { status: 400 });
     }
 
-    // Supabase 저장
+    // Supabase 데이터베이스 등록
     const { error } = await supabase.from('users_license').insert({
       user_id: userId,
       license_key: licenseKey.trim(),
@@ -41,8 +38,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) throw error;
+
     return NextResponse.json({ success: true });
   } catch (err) {
+    console.error('서버 오류:', err);
     return NextResponse.json({ success: false, message: '서버 오류' }, { status: 500 });
   }
 }
