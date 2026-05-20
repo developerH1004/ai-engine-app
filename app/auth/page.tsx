@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function AuthPage() {
@@ -8,10 +8,37 @@ export default function AuthPage() {
   const [email, setEmail]     = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult]   = useState<{ok: boolean, msg: string} | null>(null)
+  const [isKorean, setIsKorean] = useState(false)
+
+  // 브라우저 로컬 스토리지에 저장된 전역 언어 설정값을 감지
+  useEffect(() => {
+    const currentLang = localStorage.getItem('language') || localStorage.getItem('lang') || 'en'
+    if (currentLang === 'ko' || currentLang === 'kr') {
+      setIsKorean(true)
+    }
+  }, [])
+
+  // 다국어 텍스트 객체 매핑
+  const t = {
+    subtitle: "The Complete AI Atlas",
+    title: "WAIT, THEY ARE ALL HERE?!",
+    desc: isKorean 
+      ? "검로드(Gumroad)에서 발급받은 라이선스 키(License Key) 또는\n도서 구매 시 동봉된 시리얼 번호(Serial Number)를 입력해 주십시오."
+      : "Please enter the License Key issued from Gumroad or\nthe Serial Number included with your book purchase.",
+    labelCode: "GUMROAD LICENSE KEY / BOOK SERIAL NUMBER",
+    labelEmail: "BUYER EMAIL ADDRESS",
+    placeholderCode: "XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX",
+    placeholderEmail: "your@email.com",
+    btnText: isKorean ? (loading ? '인증 중...' : '인증하기') : (loading ? 'Verifying...' : 'Verify License'),
+    errEmpty: isKorean ? '시리얼 코드를 입력해주세요.' : 'Please enter your serial code.',
+    msgMaster: isKorean ? '관리자 인증 완료! 메인 화면으로 이동합니다.' : 'Master authentication complete! Redirecting...',
+    msgSuccess: isKorean ? '라이선스 인증 성공! 프리미엄 권한이 활성화되었습니다.' : 'License verified successfully! Premium access granted.',
+    msgFailServer: isKorean ? '인증 서버와 통신 중 에러가 발생했습니다.' : 'An error occurred communicating with the server.'
+  }
 
   async function handleAuth() {
     if (!code.trim()) {
-      setResult({ok: false, msg: '시리얼 코드를 입력해주세요.'})
+      setResult({ok: false, msg: t.errEmpty})
       return
     }
     
@@ -36,17 +63,17 @@ export default function AuthPage() {
         document.cookie = 'ai_map_verified=true; path=/; max-age=2592000'
         
         if (data.isMaster) {
-          setResult({ok: true, msg: '관리자 인증 완료! 메인 화면으로 이동합니다.'})
+          setResult({ok: true, msg: t.msgMaster})
         } else {
-          setResult({ok: true, msg: '라이선스 인증 성공! 프리미엄 권한이 활성화되었습니다.'})
+          setResult({ok: true, msg: t.msgSuccess})
         }
 
         setTimeout(() => router.push('/'), 1000)
       } else {
-        setResult({ok: false, msg: data.message || '인증에 실패했습니다. 코드를 다시 확인해주세요.'})
+        setResult({ok: false, msg: data.message || (isKorean ? '인증에 실패했습니다.' : 'Authentication failed.')})
       }
     } catch (err) {
-      setResult({ok: false, msg: '인증 서버와 통신 중 에러가 발생했습니다.'})
+      setResult({ok: false, msg: t.msgFailServer})
     } finally {
       setLoading(false)
     }
@@ -62,23 +89,26 @@ export default function AuthPage() {
         borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '420px',
         boxShadow: '0 8px 32px rgba(0,0,0,0.4)'
       }}>
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <h2 style={{ fontSize: '13px', fontWeight: 600, color: '#8b949e', marginBottom: '6px', letterSpacing: '1px', textTransform: 'uppercase' }}>
-            The Complete AI Atlas
-          </h2>
-          <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#fff', marginBottom: '12px', letterSpacing: '-0.5px' }}>
-            WAIT, THEY ARE ALL HERE?!
-          </h1>
-          <p style={{ fontSize: '13px', color: '#8b949e', lineHeight: 1.5 }}>
-            검로드(Gumroad)에서 발급받은 라이선스 키(License Key) 또는<br />
-            도서 구매 시 동봉된 시리얼 번호(Serial Number)를 입력해 주십시오.
+        
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '28px' }}>
+          {/* 타이틀부 좌측 정렬 블록 */}
+          <div style={{ textAlign: 'left', width: 'fit-content' }}>
+            <h2 style={{ fontSize: '11px', fontWeight: 600, color: '#8b949e', marginBottom: '2px', letterSpacing: '0.5px', textTransform: 'uppercase', fontStyle: 'italic' }}>
+              {t.subtitle}
+            </h2>
+            <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#fff', margin: '0 0 12px 0', letterSpacing: '-0.5px' }}>
+              {t.title}
+            </h1>
+          </div>
+          <p style={{ fontSize: '13px', color: '#8b949e', lineHeight: 1.5, textAlign: 'center', whiteSpace: 'pre-line' }}>
+            {t.desc}
           </p>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#8b949e', marginBottom: '6px', fontFamily: 'monospace' }}>
-              GUMROAD LICENSE KEY / BOOK SERIAL NUMBER
+              {t.labelCode}
             </label>
             <input
               type="text"
@@ -89,7 +119,7 @@ export default function AuthPage() {
               }}
               value={code}
               onChange={e => setCode(e.target.value)}
-              placeholder="XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX"
+              placeholder={t.placeholderCode}
               disabled={loading}
               onKeyDown={e => e.key === 'Enter' && handleAuth()}
             />
@@ -97,7 +127,7 @@ export default function AuthPage() {
 
           <div>
             <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#8b949e', marginBottom: '6px', fontFamily: 'monospace' }}>
-              BUYER EMAIL ADDRESS
+              {t.labelEmail}
             </label>
             <input
               type="email"
@@ -108,7 +138,7 @@ export default function AuthPage() {
               }}
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="your@email.com"
+              placeholder={t.placeholderEmail}
               disabled={loading}
               onKeyDown={e => e.key === 'Enter' && handleAuth()}
             />
@@ -128,7 +158,7 @@ export default function AuthPage() {
             transition: 'all 0.2s'
           }}
         >
-          {loading ? '인증 중...' : '인증하기'}
+          {t.btnText}
         </button>
 
         {result && (
