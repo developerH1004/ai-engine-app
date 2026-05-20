@@ -19,11 +19,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: '키 또는 ID가 없습니다.' }, { status: 400 });
     }
 
-    // 1. 검로드 API 검증
-    // 에러 유발 파라미터 제거 및 URLSearchParams 객체 명시적 사용
+    const supabase = getSupabase();
+    const trimmedKey = licenseKey.trim();
+
+    // 1. Supabase 데이터베이스 선행 조회 (수동 등록 우회 처리)
+    // 현재 접속한 유저 ID와 입력한 라이선스 키가 일치하며 승인된 상태인지 확인합니다.
+    const { data: existingLicense, error: searchError } = await supabase
+      .from('users_license')
+      .select('*')
+      .eq('license_key', trimmedKey)
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .single();
+
+    // DB에 유효한 라이선스가 이미 존재하면 검로드 통신을 생략하고 즉시 승인 반환
+    if (existingLicense) {
+      return NextResponse.json({ success: true, message: 'DB 인증 완료 (수동 등록)' });
+    }
+
+    // 2. DB에 없다면 기존대로 검로드 API 검증 시도
     const params = new URLSearchParams();
     params.append('product_permalink', 'gait69');
-    params.append('license_key', licenseKey.trim());
+    params.append('license_key', trimmedKey);
 
     const gumroadResponse = await fetch('https://api.gumroad.com/v2/licenses/verify', {
       method: 'POST',
@@ -35,7 +52,6 @@ export async function POST(req: NextRequest) {
       body: params.toString(),
     });
 
-    // HTTP 상태 코드가 200번대가 아닐 경우 검로드의 실제 에러 원문 강제 로깅
     if (!gumroadResponse.ok) {
       const errorText = await gumroadResponse.text();
       console.error(`검로드 서버 통신 에러 (${gumroadResponse.status}):`, errorText);
@@ -49,17 +65,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: '인증 실패' }, { status: 400 });
     }
 
-    // 2. Supabase 데이터베이스 저장
-    const supabase = getSupabase();
-    const { error } = await supabase.from('users_license').insert({
+    // 3. 검로드 인증 성공 시 DB 저장 (현재는 검로드 서버 장애로 도달하지 못하는 영역)
+    const { error: insertError } = await supabase.from('users_license').insert({
       user_id: userId,
-      license_key: licenseKey.trim(),
+      license_key: trimmedKey,
       buyer_email: gumroadData.purchase.email,
       is_active: true,
     });
 
-    if (error) {
-      console.error('DB 저장 실패:', error);
+    if (insertError) {
+      console.error('DB 저장 실패:', insertError);
       return NextResponse.json({ success: false, message: 'DB 저장 실패' }, { status: 500 });
     }
 
