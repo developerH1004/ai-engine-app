@@ -2,6 +2,11 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLang } from '@/lib/LangContext'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 export default function AuthPage() {
   const router = useRouter()
@@ -27,7 +32,7 @@ export default function AuthPage() {
     btnText: isKorean ? (loading ? '인증 중...' : '인증하기') : (loading ? 'Verifying...' : 'Verify License'),
     errEmpty: isKorean ? '시리얼 코드를 입력해주세요.' : 'Please enter your serial code.',
     msgMaster: isKorean ? '관리자 인증 완료! 메인 화면으로 이동합니다.' : 'Master authentication complete! Redirecting...',
-    msgSuccess: isKorean ? '라이선스 인증 성공! 프리미엄 권한이 활성화되었습니다.' : 'License verified successfully! Premium access granted.',
+    msgSuccess: isKorean ? '라이선스 인증 성공! 프리미 연 권한이 활성화되었습니다.' : 'License verified successfully! Premium access granted.',
     msgFailServer: isKorean ? '인증 서버와 통신 중 에러가 발생했습니다.' : 'An error occurred communicating with the server.'
   }
 
@@ -41,6 +46,15 @@ export default function AuthPage() {
     setResult(null)
 
     try {
+      let actualUserId = '00000000-0000-0000-0000-000000000000';
+      
+      if (supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.id) {
+          actualUserId = session.user.id;
+        }
+      }
+
       const response = await fetch('/api/verify-license', {
         method: 'POST',
         headers: {
@@ -48,7 +62,7 @@ export default function AuthPage() {
         },
         body: JSON.stringify({
           licenseKey: code.trim(),
-          userId: email.trim() || 'anonymous-user',
+          userId: actualUserId,
         }),
       })
 
