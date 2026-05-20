@@ -10,26 +10,24 @@ export async function POST(req: NextRequest) {
   try {
     const { licenseKey, userId } = await req.json();
 
-    // 검로드 API: 라이선스 키와 함께 반드시 permalink를 전달해야 합니다.
+    // 핵심: URLSearchParams를 쓰지 않고 객체로 전달하여 전송 규격을 단순화했습니다.
+    // 또한, 500 에러를 유발하는 product_permalink 파라미터를 완전히 제거하고
+    // 오직 라이선스 키만으로 검증하는 '최소 요청'을 시도합니다.
     const gumroadResponse = await fetch('https://api.gumroad.com/v2/licenses/verify', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        product_permalink: 'gait69', // 이곳에 상품 슬러그를 명시합니다.
-        license_key: licenseKey.trim(),
-        increment_uses_count: 'true',
-      }).toString(),
+      headers: { 
+        'Content-Type': 'application/x-www-form-urlencoded' 
+      },
+      body: `license_key=${licenseKey.trim()}&increment_uses_count=true`
     });
 
     const gumroadData = await gumroadResponse.json();
 
-    // 인증 실패 시 상세 로그 확인
     if (!gumroadData.success) {
-      console.error('검로드 인증 실패:', gumroadData);
+      console.error('검로드 최종 인증 실패:', gumroadData);
       return NextResponse.json({ success: false, message: '인증 실패' }, { status: 400 });
     }
 
-    // Supabase 데이터베이스 등록
     const { error } = await supabase.from('users_license').insert({
       user_id: userId,
       license_key: licenseKey.trim(),
@@ -38,10 +36,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) throw error;
-
     return NextResponse.json({ success: true });
+
   } catch (err) {
     console.error('서버 오류:', err);
-    return NextResponse.json({ success: false, message: '서버 오류' }, { status: 500 });
+    return NextResponse.json({ success: false, message: '서버 내부 오류' }, { status: 500 });
   }
 }
