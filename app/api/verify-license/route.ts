@@ -10,30 +10,29 @@ export async function POST(req: NextRequest) {
   try {
     const { licenseKey, userId } = await req.json();
 
-    // 1. 검로드 API 검증
-    // 핵심: permalink를 동적으로 처리하는 대신, 검로드가 가장 선호하는 
-    // license_key 단독 검증 방식을 사용하되, 헤더 구성을 표준화했습니다.
+    // 검로드 API: 이번에는 판매자 토큰 없이 순수 라이선스 키만 던지는 방식입니다.
+    // 만약 여기서 500이 난다면 검로드 측에서 해당 라이선스 키를 식별하지 못하는 것입니다.
     const gumroadResponse = await fetch('https://api.gumroad.com/v2/licenses/verify', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json' 
+        'User-Agent': 'Mozilla/5.0' // 검로드의 봇 차단 방지
       },
       body: new URLSearchParams({
+        product_permalink: 'gait69',
         license_key: licenseKey.trim(),
-        increment_uses_count: 'true',
       }).toString(),
     });
 
     const gumroadData = await gumroadResponse.json();
 
-    // 2. 결과 검증
-    // 검로드는 success: true 일 때만 정상 인증입니다.
+    // 결과 확인
     if (!gumroadData.success) {
-      return NextResponse.json({ success: false, message: '인증 실패' }, { status: 400 });
+      console.error('Gumroad 응답 상세:', gumroadData);
+      return NextResponse.json({ success: false, message: '인증 거부' }, { status: 400 });
     }
 
-    // 3. Supabase 등록
+    // Supabase 저장
     const { error } = await supabase.from('users_license').insert({
       user_id: userId,
       license_key: licenseKey.trim(),
@@ -42,7 +41,6 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) throw error;
-
     return NextResponse.json({ success: true });
   } catch (err) {
     return NextResponse.json({ success: false, message: '서버 오류' }, { status: 500 });
