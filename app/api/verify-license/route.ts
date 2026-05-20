@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// 환경 변수 검증 및 안전한 클라이언트 생성
 const getSupabase = () => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -21,19 +20,27 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. 검로드 API 검증
-    // 검로드 공식 규격인 product_permalink를 사용하고 Next.js fetch 캐싱을 비활성화합니다.
+    // 에러 유발 파라미터 제거 및 URLSearchParams 객체 명시적 사용
+    const params = new URLSearchParams();
+    params.append('product_permalink', 'gait69');
+    params.append('license_key', licenseKey.trim());
+
     const gumroadResponse = await fetch('https://api.gumroad.com/v2/licenses/verify', {
       method: 'POST',
       cache: 'no-store',
       headers: { 
-        'Content-Type': 'application/x-www-form-urlencoded' 
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
       },
-      body: new URLSearchParams({
-        product_permalink: 'gait69',
-        license_key: licenseKey.trim(),
-        increment_uses_count: 'true',
-      }).toString(),
+      body: params.toString(),
     });
+
+    // HTTP 상태 코드가 200번대가 아닐 경우 검로드의 실제 에러 원문 강제 로깅
+    if (!gumroadResponse.ok) {
+      const errorText = await gumroadResponse.text();
+      console.error(`검로드 서버 통신 에러 (${gumroadResponse.status}):`, errorText);
+      return NextResponse.json({ success: false, message: `검로드 통신 오류: ${gumroadResponse.status}` }, { status: 400 });
+    }
 
     const gumroadData = await gumroadResponse.json();
 
