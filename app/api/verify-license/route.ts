@@ -21,15 +21,18 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. 검로드 API 검증
-    // 검로드 규격에 맞춰 permalink와 license_key를 명확히 전달합니다.
+    // JSON 형식으로 명확한 데이터 타입을 전달하고 Next.js fetch 캐싱을 비활성화합니다.
     const gumroadResponse = await fetch('https://api.gumroad.com/v2/licenses/verify', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
+      cache: 'no-store',
+      headers: { 
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify({
         product_permalink: 'gait69',
         license_key: licenseKey.trim(),
-        increment_uses_count: 'true',
-      }).toString(),
+        increment_uses_count: true,
+      }),
     });
 
     const gumroadData = await gumroadResponse.json();
