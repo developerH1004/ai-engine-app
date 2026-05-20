@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
     const trimmedKey = licenseKey.trim();
 
     // 1. Supabase 데이터베이스 선행 조회 (수동 등록 우회 처리)
-    // 현재 접속한 유저 ID와 입력한 라이선스 키가 일치하며 승인된 상태인지 확인합니다.
     const { data: existingLicense, error: searchError } = await supabase
       .from('users_license')
       .select('*')
@@ -32,15 +31,15 @@ export async function POST(req: NextRequest) {
       .eq('is_active', true)
       .single();
 
-    // DB에 유효한 라이선스가 이미 존재하면 검로드 통신을 생략하고 즉시 승인 반환
     if (existingLicense) {
       return NextResponse.json({ success: true, message: 'DB 인증 완료 (수동 등록)' });
     }
 
-    // 2. DB에 없다면 기존대로 검로드 API 검증 시도
+    // 2. 검로드 API 검증 (에러 로그 기반 파라미터 수정)
     const params = new URLSearchParams();
-    params.append('product_permalink', 'gait69');
+    params.append('product_id', 'R8QaGPeuffxeg5Ax6Qg9Pg==');
     params.append('license_key', trimmedKey);
+    params.append('increment_uses_count', 'true');
 
     const gumroadResponse = await fetch('https://api.gumroad.com/v2/licenses/verify', {
       method: 'POST',
@@ -65,7 +64,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: '인증 실패' }, { status: 400 });
     }
 
-    // 3. 검로드 인증 성공 시 DB 저장 (현재는 검로드 서버 장애로 도달하지 못하는 영역)
+    // 3. 검로드 인증 성공 시 DB 저장
     const { error: insertError } = await supabase.from('users_license').insert({
       user_id: userId,
       license_key: trimmedKey,
