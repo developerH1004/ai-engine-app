@@ -1,44 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Vercel 환경 변수에서 로드
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''; 
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// [중요] 여기에 검로드 상품 페이지 URL의 마지막 슬러그를 정확히 입력하세요.
-// 예: gumroad.com/l/abcde 라면 'abcde'가 슬러그입니다.
+// 슬러그 확인: Gumroad 주소의 gait69 가 맞다면 그대로 유지
 const GUMROAD_PRODUCT_PERMALINK = 'gait69'; 
 
 export async function POST(req: NextRequest) {
   try {
     const { licenseKey, userId } = await req.json();
 
-    if (!licenseKey || !userId) {
-      return NextResponse.json({ success: false, message: '키 또는 ID가 없습니다.' }, { status: 400 });
-    }
-    
-    // 1. 검로드 API 호출
+    // 검로드 API 검증
+    // 핵심 변경: 요청 바디를 보다 명시적으로 구성
+    const params = new URLSearchParams();
+    params.append('product_permalink', GUMROAD_PRODUCT_PERMALINK);
+    params.append('license_key', licenseKey.trim());
+    params.append('increment_uses_count', 'true');
+
     const gumroadResponse = await fetch('https://api.gumroad.com/v2/licenses/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        product_permalink: GUMROAD_PRODUCT_PERMALINK,
-        license_key: licenseKey.trim(),
-        increment_uses_count: 'true',
-      }).toString(),
+      body: params.toString(),
     });
 
     const gumroadData = await gumroadResponse.json();
 
-    // 검로드 API 응답이 실패하거나 success가 false인 경우
+    // 400/500 에러 시 실제 검로드의 에러 메시지를 로그로 찍음
     if (!gumroadResponse.ok || !gumroadData.success) {
-      console.error('Gumroad API Error:', gumroadData);
-      return NextResponse.json({ success: false, message: '검로드 인증 실패: 키가 유효하지 않습니다.' }, { status: 400 });
+      console.error('Gumroad API Full Response:', JSON.stringify(gumroadData));
+      return NextResponse.json({ 
+        success: false, 
+        message: gumroadData.message || '인증 실패' 
+      }, { status: gumroadResponse.status });
     }
 
-    // 2. Supabase 데이터베이스에 라이선스 정보 저장
-    // [주의] 아래 테이블명(users_license)과 컬럼명이 Supabase와 정확히 일치해야 합니다.
+    // 데이터베이스 저장
     const { error } = await supabase.from('users_license').insert({
       user_id: userId,
       license_key: licenseKey.trim(),
@@ -47,13 +45,13 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) {
-      console.error('Supabase Insert Error:', error);
+      console.error('Supabase Error:', error);
       return NextResponse.json({ success: false, message: 'DB 저장 실패' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('API Server Error:', err);
-    return NextResponse.json({ success: false, message: '서버 내부 오류 발생' }, { status: 500 });
+    console.error('Internal Error:', err);
+    return NextResponse.json({ success: false, message: '서버 내부 오류' }, { status: 500 });
   }
 }
