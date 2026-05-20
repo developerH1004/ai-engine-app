@@ -1,22 +1,17 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useLang } from '@/lib/LangContext'
 
 export default function AuthPage() {
   const router = useRouter()
+  const { lang } = useLang()
+  const isKorean = lang === 'ko'
+  
   const [code, setCode]       = useState('')
   const [email, setEmail]     = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult]   = useState<{ok: boolean, msg: string} | null>(null)
-  const [isKorean, setIsKorean] = useState(false)
-
-  // 브라우저 로컬 스토리지에 저장된 전역 언어 설정값을 감지
-  useEffect(() => {
-    const currentLang = localStorage.getItem('language') || localStorage.getItem('lang') || 'en'
-    if (currentLang === 'ko' || currentLang === 'kr') {
-      setIsKorean(true)
-    }
-  }, [])
 
   // 다국어 텍스트 객체 매핑
   const t = {
@@ -91,7 +86,7 @@ export default function AuthPage() {
       }}>
         
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '28px' }}>
-          {/* 타이틀부 좌측 정렬 블록 */}
+          {/* 타이틀부 좌측 정렬 블록 보존 */}
           <div style={{ textAlign: 'left', width: 'fit-content' }}>
             <h2 style={{ fontSize: '11px', fontWeight: 600, color: '#8b949e', marginBottom: '2px', letterSpacing: '0.5px', textTransform: 'uppercase', fontStyle: 'italic' }}>
               {t.subtitle}
