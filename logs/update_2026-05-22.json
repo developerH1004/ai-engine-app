@@ -1,7 +1,20 @@
 {
   "date": "2026-05-22",
   "products_added": [],
-  "major_updated": [],
+  "major_updated": [
+    "ChatGPT Plus: GPT-4",
+    "Gemini Advanced: Gemini 2.5 Pro",
+    "Copilot Pro: Copilot Pro 1.0",
+    "Claude Pro: Claude 2",
+    "Perplexity Pro: Perplexity Pro v1.8",
+    "Poe: Poe 2.0",
+    "Notion AI: Notion AI 1.0",
+    "Canva Magic Studio: Magic Studio 1.0",
+    "Llama: Llama 3",
+    "DeepSeek: DeepSeek 1.0",
+    "Mistral Large: Mistral 7B",
+    "Grok: Grok 3"
+  ],
   "glossary_added": [],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
