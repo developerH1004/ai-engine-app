@@ -37,17 +37,17 @@ TASK_MAP = {
 
 # ── 주요 12개 모델 + 하드코딩 버전 (감지 실패 대비) ────────────
 MAJOR_MODELS = {
-    "ChatGPT Plus":       {"manufacturer":"OpenAI",        "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States","fallback_version":"GPT-4o"},
+    "ChatGPT Plus":       {"manufacturer":"OpenAI",        "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States","fallback_version":"GPT-4o (2026)"},
     "Gemini Advanced":    {"manufacturer":"Google",        "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States","fallback_version":"Gemini 2.5 Pro"},
-    "Copilot Pro":        {"manufacturer":"Microsoft",     "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States","fallback_version":"GPT-4o"},
+    "Copilot Pro":        {"manufacturer":"Microsoft",     "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States","fallback_version":"GPT-4o (2026)"},
     "Claude Pro":         {"manufacturer":"Anthropic",     "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States","fallback_version":"Claude Sonnet 4.6"},
     "Perplexity Pro":     {"manufacturer":"Perplexity AI", "category_main":"02. Search & Knowledge Discovery","category_sub":"02-01. Conversational AI Search","pricing_type":"Subscription","country":"United States","fallback_version":"Sonar Pro"},
     "Poe":                {"manufacturer":"Quora",         "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States","fallback_version":"Multi-model 2026"},
     "Notion AI":          {"manufacturer":"Notion",        "category_main":"08. Business & Office Productivity","category_sub":"08-02. Document Generation & Editing","pricing_type":"Subscription","country":"United States","fallback_version":"2026"},
     "Canva Magic Studio": {"manufacturer":"Canva",         "category_main":"03. Visual Arts & Design","category_sub":"03-01. Artistic Image Generation","pricing_type":"Subscription","country":"Australia","fallback_version":"2026"},
-    "Llama":              {"manufacturer":"Meta",          "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Free","country":"United States","fallback_version":"Llama 4"},
+    "Llama":              {"manufacturer":"Meta",          "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Free","country":"United States","fallback_version":"Llama 4 Scout"},
     "DeepSeek":           {"manufacturer":"DeepSeek",      "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Free","country":"China","fallback_version":"DeepSeek V3"},
-    "Mistral Large":      {"manufacturer":"Mistral AI",    "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"France","fallback_version":"Mistral Large 2"},
+    "Mistral Large":      {"manufacturer":"Mistral AI",    "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"France","fallback_version":"Mistral Large 2 (24.11)"},
     "Grok":               {"manufacturer":"xAI",           "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States","fallback_version":"Grok 3"},
 }
 
@@ -220,7 +220,7 @@ def check_major_models(supabase) -> dict:
                 new_ko = gen_desc_ko(new_en)
                 time.sleep(0.5)
 
-                supabase.table("ai_products").update({
+                supabase.table("ai_products").update({"updated_at": datetime.datetime.utcnow().isoformat(),
                     "description":         new_en,
                     "description_ko":      new_ko,
                     "verification_status": f"Groq-verified ({latest_version})",
@@ -304,7 +304,7 @@ def enrich_glossary_korean(supabase, limit=15):
         if not en: continue
         ko = groq_call(f"다음 AI 용어 정의를 자연스러운 한국어로 번역하세요. 번역문만 출력하세요:\n\n{en}", max_tokens=200, model="llama-3.1-8b-instant")
         if ko:
-            supabase.table("glossary").update({"definition_kr":ko}).eq("term_id",row["term_id"]).execute()
+            supabase.table("glossary").update({"definition_kr":ko,"updated_at":datetime.datetime.utcnow().isoformat()}).eq("term_id",row["term_id"]).execute()
             enriched += 1
             time.sleep(0.3)
     return enriched
@@ -322,7 +322,7 @@ def enrich_products_korean(supabase, limit=20):
         if not en: continue
         ko = gen_desc_ko(en)
         if ko:
-            supabase.table("ai_products").update({"description_ko":ko}).eq("id",row["id"]).execute()
+            supabase.table("ai_products").update({"updated_at": datetime.datetime.utcnow().isoformat(),"description_ko":ko}).eq("id",row["id"]).execute()
             enriched += 1
             time.sleep(0.3)
     return enriched
