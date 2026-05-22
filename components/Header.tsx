@@ -83,22 +83,6 @@ export default function Header() {
           onMouseLeave={e => (e.currentTarget.style.color = '#8b949e')}
           >{tx('navRequest')}</Link>
 
-          {/* 언어 토글 */}
-          <button
-            onClick={() => setLang(lang === 'ko' ? 'en' : 'ko')}
-            style={{
-              padding: '5px 12px', borderRadius: '6px', fontSize: '12px',
-              fontFamily: 'monospace', fontWeight: 700,
-              color: 'var(--accent)',
-              background: 'rgba(0,255,136,0.07)',
-              border: '1px solid rgba(0,255,136,0.2)',
-              cursor: 'pointer', transition: 'all 0.15s',
-              minWidth: '52px',
-            }}
-          >
-            {lang === 'ko' ? 'EN' : 'KO'}
-          </button>
-
           <Link href="/auth" style={{
             padding: '5px 14px', borderRadius: '6px', fontSize: '12px',
             fontWeight: 700, color: '#000',
