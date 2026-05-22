@@ -1,9 +1,9 @@
 """
-AI DB 자동 업데이트 스크립트 — auto_update.py v3
+AI DB 자동 업데이트 스크립트 — auto_update.py v4
 ================================================
 매일 자동 실행:
   1. HuggingFace API에서 최신 모델 수집
-  2. 주요 12개 모델(Golden 8 + 1군) 버전 모니터링
+  2. 주요 12개 모델 버전 — Groq API로 감지
   3. product_name 기준 중복 체크
   4. 영문 데이터 먼저 저장 → 한글 자동 번역
   5. 신규 제품 추가 시 glossary 용어 자동 생성
@@ -42,20 +42,20 @@ TASK_MAP = {
     "text-to-audio":                {"category_main":"05. Audio & Music","category_sub":"05-03. AI Composition & Background Music","category_main_ko":"05. 오디오 및 음악","category_sub_ko":"05-03. AI 작곡 및 배경음악","modality":"Audio","modality_ko":"오디오","service_type":"API / Cloud","service_type_ko":"API / 클라우드","subcategory_code":"05-03"},
 }
 
-# ── 주요 12개 모델 모니터링 대상 ──────────────────────────────
+# ── 주요 12개 모델 정의 ───────────────────────────────────────
 MAJOR_MODELS = {
-    "ChatGPT Plus":       {"manufacturer":"OpenAI",        "product_name":"ChatGPT Plus",       "url":"https://help.openai.com/en/articles/6825453-chatgpt-release-notes","version_pattern":r"(GPT-4[o\w\-\.]+|o\d[\w\-\.]*|gpt-[\w\-\.]+)","category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models"},
-    "Gemini Advanced":    {"manufacturer":"Google",        "product_name":"Gemini Advanced",     "url":"https://gemini.google.com/updates","version_pattern":r"Gemini\s+([\d\.]+\s*(?:Pro|Flash|Ultra|Nano)?[\w\s]*)","category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models"},
-    "Copilot Pro":        {"manufacturer":"Microsoft",     "product_name":"Copilot Pro",         "url":"https://blogs.microsoft.com/blog/category/microsoft-365/","version_pattern":r"Copilot\s+([\w\s\d\.]+(?:Pro|Plus)?)","category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models"},
-    "Claude Pro":         {"manufacturer":"Anthropic",     "product_name":"Claude Pro",          "url":"https://www.anthropic.com/news","version_pattern":r"Claude\s+([\d\.]+[\w\-]*(?:\s+(?:Sonnet|Opus|Haiku)[\w\s\d\.]*)?)","category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models"},
-    "Perplexity Pro":     {"manufacturer":"Perplexity AI", "product_name":"Perplexity Pro",      "url":"https://www.perplexity.ai/hub/blog","version_pattern":r"Sonar\s*([\w\-\.]*)|Perplexity\s+([\w\s\d\.]+)","category_main":"02. Search & Knowledge Discovery","category_sub":"02-01. Conversational AI Search"},
-    "Poe":                {"manufacturer":"Quora",         "product_name":"Poe",                 "url":"https://poe.com/blog","version_pattern":r"Poe\s+([\w\s\d\.]+)","category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models"},
-    "Notion AI":          {"manufacturer":"Notion",        "product_name":"Notion AI",           "url":"https://www.notion.com/releases","version_pattern":r"Notion\s+AI\s*([\w\s\d\.]*)","category_main":"08. Business & Office Productivity","category_sub":"08-02. Document Generation & Editing"},
-    "Canva Magic Studio": {"manufacturer":"Canva",         "product_name":"Canva Magic Studio",  "url":"https://www.canva.com/newsroom/","version_pattern":r"Magic\s+(?:Studio\s*)?([\w\s\d\.]*)","category_main":"03. Visual Arts & Design","category_sub":"03-01. Artistic Image Generation"},
-    "Llama":              {"manufacturer":"Meta",          "product_name":"Llama",               "url":"https://ai.meta.com/blog/","version_pattern":r"Llama\s*([\d\.]+[\w\-]*)","category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models"},
-    "DeepSeek":           {"manufacturer":"DeepSeek",      "product_name":"DeepSeek",            "url":"https://api-docs.deepseek.com/news/news250120","version_pattern":r"DeepSeek[-\s]*(V[\d\.]+|R[\d\.]+|[\w\-]+)","category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models"},
-    "Mistral Large":      {"manufacturer":"Mistral AI",    "product_name":"Mistral Large",       "url":"https://mistral.ai/news/","version_pattern":r"Mistral\s+(Large|Medium|Small|Nemo|[\w\s\d\.]+)","category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models"},
-    "Grok":               {"manufacturer":"xAI",           "product_name":"Grok",                "url":"https://x.ai/blog","version_pattern":r"Grok[-\s]*([\d\.]+[\w\-]*)","category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models"},
+    "ChatGPT Plus":       {"manufacturer":"OpenAI",        "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States"},
+    "Gemini Advanced":    {"manufacturer":"Google",        "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States"},
+    "Copilot Pro":        {"manufacturer":"Microsoft",     "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States"},
+    "Claude Pro":         {"manufacturer":"Anthropic",     "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States"},
+    "Perplexity Pro":     {"manufacturer":"Perplexity AI", "category_main":"02. Search & Knowledge Discovery","category_sub":"02-01. Conversational AI Search","pricing_type":"Subscription","country":"United States"},
+    "Poe":                {"manufacturer":"Quora",         "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States"},
+    "Notion AI":          {"manufacturer":"Notion",        "category_main":"08. Business & Office Productivity","category_sub":"08-02. Document Generation & Editing","pricing_type":"Subscription","country":"United States"},
+    "Canva Magic Studio": {"manufacturer":"Canva",         "category_main":"03. Visual Arts & Design","category_sub":"03-01. Artistic Image Generation","pricing_type":"Subscription","country":"Australia"},
+    "Llama":              {"manufacturer":"Meta",          "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Free","country":"United States"},
+    "DeepSeek":           {"manufacturer":"DeepSeek",      "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Free","country":"China"},
+    "Mistral Large":      {"manufacturer":"Mistral AI",    "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"France"},
+    "Grok":               {"manufacturer":"xAI",           "category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","pricing_type":"Subscription","country":"United States"},
 }
 
 
@@ -68,7 +68,7 @@ def groq_call(prompt: str, max_tokens=300) -> str:
         r = requests.post(
             "https://api.groq.com/openai/v1/chat/completions",
             headers={"Authorization":f"Bearer {GROQ_API_KEY}","Content-Type":"application/json"},
-            json={"model":"llama-3.1-8b-instant","messages":[{"role":"user","content":prompt}],"max_tokens":max_tokens,"temperature":0.3},
+            json={"model":"llama-3.1-8b-instant","messages":[{"role":"user","content":prompt}],"max_tokens":max_tokens,"temperature":0.1},
             timeout=30
         )
         r.raise_for_status()
@@ -77,39 +77,88 @@ def groq_call(prompt: str, max_tokens=300) -> str:
         print(f"  Groq 오류: {e}")
         return ""
 
+def get_latest_version_via_groq(product_name: str, manufacturer: str) -> str:
+    """Groq에게 최신 버전 물어보기"""
+    response = groq_call(
+        f"What is the latest released version/model name of {product_name} by {manufacturer} "
+        f"as of {TODAY}? Reply with ONLY the version/model name, nothing else. "
+        f"Example replies: 'GPT-4o', 'Claude 3.7 Sonnet', 'Llama 4', 'Gemini 2.5 Pro'. "
+        f"If you don't know the exact latest version, reply 'unknown'.",
+        max_tokens=30
+    )
+    response = response.strip().strip('"').strip("'")
+    if not response or response.lower() == "unknown" or len(response) > 60:
+        return ""
+    # 너무 긴 문장은 버전이 아님
+    if len(response.split()) > 6:
+        return ""
+    return response
+
 def gen_desc_en(product_name, manufacturer, category, version):
-    return groq_call(f"Write an 80-120 word expert analysis in English for this AI product. Name: {product_name}, Maker: {manufacturer}, Category: {category}, Version: {version}. Focus on key features and market position. Output analysis text only.", max_tokens=200) or f"{product_name} by {manufacturer}. {category} AI model."
+    return groq_call(
+        f"Write an 80-120 word expert analysis in English for this AI product. "
+        f"Name: {product_name}, Maker: {manufacturer}, Category: {category}, "
+        f"Latest version: {version}. Focus on key features and market position. "
+        f"Output analysis text only.",
+        max_tokens=200
+    ) or f"{product_name} by {manufacturer}. {category} AI model. Latest: {version}."
 
-def gen_desc_ko(en_text, product_name):
+def gen_desc_ko(en_text):
     if not en_text: return ""
-    return groq_call(f"다음 영문 AI 제품 설명을 자연스러운 한국어로 번역하세요. 번역문만 출력하세요:\n\n{en_text}", max_tokens=300)
+    return groq_call(
+        f"다음 영문 AI 제품 설명을 자연스러운 한국어로 번역하세요. "
+        f"번역문만 출력하세요:\n\n{en_text}",
+        max_tokens=300
+    )
 
-def gen_glossary_term(product_name, manufacturer, category, subcategory_code):
-    en = groq_call(f"Define the AI term '{product_name}' by {manufacturer} in {category} in 30-50 words. Focus on what it is and its key capability. Output definition text only.", max_tokens=100) or f"{product_name}: An AI model by {manufacturer} in the {category} category."
+def gen_glossary_term(product_name, manufacturer, category):
+    en = groq_call(
+        f"Define '{product_name}' by {manufacturer} in {category} in 30-50 words. "
+        f"Output definition text only.",
+        max_tokens=100
+    ) or f"{product_name}: An AI product by {manufacturer} in {category}."
     time.sleep(0.3)
-    ko = groq_call(f"다음 AI 용어 정의를 자연스러운 한국어로 번역하세요. 번역문만 출력하세요:\n\n{en}", max_tokens=150)
+    ko = groq_call(
+        f"다음 AI 용어 정의를 자연스러운 한국어로 번역하세요. 번역문만 출력하세요:\n\n{en}",
+        max_tokens=150
+    )
     return en, ko
 
 
-# ══ HuggingFace 수집 ══════════════════════════════════════════
+# ══ HuggingFace 신규 모델 수집 ════════════════════════════════
 
 def fetch_new_hf_models(existing_names: set) -> list:
     new_models = []
     cutoff = (datetime.date.today() - datetime.timedelta(days=7)).isoformat()
     for task in HF_TASKS:
         try:
-            r = requests.get(HF_API, params={"pipeline_tag":task,"sort":"createdAt","direction":-1,"limit":50,"full":True}, timeout=15)
+            r = requests.get(HF_API, params={
+                "pipeline_tag":task,"sort":"createdAt",
+                "direction":-1,"limit":50,"full":True
+            }, timeout=15)
             r.raise_for_status()
             for m in r.json():
-                model_id = m.get("id","")
+                model_id   = m.get("id","")
                 model_name = model_id.split("/")[-1] if "/" in model_id else model_id
-                created = m.get("createdAt","")[:10]
+                created    = m.get("createdAt","")[:10]
                 if created < cutoff: break
                 if model_name.lower() in existing_names: continue
                 if m.get("downloads",0) < 50: continue
-                cat = TASK_MAP.get(task, TASK_MAP["text-generation"])
+                cat    = TASK_MAP.get(task, TASK_MAP["text-generation"])
                 author = model_id.split("/")[0] if "/" in model_id else "Unknown"
-                new_models.append({**{k:v for k,v in cat.items() if k!="subcategory_code"},"country":"Global","manufacturer":author,"product_name":model_name,"official_url":f"https://huggingface.co/{model_id}","verification_status":"Auto-collected (HF)","pricing_type":"Free","pricing_type_ko":"무료","service_region":"Global","service_region_ko":"글로벌","is_research_model":m.get("downloads",0)<1000,"parent_platform":"HuggingFace","_created":created,"_downloads":m.get("downloads",0),"_subcategory_code":cat.get("subcategory_code","01-01")})
+                new_models.append({
+                    **{k:v for k,v in cat.items() if k!="subcategory_code"},
+                    "country":"Global","manufacturer":author,
+                    "product_name":model_name,
+                    "official_url":f"https://huggingface.co/{model_id}",
+                    "verification_status":"Auto-collected (HF)",
+                    "pricing_type":"Free","pricing_type_ko":"무료",
+                    "service_region":"Global","service_region_ko":"글로벌",
+                    "is_research_model":m.get("downloads",0)<1000,
+                    "parent_platform":"HuggingFace",
+                    "_created":created,
+                    "_subcategory_code":cat.get("subcategory_code","01-01"),
+                })
                 existing_names.add(model_name.lower())
             time.sleep(0.5)
         except Exception as e:
@@ -117,95 +166,127 @@ def fetch_new_hf_models(existing_names: set) -> list:
     return new_models
 
 
-# ══ 주요 12개 모델 모니터링 ══════════════════════════════════
-
-def fetch_page(url):
-    try:
-        r = requests.get(url, headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}, timeout=15)
-        r.raise_for_status()
-        return r.text
-    except Exception as e:
-        print(f"    페이지 접근 실패: {e}")
-        return ""
-
-def extract_version(html, pattern):
-    try:
-        matches = re.findall(pattern, html, re.IGNORECASE)
-        if matches:
-            match = matches[0]
-            if isinstance(match, tuple):
-                match = next((m for m in match if m), "")
-            return match.strip()[:50]
-    except: pass
-    return ""
+# ══ 주요 12개 모델 Groq 버전 감지 ════════════════════════════
 
 def check_major_models(supabase) -> dict:
     result = {"updated":[], "errors":[]}
-    print("\n[★] 주요 12개 모델 버전 모니터링...")
-    for model_key, info in MAJOR_MODELS.items():
+    print("\n[★] 주요 12개 모델 버전 모니터링 (Groq)...")
+
+    for product_name, info in MAJOR_MODELS.items():
         try:
-            print(f"  → {model_key} 확인 중...")
-            db_result = supabase.table("ai_products").select("id,product_name,description,description_ko,verification_status").ilike("product_name",f"%{info['product_name'].split()[0]}%").eq("manufacturer",info["manufacturer"]).limit(1).execute()
-            html = fetch_page(info["url"])
-            time.sleep(1)
-            if not html:
-                result["errors"].append(f"{model_key}: 페이지 접근 실패")
-                continue
-            latest_version = extract_version(html, info["version_pattern"])
+            print(f"  → {product_name} 확인 중...")
+
+            # Groq에게 최신 버전 질문
+            latest_version = get_latest_version_via_groq(product_name, info["manufacturer"])
+            time.sleep(0.5)
+
             if not latest_version:
                 print(f"    버전 감지 실패 — 스킵")
                 continue
+
             print(f"    감지된 버전: {latest_version}")
+
+            # DB에서 현재 항목 조회
+            db_result = supabase.table("ai_products") \
+                .select("id,product_name,description,description_ko,verification_status") \
+                .ilike("product_name", f"%{product_name.split()[0]}%") \
+                .eq("manufacturer", info["manufacturer"]) \
+                .limit(1).execute()
+
             if db_result.data:
                 row = db_result.data[0]
-                current_desc = row.get("description","") or ""
-                if latest_version.lower() in current_desc.lower():
+                current_status = row.get("verification_status","") or ""
+                # 이미 같은 버전이면 스킵
+                if latest_version.lower() in current_status.lower():
                     print(f"    이미 최신 — 스킵")
                     continue
-                new_en = groq_call(f"Update the product description for {info['product_name']} by {info['manufacturer']}. Latest version: {latest_version}. Write 80-120 word expert analysis. Output text only.", max_tokens=200)
+
+                # 설명 업데이트
+                new_en = gen_desc_en(product_name, info["manufacturer"], info["category_sub"], latest_version)
                 time.sleep(0.5)
-                if not new_en: continue
-                new_ko = groq_call(f"다음 AI 제품 설명을 자연스러운 한국어로 번역하세요. 번역문만 출력하세요:\n\n{new_en}", max_tokens=300)
+                new_ko = gen_desc_ko(new_en)
                 time.sleep(0.5)
-                supabase.table("ai_products").update({"description":new_en,"description_ko":new_ko,"verification_status":f"Auto-updated (v{latest_version})"}).eq("id",row["id"]).execute()
+
+                supabase.table("ai_products").update({
+                    "description":         new_en,
+                    "description_ko":      new_ko,
+                    "verification_status": f"Groq-verified ({latest_version})",
+                }).eq("id", row["id"]).execute()
+
+                # 버전 이력 저장
                 try:
-                    supabase.table("ai_versions").insert({"product_id":row["id"],"version_name":latest_version,"is_active":True,"sort_order":1}).execute()
+                    supabase.table("ai_versions").insert({
+                        "product_id":   row["id"],
+                        "version_name": latest_version,
+                        "is_active":    True,
+                        "sort_order":   1,
+                    }).execute()
                 except: pass
-                result["updated"].append(f"{model_key}: {latest_version}")
+
+                result["updated"].append(f"{product_name}: {latest_version}")
                 print(f"    ✅ 업데이트: {latest_version}")
+
             else:
-                new_en = groq_call(f"Write an 80-120 word expert analysis in English for {info['product_name']} by {info['manufacturer']}. Latest version: {latest_version}. Output text only.", max_tokens=200)
+                # DB에 없으면 신규 추가
+                new_en = gen_desc_en(product_name, info["manufacturer"], info["category_sub"], latest_version)
                 time.sleep(0.5)
-                new_ko = groq_call(f"다음 AI 제품 설명을 자연스러운 한국어로 번역하세요. 번역문만 출력하세요:\n\n{new_en}", max_tokens=300) if new_en else ""
+                new_ko = gen_desc_ko(new_en)
                 time.sleep(0.5)
-                supabase.table("ai_products").insert({"category_main":info["category_main"],"category_sub":info["category_sub"],"category_main_ko":info["category_main"],"category_sub_ko":info["category_sub"],"manufacturer":info["manufacturer"],"product_name":info["product_name"],"official_url":info["url"],"description":new_en,"description_ko":new_ko,"verification_status":f"Auto-added (v{latest_version})","country":"United States","service_region":"Global","service_region_ko":"글로벌","pricing_type":"Subscription","pricing_type_ko":"구독","is_research_model":False}).execute()
-                result["updated"].append(f"{model_key}: 신규 추가 ({latest_version})")
+
+                supabase.table("ai_products").insert({
+                    "category_main":       info["category_main"],
+                    "category_sub":        info["category_sub"],
+                    "category_main_ko":    info["category_main"],
+                    "category_sub_ko":     info["category_sub"],
+                    "manufacturer":        info["manufacturer"],
+                    "product_name":        product_name,
+                    "description":         new_en,
+                    "description_ko":      new_ko,
+                    "verification_status": f"Groq-verified ({latest_version})",
+                    "country":             info["country"],
+                    "service_region":      "Global",
+                    "service_region_ko":   "글로벌",
+                    "pricing_type":        info["pricing_type"],
+                    "pricing_type_ko":     "구독" if info["pricing_type"]=="Subscription" else "무료",
+                    "is_research_model":   False,
+                }).execute()
+
+                result["updated"].append(f"{product_name}: 신규 추가 ({latest_version})")
                 print(f"    ✅ 신규 추가: {latest_version}")
+
         except Exception as e:
-            err = f"{model_key}: {str(e)}"
+            err = f"{product_name}: {str(e)}"
             result["errors"].append(err)
             print(f"    ❌ {err}")
-        time.sleep(1)
-    print(f"  주요 모델 업데이트: {len(result['updated'])}개")
+        time.sleep(0.5)
+
+    print(f"  주요 모델 처리: {len(result['updated'])}개")
     return result
 
 
-# ══ glossary ══════════════════════════════════════════════════
+# ══ glossary 보강 ═════════════════════════════════════════════
 
 def add_glossary_term(supabase, product_name, manufacturer, category_sub, subcategory_code):
     try:
-        exists = supabase.table("glossary").select("term_id").ilike("term_en",product_name).execute()
+        exists = supabase.table("glossary").select("term_id").ilike("term_en", product_name).execute()
         if exists.data: return False
-        def_en, def_ko = gen_glossary_term(product_name, manufacturer, category_sub, subcategory_code)
-        supabase.table("glossary").insert({"term_id":str(uuid.uuid4()),"subcategory_code":subcategory_code,"term_en":product_name,"term_kr":product_name,"definition_en":def_en,"definition_kr":def_ko}).execute()
+        def_en, def_ko = gen_glossary_term(product_name, manufacturer, category_sub)
+        supabase.table("glossary").insert({
+            "term_id":          str(uuid.uuid4()),
+            "subcategory_code": subcategory_code,
+            "term_en":          product_name,
+            "term_kr":          product_name,
+            "definition_en":    def_en,
+            "definition_kr":    def_ko,
+        }).execute()
         return True
     except Exception as e:
-        print(f"  glossary 추가 오류 ({product_name}): {e}")
+        print(f"  glossary 오류 ({product_name}): {e}")
         return False
 
 def enrich_glossary_korean(supabase, limit=15):
     if not GROQ_API_KEY: return 0
-    result = supabase.table("glossary").select("term_id,term_en,definition_en,definition_kr").is_("definition_kr","null").limit(limit).execute()
+    result = supabase.table("glossary").select("term_id,definition_en,definition_kr").is_("definition_kr","null").limit(limit).execute()
     enriched = 0
     for row in result.data:
         en = row.get("definition_en","")
@@ -219,12 +300,16 @@ def enrich_glossary_korean(supabase, limit=15):
 
 def enrich_products_korean(supabase, limit=20):
     if not GROQ_API_KEY: return 0
-    result = supabase.table("ai_products").select("id,product_name,description,description_ko").is_("description_ko","null").not_.is_("description","null").limit(limit).execute()
+    result = supabase.table("ai_products") \
+        .select("id,product_name,description,description_ko") \
+        .is_("description_ko","null") \
+        .not_.is_("description","null") \
+        .limit(limit).execute()
     enriched = 0
     for row in result.data:
         en = row.get("description","")
         if not en: continue
-        ko = gen_desc_ko(en, row["product_name"])
+        ko = gen_desc_ko(en)
         if ko:
             supabase.table("ai_products").update({"description_ko":ko}).eq("id",row["id"]).execute()
             enriched += 1
@@ -238,15 +323,26 @@ def main():
     print(f"{'='*50}")
     print(f" AI DB 자동 업데이트 — {TODAY}")
     print(f"{'='*50}")
+
     if not SUPABASE_URL or not SUPABASE_KEY:
         raise ValueError("SUPABASE_URL 또는 SUPABASE_KEY 환경변수 없음")
+
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     print("✅ Supabase 연결 완료")
+
     existing = supabase.table("ai_products").select("product_name").execute()
     existing_names = {r["product_name"].lower() for r in existing.data}
     print(f"  기존 제품 수: {len(existing_names):,}개")
 
-    log = {"date":TODAY,"products_added":[],"major_updated":[],"glossary_added":[],"products_ko_enriched":0,"glossary_ko_enriched":0,"errors":[]}
+    log = {
+        "date": TODAY,
+        "products_added": [],
+        "major_updated": [],
+        "glossary_added": [],
+        "products_ko_enriched": 0,
+        "glossary_ko_enriched": 0,
+        "errors": [],
+    }
 
     # 1. HF 신규 모델
     print("\n[1] 신규 HF 모델 수집...")
@@ -257,13 +353,13 @@ def main():
         try:
             desc_en = gen_desc_en(m["product_name"],m["manufacturer"],m["category_sub"],m.get("_created","최신"))
             time.sleep(0.3)
-            desc_ko = gen_desc_ko(desc_en, m["product_name"])
+            desc_ko = gen_desc_ko(desc_en)
             time.sleep(0.3)
             insert_data = {k:v for k,v in m.items() if not k.startswith("_")}
-            insert_data["description"] = desc_en
+            insert_data["description"]    = desc_en
             insert_data["description_ko"] = desc_ko
             supabase.table("ai_products").insert(insert_data).execute()
-            g_added = add_glossary_term(supabase,m["product_name"],m["manufacturer"],m["category_sub"],m["_subcategory_code"])
+            g_added = add_glossary_term(supabase, m["product_name"], m["manufacturer"], m["category_sub"], m["_subcategory_code"])
             if g_added: log["glossary_added"].append(m["product_name"])
             log["products_added"].append(m["product_name"])
             added += 1
@@ -272,7 +368,7 @@ def main():
             log["errors"].append(f"{m['product_name']}: {str(e)}")
     print(f"  추가 완료: {added}개")
 
-    # 2. 주요 12개 모델 버전 모니터링
+    # 2. 주요 12개 모델 Groq 버전 감지
     major_result = check_major_models(supabase)
     log["major_updated"] = major_result["updated"]
     log["errors"].extend(major_result["errors"])
@@ -289,21 +385,28 @@ def main():
     log["glossary_ko_enriched"] = g_enriched
     print(f"  완료: {g_enriched}개")
 
-    # 5. 로그
+    # 5. 로그 저장
     os.makedirs(LOG_DIR, exist_ok=True)
     with open(LOG_FILE,"w",encoding="utf-8") as f:
         json.dump(log,f,ensure_ascii=False,indent=2)
+
     try:
-        supabase.table("update_logs").insert({"action":"daily_update","product_name":f"일괄 업데이트 {TODAY}","detail":f"HF {added}개 | 주요모델 {len(major_result['updated'])}개 | glossary {len(log['glossary_added'])}개 | 한글보강 {p_enriched}개","source":"GitHub Actions"}).execute()
+        supabase.table("update_logs").insert({
+            "action":       "daily_update",
+            "product_name": f"일괄 업데이트 {TODAY}",
+            "detail":       f"HF {added}개 | 주요모델 {len(major_result['updated'])}개 | glossary {len(log['glossary_added'])}개 | 한글보강 {p_enriched}개",
+            "source":       "GitHub Actions",
+        }).execute()
     except: pass
 
     print(f"\n{'='*50}")
     print(f" ✅ 완료!")
-    print(f"    HF 신규:      {added}개")
+    print(f"    HF 신규:          {added}개")
     print(f"    주요모델 업데이트: {len(major_result['updated'])}개")
-    print(f"    glossary 신규: {len(log['glossary_added'])}개")
-    print(f"    한글 보강:     {p_enriched}개")
+    print(f"    glossary 신규:    {len(log['glossary_added'])}개")
+    print(f"    한글 보강:         {p_enriched}개")
     print(f"{'='*50}")
+
 
 if __name__ == "__main__":
     main()
