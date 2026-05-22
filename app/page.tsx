@@ -145,8 +145,8 @@ export default function Home() {
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '600px', height: '300px', background: 'radial-gradient(ellipse, rgba(0,255,136,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
           <p className="font-mono text-xs text-green-400 tracking-widest pulse" style={{ position: 'relative', zIndex: 1 }}>{tx('liveUpdate')}</p>
           <div style={{ display: 'inline-block', textAlign: 'left' }}>
-            <p style={{ fontSize: '11px', color: '#00cc6a', fontFamily: 'monospace', marginTop: '20px', marginBottom: '4px', lineHeight: 1, letterSpacing: '0.08em' }}>{ko ? 'AI 지도 완전판' : 'The Complete AI Atlas'}</p>
-            <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(28px, 3.2vw, 40px)', color: '#e6edf3', lineHeight: 1.1, marginBottom: '10px', letterSpacing: '1.5px' }}>{ko ? '이거봐!!! AI가 다 모였어' : 'WAIT, THEY ARE ALL HERE?!'}</h1>
+            <p style={{ fontSize: '14px', color: '#00cc6a', fontFamily: "'Noto Sans KR', 'JetBrains Mono', monospace", fontWeight: 600, marginTop: '20px', marginBottom: '6px', lineHeight: 1, letterSpacing: '0.08em' }}>{ko ? 'AI 지도 완전판' : 'The Complete AI Atlas'}</p>
+            <h1 style={{ fontFamily: ko ? "'Noto Sans KR', sans-serif" : "'Bebas Neue', sans-serif", fontWeight: ko ? 300 : 400, fontSize: ko ? 'clamp(24px, 2.8vw, 32px)' : 'clamp(22px, 2.6vw, 34px)', color: '#e6edf3', lineHeight: 1.2, marginBottom: '10px', letterSpacing: ko ? '-0.5px' : '1.5px' }}>{ko ? '이거봐!!! AI가 다 모였어' : 'WAIT, THEY ARE ALL HERE?!'}</h1>
           </div>
           <p style={{ color: "#6e7681", fontSize: "12px", maxWidth: "520px", margin: "0 auto 10px", lineHeight: 1.6, whiteSpace: 'pre-line' }}>{tx('heroDesc')}</p>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
