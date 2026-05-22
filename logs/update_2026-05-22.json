@@ -1,8 +1,18 @@
 {
   "date": "2026-05-22",
   "products_added": [],
+  "major_updated": [
+    "ChatGPT Plus: O9whmiwlI7SrycQgB05V0YsGI8Uz6TEHE25VoE6j1-T3Oy16p2",
+    "Perplexity Pro: Blog",
+    "Poe: FullLogo_Color_OverWhite_H",
+    "Canva Magic Studio: Layers",
+    "Llama: .com",
+    "Grok: .com"
+  ],
   "glossary_added": [],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
-  "errors": []
+  "errors": [
+    "Copilot Pro: 페이지 접근 실패"
+  ]
 }
