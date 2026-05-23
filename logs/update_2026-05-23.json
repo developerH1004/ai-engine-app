@@ -1,0 +1,37 @@
+{
+  "date": "2026-05-23",
+  "products_added": [
+    "VITS-OpenBible-Malayalam",
+    "bn-wav2vec2-xlsr-53",
+    "granite-speech-4.1-2b-nar-mlx",
+    "mega-asr-GGUF",
+    "mms-1b-ckt-pooled",
+    "mega-asr-mlx",
+    "facebook-mms-1b-all-km-indomain20-withac",
+    "mega-asr-coreml",
+    "whisper-base-hausa",
+    "0xProto-368K-GGUF",
+    "tabbox-guitar-omr-convnext-branch-1200-v1",
+    "PP-FormulaNet-L-ONNX"
+  ],
+  "major_updated": [
+    "DeepSeek: DeepSeek 1.0"
+  ],
+  "glossary_added": [
+    "VITS-OpenBible-Malayalam",
+    "bn-wav2vec2-xlsr-53",
+    "granite-speech-4.1-2b-nar-mlx",
+    "mega-asr-GGUF",
+    "mms-1b-ckt-pooled",
+    "mega-asr-mlx",
+    "facebook-mms-1b-all-km-indomain20-withac",
+    "mega-asr-coreml",
+    "whisper-base-hausa",
+    "0xProto-368K-GGUF",
+    "tabbox-guitar-omr-convnext-branch-1200-v1",
+    "PP-FormulaNet-L-ONNX"
+  ],
+  "products_ko_enriched": 0,
+  "glossary_ko_enriched": 0,
+  "errors": []
+}
