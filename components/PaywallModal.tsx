@@ -1,9 +1,18 @@
 'use client'
+import { useRef, useEffect } from 'react'
 import { useLang } from '@/lib/LangContext'
 
 export default function PaywallModal({ onClose }: { onClose: () => void }) {
   const { lang } = useLang()
   const ko = lang === 'ko'
+  const modalRef = useRef<HTMLDivElement>(null)
+
+  // 팝업 위치로 자동 스크롤
+  useEffect(() => {
+    if (modalRef.current) {
+      modalRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [])
 
   return (
     <>
@@ -14,7 +23,9 @@ export default function PaywallModal({ onClose }: { onClose: () => void }) {
       />
 
       {/* 팝업 */}
-      <div style={{
+      <div
+        ref={modalRef}
+        style={{
         position: 'fixed', top: '50%', left: '50%',
         transform: 'translate(-50%, -50%)',
         zIndex: 801,
