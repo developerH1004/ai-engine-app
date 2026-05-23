@@ -155,7 +155,7 @@ export default function Header() {
             >{tx('navLinks')}</button>
             <Link href="/auth" onClick={() => setOpen(false)} style={{
               padding: '8px 12px', borderRadius: '6px', fontSize: '13px',
-              color: '#00cc6a', textDecoration: 'none', fontFamily: 'monospace', fontSize: '12px',
+              color: '#00cc6a', textDecoration: 'none', fontFamily: 'monospace',
             }}>🔑 {tx('navAuth')}</Link>
           </div>
         )}
