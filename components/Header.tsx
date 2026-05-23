@@ -6,7 +6,6 @@ import { t } from '@/lib/i18n'
 import LinkHub from '@/components/LinkHub'
 
 export default function Header() {
-  const [open, setOpen] = useState(false)
   const [hubOpen, setHubOpen] = useState(false)
   const { lang, setLang } = useLang()
   const tx = (key: string) => t[key]?.[lang] ?? key
@@ -19,7 +18,7 @@ export default function Header() {
         backdropFilter: 'blur(20px)',
         borderBottom: '1px solid rgba(255,255,255,0.05)',
       }}>
-        {/* 상단 얇은 액센트 라인 */}
+        {/* 상단 액센트 라인 */}
         <div style={{
           height: '1px',
           background: 'linear-gradient(90deg, transparent 0%, rgba(0,255,136,0.5) 50%, transparent 100%)',
@@ -50,8 +49,8 @@ export default function Header() {
           <a
             href="https://zenodo.org/records/20248631"
             target="_blank" rel="noopener noreferrer"
+            className="hidden md:inline-flex"
             style={{
-              display: 'none',
               alignItems: 'center', gap: '6px',
               padding: '4px 12px', borderRadius: '99px',
               background: 'rgba(0,255,136,0.05)',
@@ -60,7 +59,6 @@ export default function Header() {
               fontFamily: 'monospace', textDecoration: 'none',
               whiteSpace: 'nowrap',
             }}
-            className="hidden md:inline-flex"
           >
             <span style={{ opacity: 0.5, fontSize: '10px' }}>📄 DOI</span>
             10.5281/zenodo.20248631
@@ -84,32 +82,61 @@ export default function Header() {
             onMouseLeave={e => (e.currentTarget.style.color = '#8b949e')}
             >{tx('navRequest')}</Link>
 
-            {/* 링크 허브 버튼 */}
+            {/* 시리얼 인증 버튼 — 원래대로 유지 */}
+            <Link href="/auth" style={{
+              padding: '5px 14px', borderRadius: '6px', fontSize: '12px',
+              fontWeight: 700, color: '#000',
+              background: 'var(--accent)',
+              textDecoration: 'none', transition: 'all 0.15s',
+              marginLeft: '4px',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.background = '#00ff99'
+              ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(0,255,136,0.4)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.background = 'var(--accent)'
+              ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
+            }}
+            >{tx('navAuth')}</Link>
+
+            {/* 언어 전환 */}
+            <button
+              onClick={() => setLang(lang === 'ko' ? 'en' : 'ko')}
+              style={{
+                padding: '4px 10px', borderRadius: '6px', fontSize: '11px',
+                fontFamily: 'monospace', fontWeight: 700,
+                color: 'var(--accent)',
+                background: 'rgba(0,255,136,0.07)',
+                border: '1px solid rgba(0,255,136,0.2)',
+                cursor: 'pointer', marginLeft: '4px',
+              }}
+            >{lang === 'ko' ? 'EN' : 'KO'}</button>
+
+            {/* ☰ 메뉴 아이콘 → 링크 허브 드로어 */}
             <button
               onClick={() => setHubOpen(true)}
+              title={lang === 'ko' ? '링크 허브' : 'Link Hub'}
               style={{
-                padding: '5px 14px', borderRadius: '6px', fontSize: '12px',
-                fontWeight: 700, color: '#000',
-                background: 'var(--accent)',
-                border: 'none', cursor: 'pointer',
-                transition: 'all 0.15s',
-                marginLeft: '4px',
+                padding: '5px 8px', borderRadius: '6px', fontSize: '16px',
+                color: '#8b949e', background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.08)',
+                cursor: 'pointer', marginLeft: '4px',
+                transition: 'all 0.15s', lineHeight: 1,
               }}
               onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.background = '#00ff99'
-                ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(0,255,136,0.4)'
+                (e.currentTarget as HTMLElement).style.color = 'var(--accent)'
+                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,255,136,0.3)'
               }}
               onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.background = 'var(--accent)'
-                ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
+                (e.currentTarget as HTMLElement).style.color = '#8b949e'
+                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'
               }}
-            >
-              {tx('navLinks')}
-            </button>
+            >☰</button>
           </nav>
 
-          {/* 모바일 */}
-          <div className="md:hidden" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* 모바일 우측 */}
+          <div className="md:hidden" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <button
               onClick={() => setLang(lang === 'ko' ? 'en' : 'ko')}
               style={{
@@ -121,44 +148,18 @@ export default function Header() {
                 cursor: 'pointer',
               }}
             >{lang === 'ko' ? 'EN' : 'KO'}</button>
+
+            {/* 모바일 ☰ → 링크 허브 */}
             <button
-              onClick={() => setOpen(!open)}
+              onClick={() => setHubOpen(true)}
               style={{
                 padding: '4px 10px', borderRadius: '6px', fontSize: '14px',
                 color: '#8b949e', background: 'transparent',
                 border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer',
               }}
-            >{open ? '✕' : '☰'}</button>
+            >☰</button>
           </div>
         </div>
-
-        {/* 모바일 메뉴 */}
-        {open && (
-          <div className="md:hidden" style={{
-            borderTop: '1px solid rgba(255,255,255,0.05)',
-            padding: '12px 20px', display: 'flex', flexDirection: 'column', gap: '8px',
-            background: 'rgba(8,10,15,0.98)',
-          }}>
-            <Link href="/" onClick={() => setOpen(false)} style={{ padding: '8px 12px', borderRadius: '6px', fontSize: '13px', color: '#8b949e', textDecoration: 'none' }}>{tx('navExplore')}</Link>
-            <Link href="/request" onClick={() => setOpen(false)} style={{ padding: '8px 12px', borderRadius: '6px', fontSize: '13px', color: '#8b949e', textDecoration: 'none' }}>{tx('navRequest')}</Link>
-            <a href="https://zenodo.org/records/20248631" target="_blank" rel="noopener noreferrer"
-              style={{ padding: '8px 12px', fontSize: '11px', fontFamily: 'monospace', color: '#00cc6a', textDecoration: 'none' }}>
-              DOI: 10.5281/zenodo.20248631
-            </a>
-            <button
-              onClick={() => { setOpen(false); setHubOpen(true) }}
-              style={{
-                padding: '9px 14px', borderRadius: '6px', fontSize: '13px',
-                fontWeight: 700, color: '#000', background: 'var(--accent)',
-                border: 'none', cursor: 'pointer', textAlign: 'center',
-              }}
-            >{tx('navLinks')}</button>
-            <Link href="/auth" onClick={() => setOpen(false)} style={{
-              padding: '8px 12px', borderRadius: '6px', fontSize: '13px',
-              color: '#00cc6a', textDecoration: 'none', fontFamily: 'monospace',
-            }}>🔑 {tx('navAuth')}</Link>
-          </div>
-        )}
       </header>
 
       {/* 링크 허브 드로어 */}
