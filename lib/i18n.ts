@@ -10,6 +10,7 @@ export const t: Record<string, Record<Lang, string>> = {
   navExplore:     { ko: '탐색', en: 'Explore' },
   navRequest:     { ko: '등록 요청', en: 'Submit Request' },
   navAuth:        { ko: '시리얼 인증', en: 'Serial Auth' },
+  navLinks:       { ko: '링크 / 인증', en: 'Links / Auth' },
 
   // 메인 히어로 — 새 책 제목
   heroSubKo:      { ko: 'AI 지도 완전판', en: 'The Complete AI Atlas' },
