@@ -5,6 +5,7 @@ import { useLang } from '@/lib/LangContext'
 import { t } from '@/lib/i18n'
 import { GlossaryTerm } from '@/lib/glossaryData'
 import { parseTextWithGlossary } from '@/lib/useGlossary'
+import PaywallModal from '@/components/PaywallModal'
 
 function calcPopupPos(
   clientX: number,
@@ -58,6 +59,11 @@ export default function ProductCard({ product, isComparing, onCompare }: {
 
   const [detailOpen,    setDetailOpen]    = useState(false)
   const [detailStyle,   setDetailStyle]   = useState<React.CSSProperties>({})
+  const [paywallOpen,   setPaywallOpen]   = useState(false)
+
+  // 쿠키로 인증 여부 확인
+  const isVerified = typeof document !== 'undefined'
+    && document.cookie.split(';').some(c => c.trim().startsWith('ai_map_verified=true'))
   const [glossaryTerm,  setGlossaryTerm]  = useState<GlossaryTerm | null>(null)
   const [glossaryStyle, setGlossaryStyle] = useState<React.CSSProperties>({})
   const [prompts, setPrompts]             = useState<any[]>([])
@@ -164,10 +170,10 @@ export default function ProductCard({ product, isComparing, onCompare }: {
         className="card p-4 flex flex-col gap-2"
         style={{ cursor: 'pointer', ...(isComparing ? { borderColor: 'var(--accent)', background: 'rgba(0,255,136,0.05)' } : {}) }}
         onClick={() => {
+          if (!isVerified) { setPaywallOpen(true); return }
           const rect = cardRef.current?.getBoundingClientRect()
           if (rect) {
             setDetailStyle(calcPopupPosFromRect(rect, 620))
-            // 팝업(=카드 위치)이 화면 세로 중앙에 오도록 스크롤
             const pageTop = rect.top + window.scrollY
             const targetScroll = pageTop - window.innerHeight / 2
             window.scrollTo({ top: targetScroll, behavior: 'smooth' })
@@ -239,19 +245,26 @@ export default function ProductCard({ product, isComparing, onCompare }: {
           onMouseDown={e => e.stopPropagation()}
           onClick={e => e.stopPropagation()}        >
           {product.official_url && (
-            <a href={product.official_url} target="_blank" rel="noopener noreferrer"
-              style={{ flex: 1, textAlign: 'center', fontSize: '11px', color: '#777', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', textDecoration: 'none' }}>
-              🔗 {tx('officialSite')}
-            </a>
+            isVerified ? (
+              <a href={product.official_url} target="_blank" rel="noopener noreferrer"
+                style={{ flex: 1, textAlign: 'center', fontSize: '11px', color: '#777', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)', textDecoration: 'none' }}>
+                🔗 {tx('officialSite')}
+              </a>
+            ) : (
+              <button onClick={() => setPaywallOpen(true)}
+                style={{ flex: 1, textAlign: 'center', fontSize: '11px', color: '#555', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.06)', background: 'none', cursor: 'pointer' }}>
+                🔒 {tx('officialSite')}
+              </button>
+            )
           )}
-          <button onClick={() => onCompare(product)} style={{
+          <button onClick={() => isVerified ? onCompare(product) : setPaywallOpen(true)} style={{
             fontSize: '11px', padding: '6px 12px', borderRadius: '6px',
             border: isComparing ? '1px solid #00ff88' : '1px solid rgba(255,255,255,0.08)',
-            color: isComparing ? '#00ff88' : '#777',
+            color: isComparing ? '#00ff88' : (isVerified ? '#777' : '#555'),
             background: isComparing ? 'rgba(0,255,136,0.1)' : 'transparent',
             cursor: 'pointer', whiteSpace: 'nowrap',
           }}>
-            {isComparing ? tx('comparing') : tx('addCompare')}
+            {isComparing ? tx('comparing') : (isVerified ? tx('addCompare') : '🔒 ' + tx('addCompare'))}
           </button>
         </div>
       </div>
@@ -522,6 +535,9 @@ export default function ProductCard({ product, isComparing, onCompare }: {
           </div>
         </>
       )}
+
+      {/* ── 페이월 팝업 ── */}
+      {paywallOpen && <PaywallModal onClose={() => setPaywallOpen(false)} />}
 
       {/* ── 용어 해설 팝업 (첫번째 팝업 위에 표시) ── */}
       {glossaryTerm && (
