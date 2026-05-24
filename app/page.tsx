@@ -13,7 +13,7 @@ import ComparePanel from '@/components/ComparePanel'
 
 const DEFAULT_PAGE_SIZE = 20
 const MAX_COMPARE = 10
-const PAGE_SIZE_OPTIONS = [10, 20, 30, 50, 100]
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100]
 
 export default function Home() {
   const { lang } = useLang()
@@ -163,6 +163,13 @@ export default function Home() {
   // 날짜 범위 결과 요약
   const dateRangeSummary = dateRangeResults ? summarizeDateRangeResults(dateRangeResults) : null
 
+  // [FIX 1] 언어별 날짜검색 placeholder
+  const dateSearchHint = ko ? '날짜검색: 260520-260524' : 'Date search: 260520-260524'
+  const searchPlaceholder = tx('searchPlaceholder') + ' | ' + dateSearchHint
+
+  // [FIX 3&4] 총 페이지 수 계산
+  const totalPages = Math.max(1, Math.ceil((isFiltered ? filteredCount : totalCount) / pageSize))
+
   return (
     <div className="min-h-screen grid-bg">
       <Header />
@@ -203,69 +210,67 @@ export default function Home() {
         </section>
 
         <div className="mb-2">
+          {/* [FIX 1] 언어별 placeholder */}
           <SearchBar
             value={searchQuery}
             onChange={handleSearch}
-            placeholder={tx('searchPlaceholder') + ' | 날짜검색: 260520-260524'}
+            placeholder={searchPlaceholder}
           />
         </div>
 
         {/* ── 날짜 범위 검색 결과 ── */}
         {dateRangeLoading && (
           <div style={{ textAlign: 'center', padding: '40px', color: '#00ff88', fontFamily: 'monospace' }}>
-            📅 날짜 범위 검색 중...
+            📅 {ko ? '날짜 범위 검색 중...' : 'Searching date range...'}
           </div>
         )}
 
         {dateRangeResults !== null && !dateRangeLoading && (
           <div style={{ marginBottom: '24px' }}>
-            {/* 헤더 */}
             <div style={{ background: 'rgba(26,43,74,0.8)', border: '1px solid rgba(184,150,64,0.3)', borderRadius: '12px', padding: '16px 20px', marginBottom: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                 <div>
                   <span style={{ color: '#b89640', fontWeight: 700, fontSize: '14px' }}>
-                    📅 {dateRangeQuery?.from} ~ {dateRangeQuery?.to} 변경 내역
+                    📅 {dateRangeQuery?.from} ~ {dateRangeQuery?.to} {ko ? '변경 내역' : 'Change Log'}
                   </span>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                   <span style={{ padding: '3px 10px', borderRadius: '99px', background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)', color: '#00ff88', fontSize: '12px', fontWeight: 600 }}>
-                    🆕 신규 {dateRangeSummary?.newCount}개
+                    🆕 {ko ? '신규' : 'New'} {dateRangeSummary?.newCount}
                   </span>
                   <span style={{ padding: '3px 10px', borderRadius: '99px', background: 'rgba(74,138,223,0.1)', border: '1px solid rgba(74,138,223,0.3)', color: '#4a8adf', fontSize: '12px', fontWeight: 600 }}>
-                    🔄 업데이트 {dateRangeSummary?.updatedCount}개
+                    🔄 {ko ? '업데이트' : 'Updated'} {dateRangeSummary?.updatedCount}
                   </span>
                   <span style={{ padding: '3px 10px', borderRadius: '99px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#aaa', fontSize: '12px' }}>
-                    총 {dateRangeSummary?.total}개
+                    {ko ? '총' : 'Total'} {dateRangeSummary?.total}
                   </span>
                   <button
                     onClick={() => { setDateRangeResults(null); setDateRangeQuery(null); setSearchQuery('') }}
                     style={{ padding: '3px 10px', borderRadius: '99px', background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: '#888', fontSize: '12px', cursor: 'pointer' }}
                   >
-                    ✕ 닫기
+                    ✕ {ko ? '닫기' : 'Close'}
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* 결과 없음 */}
             {dateRangeResults.length === 0 && (
               <div style={{ textAlign: 'center', padding: '60px', color: '#666', fontFamily: 'monospace' }}>
-                해당 기간에 변경된 항목이 없습니다.
+                {ko ? '해당 기간에 변경된 항목이 없습니다.' : 'No changes found in this date range.'}
               </div>
             )}
 
-            {/* 결과 테이블 */}
             {dateRangeResults.length > 0 && (
               <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                   <thead>
                     <tr style={{ background: 'rgba(26,43,74,0.9)' }}>
-                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>구분</th>
-                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>AI 엔진명</th>
-                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>제조사</th>
-                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)', whiteSpace: 'nowrap' }}>카테고리</th>
-                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>날짜</th>
-                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>출처</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>{ko ? '구분' : 'Type'}</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>{ko ? 'AI 엔진명' : 'AI Engine'}</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>{ko ? '제조사' : 'Maker'}</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)', whiteSpace: 'nowrap' }}>{ko ? '카테고리' : 'Category'}</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>{ko ? '날짜' : 'Date'}</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>{ko ? '출처' : 'Source'}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -287,7 +292,7 @@ export default function Home() {
                               color: isNew ? '#00ff88' : '#4a8adf',
                               whiteSpace: 'nowrap'
                             }}>
-                              {isNew ? '🆕 신규' : '🔄 수정'}
+                              {isNew ? (ko ? '🆕 신규' : '🆕 New') : (ko ? '🔄 수정' : '🔄 Updated')}
                             </span>
                           </td>
                           <td style={{ padding: '8px 14px', color: '#e6edf3', fontWeight: 500 }}>
@@ -317,17 +322,124 @@ export default function Home() {
           </div>
         )}
 
-        {/* ── 일반 검색 결과 (날짜 범위 검색 중이 아닐 때) ── */}
+        {/* ── 일반 검색 결과 ── */}
         {dateRangeResults === null && (
           <>
             <div className="mb-6">
               <CategoryNav selectedMain={selectedMain} selectedSub={selectedSub} onSelect={handleCategory} />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
-              {products.map(p => (
-                <ProductCard key={p.id} product={p} isComparing={!!compareList.find(c => c.id === p.id)} onCompare={toggleCompare} />
-              ))}
+
+            {/* [FIX 3] 페이지당 표시 개수 + 페이지 정보 */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+              <span style={{ fontSize: '12px', color: '#666', fontFamily: 'monospace' }}>
+                {ko ? `페이지 ${page + 1} / ${totalPages}` : `Page ${page + 1} / ${totalPages}`}
+                {' '}·{' '}
+                {ko ? `총 ${(isFiltered ? filteredCount : totalCount).toLocaleString()}개` : `${(isFiltered ? filteredCount : totalCount).toLocaleString()} total`}
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '11px', color: '#666' }}>{ko ? '페이지당' : 'Per page'}</span>
+                {PAGE_SIZE_OPTIONS.map(n => (
+                  <button
+                    key={n}
+                    onClick={() => handlePageSize(n)}
+                    style={{
+                      padding: '3px 10px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer',
+                      background: pageSize === n ? 'rgba(0,255,136,0.15)' : 'rgba(255,255,255,0.04)',
+                      border: pageSize === n ? '1px solid rgba(0,255,136,0.5)' : '1px solid rgba(255,255,255,0.1)',
+                      color: pageSize === n ? '#00ff88' : '#888',
+                      fontFamily: 'monospace', transition: 'all 0.15s',
+                    }}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
+              {loading ? (
+                <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '60px', color: '#00ff88', fontFamily: 'monospace' }}>
+                  {ko ? '로딩 중...' : 'Loading...'}
+                </div>
+              ) : products.length === 0 ? (
+                <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '60px', color: '#666', fontFamily: 'monospace' }}>
+                  {ko ? '검색 결과가 없습니다.' : 'No results found.'}
+                </div>
+              ) : (
+                products.map(p => (
+                  <ProductCard key={p.id} product={p} isComparing={!!compareList.find(c => c.id === p.id)} onCompare={toggleCompare} />
+                ))
+              )}
+            </div>
+
+            {/* [FIX 4] 페이지네이션 */}
+            {totalPages > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '32px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => setPage(0)}
+                  disabled={page === 0}
+                  style={{
+                    padding: '6px 12px', borderRadius: '6px', fontSize: '12px',
+                    cursor: page === 0 ? 'default' : 'pointer',
+                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                    color: page === 0 ? '#444' : '#888', fontFamily: 'monospace',
+                  }}
+                >«</button>
+                <button
+                  onClick={() => setPage(p => Math.max(0, p - 1))}
+                  disabled={page === 0}
+                  style={{
+                    padding: '6px 14px', borderRadius: '6px', fontSize: '12px',
+                    cursor: page === 0 ? 'default' : 'pointer',
+                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                    color: page === 0 ? '#444' : '#888', fontFamily: 'monospace',
+                  }}
+                >{ko ? '이전' : 'Prev'}</button>
+
+                {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
+                  let p: number
+                  if (totalPages <= 7) { p = i }
+                  else if (page < 4) { p = i }
+                  else if (page > totalPages - 5) { p = totalPages - 7 + i }
+                  else { p = page - 3 + i }
+                  return (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      style={{
+                        padding: '6px 12px', borderRadius: '6px', fontSize: '12px',
+                        cursor: 'pointer', minWidth: '36px',
+                        background: page === p ? 'rgba(0,255,136,0.15)' : 'rgba(255,255,255,0.04)',
+                        border: page === p ? '1px solid rgba(0,255,136,0.5)' : '1px solid rgba(255,255,255,0.1)',
+                        color: page === p ? '#00ff88' : '#888',
+                        fontFamily: 'monospace', fontWeight: page === p ? 700 : 400,
+                      }}
+                    >{p + 1}</button>
+                  )
+                })}
+
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                  disabled={page >= totalPages - 1}
+                  style={{
+                    padding: '6px 14px', borderRadius: '6px', fontSize: '12px',
+                    cursor: page >= totalPages - 1 ? 'default' : 'pointer',
+                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                    color: page >= totalPages - 1 ? '#444' : '#888', fontFamily: 'monospace',
+                  }}
+                >{ko ? '다음' : 'Next'}</button>
+                <button
+                  onClick={() => setPage(totalPages - 1)}
+                  disabled={page >= totalPages - 1}
+                  style={{
+                    padding: '6px 12px', borderRadius: '6px', fontSize: '12px',
+                    cursor: page >= totalPages - 1 ? 'default' : 'pointer',
+                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+                    color: page >= totalPages - 1 ? '#444' : '#888', fontFamily: 'monospace',
+                  }}
+                >»</button>
+              </div>
+            )}
           </>
         )}
       </main>
