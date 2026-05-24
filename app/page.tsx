@@ -4,6 +4,7 @@ import { supabase, AIProduct } from '@/lib/supabase'
 import { useLang } from '@/lib/LangContext'
 import { t } from '@/lib/i18n'
 import { expandSearchTerms } from '@/lib/searchDict'
+import { parseDateRangeQuery, fetchByDateRange, DateRangeResult, summarizeDateRangeResults } from '@/lib/date_range_search'
 import Header from '@/components/Header'
 import SearchBar from '@/components/SearchBar'
 import CategoryNav from '@/components/CategoryNav'
@@ -19,17 +20,22 @@ export default function Home() {
   const tx = (key: string) => t[key]?.[lang] ?? key
   const ko = lang === 'ko'
 
-  const [products, setProducts]           = useState<AIProduct[]>([])
-  const [loading, setLoading]             = useState(true)
-  const [searchQuery, setSearchQuery]     = useState('')
-  const [selectedMain, setSelectedMain]   = useState('')
-  const [selectedSub, setSelectedSub]     = useState('')
-  const [compareList, setCompareList]     = useState<AIProduct[]>([])
-  const [showCompare, setShowCompare]     = useState(false)
-  const [totalCount, setTotalCount]       = useState(0)
-  const [filteredCount, setFilteredCount] = useState(0)
-  const [page, setPage]                   = useState(0)
-  const [pageSize, setPageSize]           = useState(DEFAULT_PAGE_SIZE)
+  const [products, setProducts]               = useState<AIProduct[]>([])
+  const [loading, setLoading]                 = useState(true)
+  const [searchQuery, setSearchQuery]         = useState('')
+  const [selectedMain, setSelectedMain]       = useState('')
+  const [selectedSub, setSelectedSub]         = useState('')
+  const [compareList, setCompareList]         = useState<AIProduct[]>([])
+  const [showCompare, setShowCompare]         = useState(false)
+  const [totalCount, setTotalCount]           = useState(0)
+  const [filteredCount, setFilteredCount]     = useState(0)
+  const [page, setPage]                       = useState(0)
+  const [pageSize, setPageSize]               = useState(DEFAULT_PAGE_SIZE)
+
+  // ── 날짜 범위 검색 상태 ──────────────────────────────────
+  const [dateRangeResults, setDateRangeResults]   = useState<DateRangeResult[] | null>(null)
+  const [dateRangeLoading, setDateRangeLoading]   = useState(false)
+  const [dateRangeQuery, setDateRangeQuery]       = useState<{from:string, to:string} | null>(null)
 
   useEffect(() => {
     supabase.from('ai_products').select('id', { count: 'exact', head: true })
@@ -91,12 +97,48 @@ export default function Home() {
     }
   }, [selectedMain, selectedSub, searchQuery, page, pageSize])
 
-  useEffect(() => { fetchProducts() }, [fetchProducts])
+  useEffect(() => {
+    // 날짜 범위 검색 중이면 일반 검색 스킵
+    if (dateRangeResults !== null) return
+    fetchProducts()
+  }, [fetchProducts, dateRangeResults])
 
-  function handleSearch(val: string) { setSearchQuery(val); setPage(0) }
-  function handleCategory(main: string, sub: string) {
-    setSelectedMain(main); setSelectedSub(sub); setPage(0); setSearchQuery('')
+  // ── 검색 핸들러 ─────────────────────────────────────────
+  async function handleSearch(val: string) {
+    setSearchQuery(val)
+    setPage(0)
+
+    // 날짜 범위 패턴 감지
+    const dateRange = parseDateRangeQuery(val)
+    if (dateRange) {
+      setDateRangeLoading(true)
+      setDateRangeQuery(dateRange)
+      try {
+        const results = await fetchByDateRange(dateRange)
+        setDateRangeResults(results)
+      } catch (e) {
+        console.error(e)
+        setDateRangeResults([])
+      } finally {
+        setDateRangeLoading(false)
+      }
+      return
+    }
+
+    // 날짜 범위 아니면 초기화
+    setDateRangeResults(null)
+    setDateRangeQuery(null)
   }
+
+  function handleCategory(main: string, sub: string) {
+    setSelectedMain(main)
+    setSelectedSub(sub)
+    setPage(0)
+    setSearchQuery('')
+    setDateRangeResults(null)
+    setDateRangeQuery(null)
+  }
+
   function handlePageSize(n: number) { setPageSize(n); setPage(0) }
 
   function toggleCompare(product: AIProduct) {
@@ -117,6 +159,9 @@ export default function Home() {
     : tx('allCategory')
 
   const expandedTerms = searchQuery ? expandSearchTerms(searchQuery).filter(t => t !== searchQuery.toLowerCase()) : []
+
+  // 날짜 범위 결과 요약
+  const dateRangeSummary = dateRangeResults ? summarizeDateRangeResults(dateRangeResults) : null
 
   return (
     <div className="min-h-screen grid-bg">
@@ -158,20 +203,135 @@ export default function Home() {
         </section>
 
         <div className="mb-2">
-          <SearchBar value={searchQuery} onChange={handleSearch} placeholder={tx('searchPlaceholder')} />
+          <SearchBar
+            value={searchQuery}
+            onChange={handleSearch}
+            placeholder={tx('searchPlaceholder') + ' | 날짜검색: 260520-260524'}
+          />
         </div>
 
-        <div className="mb-6">
-          <CategoryNav selectedMain={selectedMain} selectedSub={selectedSub} onSelect={handleCategory} />
-        </div>
+        {/* ── 날짜 범위 검색 결과 ── */}
+        {dateRangeLoading && (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#00ff88', fontFamily: 'monospace' }}>
+            📅 날짜 범위 검색 중...
+          </div>
+        )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
-          {products.map(p => (
-            <ProductCard key={p.id} product={p} isComparing={!!compareList.find(c => c.id === p.id)} onCompare={toggleCompare} />
-          ))}
-        </div>
+        {dateRangeResults !== null && !dateRangeLoading && (
+          <div style={{ marginBottom: '24px' }}>
+            {/* 헤더 */}
+            <div style={{ background: 'rgba(26,43,74,0.8)', border: '1px solid rgba(184,150,64,0.3)', borderRadius: '12px', padding: '16px 20px', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <span style={{ color: '#b89640', fontWeight: 700, fontSize: '14px' }}>
+                    📅 {dateRangeQuery?.from} ~ {dateRangeQuery?.to} 변경 내역
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <span style={{ padding: '3px 10px', borderRadius: '99px', background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)', color: '#00ff88', fontSize: '12px', fontWeight: 600 }}>
+                    🆕 신규 {dateRangeSummary?.newCount}개
+                  </span>
+                  <span style={{ padding: '3px 10px', borderRadius: '99px', background: 'rgba(74,138,223,0.1)', border: '1px solid rgba(74,138,223,0.3)', color: '#4a8adf', fontSize: '12px', fontWeight: 600 }}>
+                    🔄 업데이트 {dateRangeSummary?.updatedCount}개
+                  </span>
+                  <span style={{ padding: '3px 10px', borderRadius: '99px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#aaa', fontSize: '12px' }}>
+                    총 {dateRangeSummary?.total}개
+                  </span>
+                  <button
+                    onClick={() => { setDateRangeResults(null); setDateRangeQuery(null); setSearchQuery('') }}
+                    style={{ padding: '3px 10px', borderRadius: '99px', background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: '#888', fontSize: '12px', cursor: 'pointer' }}
+                  >
+                    ✕ 닫기
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 결과 없음 */}
+            {dateRangeResults.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '60px', color: '#666', fontFamily: 'monospace' }}>
+                해당 기간에 변경된 항목이 없습니다.
+              </div>
+            )}
+
+            {/* 결과 테이블 */}
+            {dateRangeResults.length > 0 && (
+              <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <thead>
+                    <tr style={{ background: 'rgba(26,43,74,0.9)' }}>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>구분</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>AI 엔진명</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>제조사</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)', whiteSpace: 'nowrap' }}>카테고리</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>날짜</th>
+                      <th style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', fontWeight: 600, borderBottom: '1px solid rgba(184,150,64,0.3)' }}>출처</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dateRangeResults.map((r, i) => {
+                      const date = r._change_type === '신규 추가'
+                        ? (r.created_at || '').slice(0, 10)
+                        : (r.updated_at  || '').slice(0, 10)
+                      const isNew = r._change_type === '신규 추가'
+                      return (
+                        <tr key={r.id ?? i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(26,43,74,0.4)')}
+                          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                        >
+                          <td style={{ padding: '8px 14px' }}>
+                            <span style={{
+                              padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 600,
+                              background: isNew ? 'rgba(0,255,136,0.1)' : 'rgba(74,138,223,0.1)',
+                              border: `1px solid ${isNew ? 'rgba(0,255,136,0.3)' : 'rgba(74,138,223,0.3)'}`,
+                              color: isNew ? '#00ff88' : '#4a8adf',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {isNew ? '🆕 신규' : '🔄 수정'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '8px 14px', color: '#e6edf3', fontWeight: 500 }}>
+                            {r.official_url ? (
+                              <a href={r.official_url} target="_blank" rel="noopener noreferrer"
+                                style={{ color: '#e6edf3', textDecoration: 'none' }}
+                                onMouseEnter={e => (e.currentTarget.style.color = '#00ff88')}
+                                onMouseLeave={e => (e.currentTarget.style.color = '#e6edf3')}
+                              >
+                                {r.product_name}
+                              </a>
+                            ) : r.product_name}
+                          </td>
+                          <td style={{ padding: '8px 14px', color: '#aaa' }}>{r.manufacturer || '-'}</td>
+                          <td style={{ padding: '8px 14px', color: '#888', fontSize: '12px' }}>
+                            {(ko ? r.category_main_ko : r.category_main || '-')?.replace(/^\d+\.\s/, '')}
+                          </td>
+                          <td style={{ padding: '8px 14px', color: '#888', fontFamily: 'monospace', fontSize: '12px', whiteSpace: 'nowrap' }}>{date}</td>
+                          <td style={{ padding: '8px 14px', color: '#666', fontSize: '11px' }}>{r.parent_platform || '-'}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── 일반 검색 결과 (날짜 범위 검색 중이 아닐 때) ── */}
+        {dateRangeResults === null && (
+          <>
+            <div className="mb-6">
+              <CategoryNav selectedMain={selectedMain} selectedSub={selectedSub} onSelect={handleCategory} />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
+              {products.map(p => (
+                <ProductCard key={p.id} product={p} isComparing={!!compareList.find(c => c.id === p.id)} onCompare={toggleCompare} />
+              ))}
+            </div>
+          </>
+        )}
       </main>
-      
+
       {showCompare && <ComparePanel products={compareList} onClose={() => setShowCompare(false)} />}
     </div>
   )
