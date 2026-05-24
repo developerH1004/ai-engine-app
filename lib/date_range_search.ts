@@ -86,7 +86,7 @@ export async function fetchByDateRange(
     .order('created_at', { ascending: false })
 
   if (newItems) {
-    newItems.forEach(r => results.push({ ...r, _change_type: '신규 추가' }))
+    newItems.forEach((r: any) => results.push({ ...r, _change_type: '신규 추가' }))
   }
 
   // 2. 업데이트 (updated_at 기준, 신규 제외)
@@ -99,7 +99,7 @@ export async function fetchByDateRange(
     .order('updated_at', { ascending: false })
 
   if (updatedItems) {
-    updatedItems.forEach(r => results.push({ ...r, _change_type: '업데이트' }))
+    updatedItems.forEach((r: any) => results.push({ ...r, _change_type: '업데이트' }))
   }
 
   // 중복 제거 (id 기준)
