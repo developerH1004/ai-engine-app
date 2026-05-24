@@ -12,7 +12,8 @@ const supabase = createClient(
 const INVALID_KEYWORDS = [
   'font', 'gguf-font', 'not-a-language-model',
   'monospace', 'glyph', 'bezier', 'rasterization',
-  'typeface', 'typefont'
+  'typeface', 'typefont', '0xproto', 'nerd-font',
+  'ligature', 'codepoint', 'bitmap', 'truetype', 'opentype',
 ]
 
 async function getAllProducts() {
@@ -31,8 +32,28 @@ async function getAllProducts() {
   return all
 }
 
+// 날짜 파싱: YYMMDD 또는 YYYY-MM-DD 모두 지원
+function parseDate(input: string): string {
+  const trimmed = input.trim().replace(/\s/g, '')
+  // YYMMDD 형식 (6자리 숫자)
+  if (/^\d{6}$/.test(trimmed)) {
+    return `20${trimmed.slice(0,2)}-${trimmed.slice(2,4)}-${trimmed.slice(4,6)}`
+  }
+  // YYMMDD-YYMMDD 범위 입력 시 앞부분만 사용 (백오피스는 별도 필드로 분리)
+  const rangeMatch = trimmed.match(/^(\d{6})-(\d{6})$/)
+  if (rangeMatch) {
+    return `20${rangeMatch[1].slice(0,2)}-${rangeMatch[1].slice(2,4)}-${rangeMatch[1].slice(4,6)}`
+  }
+  // YYYY-MM-DD 형식
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return trimmed
+  }
+  return trimmed
+}
+
 export async function POST(req: NextRequest) {
-  const { action, password, ids } = await req.json()
+  const body = await req.json()
+  const { action, password, ids, dateFrom, dateTo } = body
 
   if (password !== ADMIN_PASSWORD) {
     return NextResponse.json({ error: '비밀번호 오류' }, { status: 401 })
@@ -63,6 +84,53 @@ export async function POST(req: NextRequest) {
       }
     }
     return NextResponse.json({ results: duplicates, count: duplicates.length })
+  }
+
+  // ── 날짜 범위 검색 ───────────────────────────────────────
+  if (action === 'date_search') {
+    if (!dateFrom) return NextResponse.json({ error: '시작 날짜 필요' }, { status: 400 })
+
+    const from = parseDate(dateFrom)
+    const to   = parseDate(dateTo || dateFrom)
+
+    // to 날짜 +1일
+    const toDate = new Date(to)
+    toDate.setDate(toDate.getDate() + 1)
+    const toNext = toDate.toISOString().slice(0, 10)
+
+    const SELECT = 'id, product_name, manufacturer, category_main, category_main_ko, created_at, updated_at, verification_status, parent_platform, official_url'
+
+    // 신규
+    const { data: newItems, error: e1 } = await supabase
+      .from('ai_products')
+      .select(SELECT)
+      .gte('created_at', `${from}T00:00:00`)
+      .lt('created_at',  `${toNext}T00:00:00`)
+      .order('created_at', { ascending: false })
+
+    // 업데이트 (신규 제외)
+    const { data: updatedItems, error: e2 } = await supabase
+      .from('ai_products')
+      .select(SELECT)
+      .gte('updated_at', `${from}T00:00:00`)
+      .lt('updated_at',  `${toNext}T00:00:00`)
+      .lt('created_at',  `${from}T00:00:00`)
+      .order('updated_at', { ascending: false })
+
+    if (e1 || e2) {
+      return NextResponse.json({ error: (e1 || e2)?.message }, { status: 500 })
+    }
+
+    const newList     = (newItems     || []).map((r: any) => ({ ...r, _type: '신규' }))
+    const updatedList = (updatedItems || []).map((r: any) => ({ ...r, _type: '수정' }))
+
+    return NextResponse.json({
+      results:      [...newList, ...updatedList],
+      newCount:     newList.length,
+      updatedCount: updatedList.length,
+      from,
+      to,
+    })
   }
 
   // ── 선택 삭제 ────────────────────────────────────────────

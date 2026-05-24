@@ -25,6 +25,63 @@ HF_TASKS = [
     "image-to-text","text-to-audio",
 ]
 
+# ── 비AI 모델 판별 ────────────────────────────────────────────
+# 허깅페이스 태그 기반으로 실제 AI 모델인지 판별
+NON_AI_TAGS = {
+    "not-a-language-model", "font", "glyph", "bitmap",
+    "truetype", "opentype", "monospace", "typeface",
+    "rasterization", "bezier", "ligature", "codepoint",
+    "dataset", "text-classification-dataset",
+}
+
+NON_AI_ARCHITECTURES = {
+    "font", "dataset",
+}
+
+def is_valid_ai_model(m: dict) -> tuple:
+    """
+    허깅페이스 모델 메타데이터를 분석해서 유효한 AI 모델인지 판별.
+    (is_valid, reason) 반환
+    """
+    model_id = m.get("id", "")
+    model_name = model_id.split("/")[-1].lower() if "/" in model_id else model_id.lower()
+    tags = set(t.lower() for t in (m.get("tags") or []))
+    
+    # 1. 명시적 비AI 태그 체크
+    bad_tags = tags & NON_AI_TAGS
+    if bad_tags:
+        return False, f"비AI 태그: {bad_tags}"
+    
+    # 2. 아키텍처 체크
+    config = m.get("config") or {}
+    arch = str(config.get("model_type", "") or config.get("architectures", [""])[0] if config.get("architectures") else "").lower()
+    if arch in NON_AI_ARCHITECTURES:
+        return False, f"비AI 아키텍처: {arch}"
+    
+    # 3. 모델 카드 태그에서 library_name 체크
+    library = str(m.get("library_name", "") or "").lower()
+    if library in {"font-tools", "fonttools"}:
+        return False, f"비AI 라이브러리: {library}"
+    
+    # 4. 모델명 패턴 체크 (최소한의 패턴만)
+    name_bad_patterns = ["-font-", "-gguf-font", "nerd-font", "-typeface-"]
+    for pat in name_bad_patterns:
+        if pat in model_name:
+            return False, f"모델명 패턴: {pat}"
+    
+    # 5. safetensors/gguf 없는 순수 데이터셋
+    siblings = [s.get("rfilename", "") for s in (m.get("siblings") or [])]
+    has_model_file = any(
+        f.endswith((".bin", ".safetensors", ".gguf", ".pt", ".ckpt", ".pth"))
+        for f in siblings
+    )
+    # 모델 파일이 아예 없고 downloads도 적으면 제외
+    if not has_model_file and m.get("downloads", 0) < 500:
+        return False, "모델 파일 없음 (데이터셋/도구)"
+    
+    return True, "valid"
+
+
 TASK_MAP = {
     "text-generation":              {"category_main":"01. Foundation Models","category_sub":"01-01. General Purpose Language Models","category_main_ko":"01. 파운데이션 모델","category_sub_ko":"01-01. 범용 언어 모델","modality":"Text","modality_ko":"텍스트","service_type":"API / Cloud","service_type_ko":"API / 클라우드","subcategory_code":"01-01"},
     "text-to-image":                {"category_main":"03. Visual Arts & Design","category_sub":"03-01. Artistic Image Generation","category_main_ko":"03. 비주얼 아트 및 디자인","category_sub_ko":"03-01. 예술적 이미지 생성","modality":"Image","modality_ko":"이미지","service_type":"API / Cloud","service_type_ko":"API / 클라우드","subcategory_code":"03-01"},
@@ -163,12 +220,11 @@ def fetch_new_hf_models(existing_names: set) -> list:
                 if created < cutoff: break
                 if model_name.lower() in existing_names: continue
                 if m.get("downloads",0) < 50: continue
-                # 폰트/비AI 모델 필터
-                tags = [t.lower() for t in (m.get("tags") or [])]
-                arch = str((m.get("config") or {}).get("model_type", "")).lower()
-                if "font" in tags: continue
-                if "not-a-language-model" in tags: continue
-                if arch == "font": continue
+                # 비AI 모델 필터 (태그/아키텍처/파일 기반 검증)
+                valid, reason = is_valid_ai_model(m)
+                if not valid:
+                    print(f"  ⛔ 비AI 제외: {model_name} ({reason})")
+                    continue
                 cat    = TASK_MAP.get(task, TASK_MAP["text-generation"])
                 author = model_id.split("/")[0] if "/" in model_id else "Unknown"
                 new_models.append({
