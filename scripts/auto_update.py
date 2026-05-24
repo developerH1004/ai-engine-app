@@ -163,6 +163,12 @@ def fetch_new_hf_models(existing_names: set) -> list:
                 if created < cutoff: break
                 if model_name.lower() in existing_names: continue
                 if m.get("downloads",0) < 50: continue
+                # 폰트/비AI 모델 필터
+                tags = [t.lower() for t in (m.get("tags") or [])]
+                arch = str((m.get("config") or {}).get("model_type", "")).lower()
+                if "font" in tags: continue
+                if "not-a-language-model" in tags: continue
+                if arch == "font": continue
                 cat    = TASK_MAP.get(task, TASK_MAP["text-generation"])
                 author = model_id.split("/")[0] if "/" in model_id else "Unknown"
                 new_models.append({
