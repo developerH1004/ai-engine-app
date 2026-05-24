@@ -155,13 +155,14 @@ def gen_desc_en(product_name, manufacturer, category, version):
     ) or f"{product_name} by {manufacturer}. {category} AI model. Latest: {version}."
 
 def gen_desc_ko(en_text):
-    if not en_text: return ""
-    return groq_call(
+    if not en_text: return None
+    result = groq_call(
         f"다음 영문 AI 제품 설명을 자연스러운 한국어로 번역하세요. "
         f"번역문만 출력하세요:\n\n{en_text}",
         max_tokens=300,
         model="llama-3.1-8b-instant"
     )
+    return result if result and result.strip() else None
 
 def gen_glossary_term(product_name, manufacturer, category):
     en = groq_call(
@@ -375,7 +376,7 @@ def enrich_products_korean(supabase, limit=20):
     if not GROQ_API_KEY: return 0
     result = supabase.table("ai_products") \
         .select("id,product_name,description,description_ko") \
-        .is_("description_ko","null") \
+        .or_("description_ko.is.null,description_ko.eq.") \
         .not_.is_("description","null") \
         .limit(limit).execute()
     enriched = 0

@@ -1,1 +1,4 @@
 MASTER-DEVEL-OPER-H004
+관리자 사이트
+https://ai-engine-app.vercel.app/admin
+비번 : devH2026!
