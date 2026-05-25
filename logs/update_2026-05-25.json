@@ -1,0 +1,51 @@
+{
+  "date": "2026-05-25",
+  "products_added": [
+    "Lens-Turbo-SDNQ-uint4-static",
+    "xlsr-1b-ckt-staged-bible-radio-to-chuklang-source-eval-stage2",
+    "xlsr-1b-ckt-staged-bible-radio-to-chuklang-source-eval-stage1",
+    "fleurs-trigram-hours0p25-synthetic-hours0p625-whisper-small-no-language",
+    "fleurs-trigram-hours0p25-synthetic-hours1p25-whisper-small-no-language",
+    "no_augmentation",
+    "xlsr-1b-ckt-chuklang-only",
+    "fleurs-trigram-hours0p25-synthetic-hours0p625-whisper-tiny-no-language",
+    "speed_augmentation",
+    "fleurs-trigram-hours0p25-synthetic-hours1p25-whisper-tiny-no-language",
+    "JetlinkSTT-3-1.7B-GGUF",
+    "pitch_augmentation_fix",
+    "mms-1b-ckt-staged-bible-radio-to-chuklang-source-eval-stage2",
+    "mms-1b-ckt-staged-bible-radio-to-chuklang-source-eval-stage1",
+    "pazarf",
+    "mms-1b-ckt-staged-bible-radio-to-chuklang-stage2",
+    "mms-1b-ckt-staged-bible-radio-to-chuklang-stage1",
+    "whisper-small-clean-1e5-10epochs",
+    "Ministral-3-8B-Uncensored-Q5_K_S-GGUF"
+  ],
+  "major_updated": [
+    "DeepSeek: DeepSeek 1.0"
+  ],
+  "glossary_added": [
+    "Lens-Turbo-SDNQ-uint4-static",
+    "xlsr-1b-ckt-staged-bible-radio-to-chuklang-source-eval-stage2",
+    "xlsr-1b-ckt-staged-bible-radio-to-chuklang-source-eval-stage1",
+    "fleurs-trigram-hours0p25-synthetic-hours0p625-whisper-small-no-language",
+    "fleurs-trigram-hours0p25-synthetic-hours1p25-whisper-small-no-language",
+    "no_augmentation",
+    "xlsr-1b-ckt-chuklang-only",
+    "fleurs-trigram-hours0p25-synthetic-hours0p625-whisper-tiny-no-language",
+    "speed_augmentation",
+    "fleurs-trigram-hours0p25-synthetic-hours1p25-whisper-tiny-no-language",
+    "JetlinkSTT-3-1.7B-GGUF",
+    "pitch_augmentation_fix",
+    "mms-1b-ckt-staged-bible-radio-to-chuklang-source-eval-stage2",
+    "mms-1b-ckt-staged-bible-radio-to-chuklang-source-eval-stage1",
+    "pazarf",
+    "mms-1b-ckt-staged-bible-radio-to-chuklang-stage2",
+    "mms-1b-ckt-staged-bible-radio-to-chuklang-stage1",
+    "whisper-small-clean-1e5-10epochs",
+    "Ministral-3-8B-Uncensored-Q5_K_S-GGUF"
+  ],
+  "products_ko_enriched": 4,
+  "glossary_ko_enriched": 0,
+  "errors": []
+}
