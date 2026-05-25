@@ -195,17 +195,17 @@ export default function AdminPage() {
     if (link.id) {
       res = await fetch(`${SB_URL}/rest/v1/links?id=eq.${link.id}`, {
         method: 'PATCH',
-        headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+        headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
         body: JSON.stringify(body)
       })
     } else {
       res = await fetch(`${SB_URL}/rest/v1/links`, {
         method: 'POST',
-        headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+        headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
         body: JSON.stringify(body)
       })
     }
-    if (res.ok) {
+    if (res.ok || res.status === 204) {
       setLinksMsg(link.id ? '✅ 수정 완료' : '✅ 추가 완료')
       setEditLink(null); setShowNewForm(false)
       setNewLink({ category: 'community', is_visible: true })
@@ -221,7 +221,7 @@ export default function AdminPage() {
       method: 'DELETE',
       headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
     })
-    if (res.ok) { setLinksMsg('✅ 삭제 완료'); loadLinks() }
+    if (res.ok || res.status === 204) { setLinksMsg('✅ 삭제 완료'); loadLinks() }
     else setLinksMsg('❌ 삭제 실패')
   }
 
