@@ -1,7 +1,7 @@
 'use client'
 // app/admin/page.tsx
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const SECTIONS = ['대시보드', '비AI 탐지', '중복 탐지', '날짜 검색', 'Links 관리', 'URL 무결성', '모니터링', '로그'] as const
 type Section = typeof SECTIONS[number]
@@ -78,6 +78,7 @@ export default function AdminPage() {
   // Links 관리 상태
   const [links, setLinks]             = useState<LinkItem[]>([])
   const [linksLoading, setLinksLoading] = useState(false)
+  const editFormRef = useRef<HTMLDivElement>(null)
   const [linksMsg, setLinksMsg]       = useState('')
   const [editLink, setEditLink]       = useState<LinkItem | null>(null)
   const [newLink, setNewLink]         = useState<Partial<LinkItem>>({ category: 'community', is_visible: true })
@@ -571,7 +572,7 @@ export default function AdminPage() {
               <LinkForm link={newLink} onChange={setNewLink} onSave={() => saveLink(newLink)} onCancel={() => setShowNewForm(false)} title="새 링크 추가" />
             )}
             {editLink && (
-              <LinkForm link={editLink} onChange={(v) => setEditLink(v as LinkItem)} onSave={() => saveLink(editLink)} onCancel={() => setEditLink(null)} title="링크 수정" />
+              <div ref={editFormRef}><LinkForm link={editLink} onChange={(v) => setEditLink(v as LinkItem)} onSave={() => saveLink(editLink)} onCancel={() => setEditLink(null)} title="링크 수정" /></div>
             )}
             {linksLoading ? (
               <div style={{ color: '#555', textAlign: 'center', padding: '40px' }}>로딩 중...</div>
@@ -594,7 +595,7 @@ export default function AdminPage() {
                             {link.is_visible ? '노출' : '숨김'}
                           </span>
                           <span style={{ fontSize: '11px', color: '#555' }}>#{link.sort_order}</span>
-                          <button onClick={() => { setEditLink(link); setShowNewForm(false) }}
+                          <button onClick={() => { setEditLink(link); setShowNewForm(false); setTimeout(() => editFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50) }}
                             style={{ padding: '4px 10px', borderRadius: '4px', background: 'rgba(74,138,223,0.1)', border: '1px solid rgba(74,138,223,0.2)', color: '#4a8adf', fontSize: '11px', cursor: 'pointer' }}>수정</button>
                           <button onClick={() => deleteLink(link.id)}
                             style={{ padding: '4px 10px', borderRadius: '4px', background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.2)', color: '#ff4444', fontSize: '11px', cursor: 'pointer' }}>삭제</button>
