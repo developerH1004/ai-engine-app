@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { LangProvider } from '@/lib/LangContext'
+import { Analytics } from '@vercel/analytics/react'
 
 export const metadata: Metadata = {
   title: 'AI MAP — GAIT 69 | 이거봐! AI가 모두 모였어',
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-gray-950 text-gray-100 antialiased">
         <LangProvider>{children}</LangProvider>
+        <Analytics />
       </body>
     </html>
   )
