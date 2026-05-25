@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react'
 
-const SECTIONS = ['대시보드', '비AI 탐지', '중복 탐지', '날짜 검색', 'Links 관리', 'URL 무결성', '모니터링', '로그'] as const
+const SECTIONS = ['대시보드', '비AI 탐지', '중복 탐지', '날짜 검색', 'Links 관리', 'URL 무결성', '로그'] as const
 type Section = typeof SECTIONS[number]
 
 interface Product {
@@ -34,27 +34,9 @@ interface UrlCheckResult {
   product_name: string
   manufacturer: string
   official_url: string
-  status: 'ok' | 'dead' | 'error'
+  status: 'ok' | 'dead' | 'error' | 'checking'
   statusCode?: number
   error?: string
-}
-
-interface MonitorData {
-  supabase: {
-    totalRows: number
-    glossaryRows: number
-    linksRows: number
-    logsRows: number
-  }
-  github: {
-    lastRun: string
-    lastStatus: string
-    lastConclusion: string
-  } | null
-  vercel: {
-    lastDeploy: string
-    lastStatus: string
-  } | null
 }
 
 const LINK_CATEGORIES = ['books', 'devtools', 'community', 'research']
@@ -91,12 +73,6 @@ export default function AdminPage() {
   const [urlMsg, setUrlMsg]           = useState('')
   const [urlFilter, setUrlFilter]     = useState<'all' | 'dead' | 'error'>('all')
   const [urlSelected, setUrlSelected] = useState<Set<number>>(new Set())
-
-  // 모니터링 상태
-  const [monitor, setMonitor]         = useState<MonitorData | null>(null)
-  const [monitorLoading, setMonitorLoading] = useState(false)
-  const [visitors, setVisitors]       = useState<any[]>([])
-  const [visitorsLoading, setVisitorsLoading] = useState(false)
 
   const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const SB_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -186,29 +162,22 @@ export default function AdminPage() {
 
   async function saveLink(link: Partial<LinkItem>) {
     if (!link.name || !link.url || !link.category) { setLinksMsg('이름, URL, 카테고리는 필수입니다'); return }
-    const body = {
-      name: link.name, url: link.url, category: link.category,
-      description: link.description || null, description_ko: link.description_ko || null,
-      sort_order: link.sort_order || 99, is_visible: link.is_visible ?? true
-    }
+    const body = { name: link.name, url: link.url, category: link.category, description: link.description || null, description_ko: link.description_ko || null, sort_order: link.sort_order || 99, is_visible: link.is_visible ?? true }
     let res
     if (link.id) {
       res = await fetch(`${SB_URL}/rest/v1/links?id=eq.${link.id}`, {
-        method: 'PATCH',
-        headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+        method: 'PATCH', headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
         body: JSON.stringify(body)
       })
     } else {
       res = await fetch(`${SB_URL}/rest/v1/links`, {
-        method: 'POST',
-        headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+        method: 'POST', headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
         body: JSON.stringify(body)
       })
     }
     if (res.ok) {
       setLinksMsg(link.id ? '✅ 수정 완료' : '✅ 추가 완료')
-      setEditLink(null); setShowNewForm(false)
-      setNewLink({ category: 'community', is_visible: true })
+      setEditLink(null); setShowNewForm(false); setNewLink({ category: 'community', is_visible: true })
       loadLinks()
     } else {
       setLinksMsg('❌ 저장 실패')
@@ -218,8 +187,7 @@ export default function AdminPage() {
   async function deleteLink(id: number) {
     if (!confirm('이 링크를 삭제하시겠습니까?')) return
     const res = await fetch(`${SB_URL}/rest/v1/links?id=eq.${id}`, {
-      method: 'DELETE',
-      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+      method: 'DELETE', headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
     })
     if (res.ok) { setLinksMsg('✅ 삭제 완료'); loadLinks() }
     else setLinksMsg('❌ 삭제 실패')
@@ -230,7 +198,8 @@ export default function AdminPage() {
     if (!confirm('전체 AI 엔진 URL을 검사합니다. 시간이 걸릴 수 있어요. 시작할까요?')) return
     setUrlChecking(true); setUrlResults([]); setUrlSelected(new Set()); setUrlMsg('')
 
-    const res = await fetch(`${SB_URL}/rest/v1/ai_products?select=id,product_name,manufacturer,official_url&official_url=not.is.null&official_url=neq.&limit=5000`, {
+    // URL 있는 제품만 가져오기
+    const res = await fetch(`${SB_URL}/rest/v1/ai_products?select=id,product_name,manufacturer,official_url&official_url=not.is.null&official_url=neq.`, {
       headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
     })
     const products = await res.json()
@@ -239,8 +208,8 @@ export default function AdminPage() {
     setUrlTotal(products.length)
     setUrlMsg(`총 ${products.length}개 URL 검사 시작...`)
 
-    const allResults: UrlCheckResult[] = []
-    const BATCH = 20
+    const results: UrlCheckResult[] = []
+    const BATCH = 20 // 동시 20개씩
 
     for (let i = 0; i < products.length; i += BATCH) {
       const batch = products.slice(i, i + BATCH)
@@ -259,95 +228,26 @@ export default function AdminPage() {
           }
         })
       )
-      checks.forEach(c => { if (c.status === 'fulfilled') allResults.push(c.value) })
+      checks.forEach(c => { if (c.status === 'fulfilled') results.push(c.value) })
       setUrlProgress(Math.min(i + BATCH, products.length))
-      setUrlResults([...allResults])
+      setUrlResults([...results])
     }
 
-    const dead = allResults.filter(r => r.status === 'dead').length
-    const err = allResults.filter(r => r.status === 'error').length
-    setUrlMsg(`✅ 검사 완료 — 정상: ${allResults.length - dead - err}개 / 불량: ${dead}개 / 오류: ${err}개`)
+    const dead = results.filter(r => r.status === 'dead').length
+    const err = results.filter(r => r.status === 'error').length
+    setUrlMsg(`✅ 검사 완료 — 정상: ${results.length - dead - err}개 / 불량: ${dead}개 / 오류: ${err}개`)
     setUrlChecking(false)
   }
 
   async function deleteUrlSelected() {
     if (urlSelected.size === 0) { setUrlMsg('삭제할 항목을 선택하세요'); return }
-    if (!confirm(`${urlSelected.size}개를 삭제하시겠습니까?`)) return
+    if (!confirm(`${urlSelected.size}개를 삭제하시겠습니까? 복구 불가합니다.`)) return
     const data = await callAPI('delete_items', { ids: Array.from(urlSelected) })
     if (data.error) { setUrlMsg('❌ ' + data.error); return }
     setUrlMsg(`✅ ${data.deleted}개 삭제 완료`)
     setUrlResults(prev => prev.filter(r => !urlSelected.has(r.id)))
     setUrlSelected(new Set())
     loadStats()
-  }
-
-  // ── 모니터링 ──────────────────────────────────────────────
-  async function loadMonitor() {
-    setMonitorLoading(true)
-    try {
-      // Supabase 각 테이블 row 수
-      const [p1, p2, p3, p4, p5] = await Promise.all([
-        fetch(`${SB_URL}/rest/v1/ai_products?select=id`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: 'count=exact', 'Range-Unit': 'items', Range: '0-0' } }),
-        fetch(`${SB_URL}/rest/v1/glossary?select=id`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: 'count=exact', 'Range-Unit': 'items', Range: '0-0' } }),
-        fetch(`${SB_URL}/rest/v1/links?select=id`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: 'count=exact', 'Range-Unit': 'items', Range: '0-0' } }),
-        fetch(`${SB_URL}/rest/v1/update_logs?select=id`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: 'count=exact', 'Range-Unit': 'items', Range: '0-0' } }),
-        fetch(`${SB_URL}/rest/v1/update_logs?select=created_at,action&order=created_at.desc&limit=1`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } }),
-      ])
-
-      const getCount = (res: Response) => {
-        const range = res.headers.get('content-range')
-        return range ? parseInt(range.split('/')[1] || '0') : 0
-      }
-
-      const lastLog = await p5.json()
-
-      // GitHub Actions 최근 실행
-      let github = null
-      try {
-        const ghRes = await fetch('https://api.github.com/repos/developerH1004/ai-engine-app/actions/runs?per_page=1')
-        if (ghRes.ok) {
-          const ghData = await ghRes.json()
-          const run = ghData.workflow_runs?.[0]
-          if (run) github = { lastRun: run.created_at, lastStatus: run.status, lastConclusion: run.conclusion || '-' }
-        }
-      } catch {}
-
-      setMonitor({
-        supabase: {
-          totalRows: getCount(p1),
-          glossaryRows: getCount(p2),
-          linksRows: getCount(p3),
-          logsRows: getCount(p4),
-        },
-        github,
-        vercel: lastLog?.[0] ? { lastDeploy: lastLog[0].created_at, lastStatus: lastLog[0].action } : null
-      })
-    } catch (e) {
-      console.error(e)
-    }
-    setMonitorLoading(false)
-  }
-
-  async function loadVisitors() {
-    setVisitorsLoading(true)
-    try {
-      // update_logs에서 날짜별 집계로 방문 패턴 추정
-      const res = await fetch(`${SB_URL}/rest/v1/update_logs?select=created_at,action,detail&order=created_at.desc&limit=100`, {
-        headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
-      })
-      const data = await res.json()
-      // 날짜별 그룹핑
-      const byDate: Record<string, number> = {}
-      if (Array.isArray(data)) {
-        data.forEach((log: any) => {
-          const date = (log.created_at || '').slice(0, 10)
-          if (date) byDate[date] = (byDate[date] || 0) + 1
-        })
-      }
-      const sorted = Object.entries(byDate).sort((a, b) => b[0].localeCompare(a[0])).slice(0, 14)
-      setVisitors(sorted)
-    } catch {}
-    setVisitorsLoading(false)
   }
 
   const filteredUrlResults = urlResults.filter(r => urlFilter === 'all' ? r.status !== 'ok' : r.status === urlFilter)
@@ -363,7 +263,6 @@ export default function AdminPage() {
     setUrlSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
   }
 
-  // ── 로그인 화면 ──────────────────────────────────────────
   if (!auth) {
     return (
       <div style={{ minHeight: '100vh', background: '#0d1117', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -392,12 +291,7 @@ export default function AdminPage() {
       <nav style={{ background: '#161b22', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 24px', display: 'flex', alignItems: 'center', gap: '4px', overflowX: 'auto' }}>
         <span style={{ color: '#b89640', fontWeight: 700, fontSize: '14px', marginRight: '16px', whiteSpace: 'nowrap' }}>🛡️ AI MAP Admin</span>
         {SECTIONS.map(s => (
-          <button key={s} onClick={() => {
-            setSection(s); setMessage('')
-            if (s === 'Links 관리') loadLinks()
-            if (s === '로그') loadLogs()
-            if (s === '모니터링') { loadMonitor(); loadVisitors() }
-          }}
+          <button key={s} onClick={() => { setSection(s); setMessage(''); if (s === 'Links 관리') loadLinks(); if (s === '로그') loadLogs() }}
             style={{ padding: '14px 14px', background: 'transparent', border: 'none', borderBottom: section === s ? '2px solid #b89640' : '2px solid transparent', color: section === s ? '#b89640' : '#666', fontSize: '12px', fontWeight: section === s ? 700 : 400, cursor: 'pointer', whiteSpace: 'nowrap' }}>
             {s}
           </button>
@@ -423,14 +317,13 @@ export default function AdminPage() {
                   </div>
                 ))}
               </div>
-            ) : <div style={{ color: '#555', marginBottom: '24px' }}>로딩 중...</div>}
+            ) : <div style={{ color: '#555' }}>로딩 중...</div>}
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               {[
                 { label: '🔍 비AI 항목 탐지', action: () => { setSection('비AI 탐지'); findInvalid() } },
                 { label: '🔄 중복 탐지', action: () => { setSection('중복 탐지'); findDuplicates() } },
                 { label: '📅 날짜 검색', action: () => setSection('날짜 검색') },
                 { label: '🔗 URL 무결성 검사', action: () => setSection('URL 무결성') },
-                { label: '📡 모니터링', action: () => { setSection('모니터링'); loadMonitor(); loadVisitors() } },
               ].map(b => (
                 <button key={b.label} onClick={b.action}
                   style={{ padding: '10px 20px', borderRadius: '8px', background: '#161b22', border: '1px solid rgba(184,150,64,0.3)', color: '#b89640', fontSize: '13px', cursor: 'pointer' }}>
@@ -495,14 +388,14 @@ export default function AdminPage() {
             <h2 style={{ color: '#b89640', marginBottom: '24px' }}>📅 날짜 범위 검색</h2>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', marginBottom: '24px', flexWrap: 'wrap' }}>
               <div>
-                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '6px' }}>시작일</label>
+                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '6px' }}>시작일 (260520 또는 2026-05-20)</label>
                 <input value={dateFrom} onChange={e => setDateFrom(e.target.value)} placeholder="260520"
-                  style={{ padding: '10px 14px', borderRadius: '8px', background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '13px', outline: 'none', width: '180px' }} />
+                  style={{ padding: '10px 14px', borderRadius: '8px', background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '13px', outline: 'none', width: '200px' }} />
               </div>
               <div>
-                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '6px' }}>종료일</label>
+                <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '6px' }}>종료일 (비우면 시작일과 동일)</label>
                 <input value={dateTo} onChange={e => setDateTo(e.target.value)} placeholder="260524"
-                  style={{ padding: '10px 14px', borderRadius: '8px', background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '13px', outline: 'none', width: '180px' }} />
+                  style={{ padding: '10px 14px', borderRadius: '8px', background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '13px', outline: 'none', width: '200px' }} />
               </div>
               <button onClick={searchByDate} disabled={loading}
                 style={{ padding: '10px 24px', borderRadius: '8px', background: '#b89640', border: 'none', color: '#000', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
@@ -567,12 +460,17 @@ export default function AdminPage() {
               </button>
             </div>
             {linksMsg && <div style={{ marginBottom: '16px', color: '#00ff88', fontSize: '13px' }}>{linksMsg}</div>}
+
+            {/* 새 링크 추가 폼 */}
             {showNewForm && (
               <LinkForm link={newLink} onChange={setNewLink} onSave={() => saveLink(newLink)} onCancel={() => setShowNewForm(false)} title="새 링크 추가" />
             )}
+
+            {/* 수정 폼 */}
             {editLink && (
               <LinkForm link={editLink} onChange={(v) => setEditLink(v as LinkItem)} onSave={() => saveLink(editLink)} onCancel={() => setEditLink(null)} title="링크 수정" />
             )}
+
             {linksLoading ? (
               <div style={{ color: '#555', textAlign: 'center', padding: '40px' }}>로딩 중...</div>
             ) : (
@@ -608,7 +506,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── URL 무결성 ── */}
+        {/* ── URL 무결성 검사 ── */}
         {section === 'URL 무결성' && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
@@ -624,9 +522,11 @@ export default function AdminPage() {
                 </button>
               )}
             </div>
+
             <div style={{ background: '#161b22', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '14px 18px', marginBottom: '20px', fontSize: '12px', color: '#888' }}>
-              ℹ️ ai_products의 official_url 전체를 실제 접속 테스트합니다. 404/서비스종료 URL을 찾아 삭제 여부를 결정할 수 있어요.
+              ℹ️ ai_products 테이블의 official_url 전체를 실제 접속 테스트합니다. 404/서비스종료 URL을 찾아서 삭제 여부를 결정할 수 있어요. 시간이 다소 걸릴 수 있어요.
             </div>
+
             {urlChecking && (
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ height: '6px', borderRadius: '99px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden', marginBottom: '8px' }}>
@@ -635,7 +535,9 @@ export default function AdminPage() {
                 <div style={{ fontSize: '12px', color: '#666' }}>{urlProgress} / {urlTotal} 검사 완료</div>
               </div>
             )}
+
             {urlMsg && <div style={{ marginBottom: '16px', color: '#b89640', fontSize: '13px' }}>{urlMsg}</div>}
+
             {urlResults.length > 0 && (
               <>
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
@@ -650,6 +552,7 @@ export default function AdminPage() {
                     </button>
                   ))}
                 </div>
+
                 {filteredUrlResults.length > 0 && (
                   <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
@@ -687,113 +590,6 @@ export default function AdminPage() {
                 )}
               </>
             )}
-          </div>
-        )}
-
-        {/* ── 모니터링 ── */}
-        {section === '모니터링' && (
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
-              <h2 style={{ color: '#b89640', margin: 0 }}>📡 인프라 모니터링</h2>
-              <button onClick={() => { loadMonitor(); loadVisitors() }} disabled={monitorLoading}
-                style={{ padding: '8px 16px', borderRadius: '8px', background: '#161b22', border: '1px solid rgba(255,255,255,0.1)', color: '#888', fontSize: '12px', cursor: 'pointer' }}>
-                {monitorLoading ? '로딩 중...' : '새로고침'}
-              </button>
-            </div>
-
-            {/* Supabase 현황 */}
-            <div style={{ marginBottom: '28px' }}>
-              <div style={{ fontSize: '11px', color: '#b89640', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>📦 SUPABASE DB 현황</div>
-              {monitor ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>
-                  {[
-                    { label: 'AI 엔진', value: monitor.supabase.totalRows.toLocaleString(), color: '#00ff88' },
-                    { label: '글로서리', value: monitor.supabase.glossaryRows.toLocaleString(), color: '#b89640' },
-                    { label: 'Links', value: monitor.supabase.linksRows, color: '#4a8adf' },
-                    { label: '업데이트 로그', value: monitor.supabase.logsRows.toLocaleString(), color: '#888' },
-                  ].map(s => (
-                    <div key={s.label} style={{ background: '#161b22', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '16px 20px' }}>
-                      <div style={{ color: '#555', fontSize: '11px', marginBottom: '6px' }}>{s.label}</div>
-                      <div style={{ color: s.color, fontSize: '22px', fontWeight: 700 }}>{s.value}</div>
-                    </div>
-                  ))}
-                </div>
-              ) : <div style={{ color: '#555', fontSize: '13px' }}>로딩 중...</div>}
-            </div>
-
-            {/* GitHub Actions */}
-            <div style={{ marginBottom: '28px' }}>
-              <div style={{ fontSize: '11px', color: '#b89640', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>⚙️ GITHUB ACTIONS 최근 실행</div>
-              {monitor?.github ? (
-                <div style={{ background: '#161b22', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '16px 20px', display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-                  <div>
-                    <div style={{ color: '#555', fontSize: '11px', marginBottom: '4px' }}>마지막 실행</div>
-                    <div style={{ color: '#e6edf3', fontSize: '13px' }}>{monitor.github.lastRun.slice(0, 16).replace('T', ' ')}</div>
-                  </div>
-                  <div>
-                    <div style={{ color: '#555', fontSize: '11px', marginBottom: '4px' }}>상태</div>
-                    <div style={{ color: monitor.github.lastStatus === 'completed' ? '#00ff88' : '#ff9632', fontSize: '13px', fontWeight: 600 }}>{monitor.github.lastStatus}</div>
-                  </div>
-                  <div>
-                    <div style={{ color: '#555', fontSize: '11px', marginBottom: '4px' }}>결과</div>
-                    <div style={{ color: monitor.github.lastConclusion === 'success' ? '#00ff88' : '#ff4444', fontSize: '13px', fontWeight: 600 }}>{monitor.github.lastConclusion}</div>
-                  </div>
-                  <div>
-                    <a href="https://github.com/developerH1004/ai-engine-app/actions" target="_blank" rel="noopener noreferrer"
-                      style={{ padding: '6px 14px', borderRadius: '6px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#888', fontSize: '12px', textDecoration: 'none', display: 'inline-block', marginTop: '16px' }}>
-                      GitHub Actions 열기 ↗
-                    </a>
-                  </div>
-                </div>
-              ) : (
-                <div style={{ background: '#161b22', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '16px 20px', color: '#555', fontSize: '13px' }}>
-                  GitHub API 응답 없음 (공개 repo만 지원)
-                </div>
-              )}
-            </div>
-
-            {/* 업데이트 스케줄 안내 */}
-            <div style={{ marginBottom: '28px' }}>
-              <div style={{ fontSize: '11px', color: '#b89640', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>🕐 자동 업데이트 스케줄</div>
-              <div style={{ background: '#161b22', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '16px 20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                  <span style={{ padding: '2px 8px', borderRadius: '4px', background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)', color: '#00ff88', fontSize: '11px', fontWeight: 600 }}>✅ 활성</span>
-                  <span style={{ color: '#e6edf3', fontSize: '13px' }}>매일 09:00 UTC (필리핀 17:00, 한국 18:00)</span>
-                </div>
-                <div style={{ color: '#555', fontSize: '12px' }}>GitHub Actions → scripts/auto_update.py → Hugging Face 크롤링 → Supabase 업데이트</div>
-              </div>
-            </div>
-
-            {/* 방문자 통계 (update_logs 기반) */}
-            <div>
-              <div style={{ fontSize: '11px', color: '#b89640', fontWeight: 700, letterSpacing: '1px', marginBottom: '12px' }}>📊 업데이트 활동 (최근 14일)</div>
-              <div style={{ background: '#161b22', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '16px 20px' }}>
-                {visitorsLoading ? (
-                  <div style={{ color: '#555', fontSize: '13px' }}>로딩 중...</div>
-                ) : visitors.length > 0 ? (
-                  <>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      {visitors.map(([date, count]) => {
-                        const maxCount = Math.max(...visitors.map(([, c]) => c))
-                        const pct = Math.round((count / maxCount) * 100)
-                        return (
-                          <div key={date} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div style={{ width: '80px', color: '#666', fontSize: '11px', fontFamily: 'monospace', flexShrink: 0 }}>{date}</div>
-                            <div style={{ flex: 1, height: '16px', background: 'rgba(255,255,255,0.04)', borderRadius: '4px', overflow: 'hidden' }}>
-                              <div style={{ height: '100%', width: `${pct}%`, background: 'rgba(0,255,136,0.4)', borderRadius: '4px', transition: 'width 0.3s' }} />
-                            </div>
-                            <div style={{ width: '30px', color: '#888', fontSize: '11px', textAlign: 'right', flexShrink: 0 }}>{count}</div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                    <div style={{ color: '#555', fontSize: '11px', marginTop: '12px' }}>* update_logs 기반 활동 집계</div>
-                  </>
-                ) : (
-                  <div style={{ color: '#555', fontSize: '13px' }}>데이터 없음</div>
-                )}
-              </div>
-            </div>
           </div>
         )}
 
@@ -838,7 +634,7 @@ export default function AdminPage() {
   )
 }
 
-// ── 링크 폼 ──────────────────────────────────────────────────
+// ── 링크 폼 컴포넌트 ──────────────────────────────────────────
 function LinkForm({ link, onChange, onSave, onCancel, title }: {
   link: Partial<LinkItem>
   onChange: (v: Partial<LinkItem>) => void
@@ -846,19 +642,20 @@ function LinkForm({ link, onChange, onSave, onCancel, title }: {
   onCancel: () => void
   title: string
 }) {
-  const inp = { width: '100%', padding: '8px 12px', borderRadius: '6px', background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }
-  const lbl = { display: 'block' as const, color: '#888', fontSize: '11px', marginBottom: '4px' }
+  const inputStyle = { width: '100%', padding: '8px 12px', borderRadius: '6px', background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }
+  const labelStyle = { display: 'block' as const, color: '#888', fontSize: '11px', marginBottom: '4px' }
   return (
     <div style={{ background: '#161b22', border: '1px solid rgba(0,255,136,0.2)', borderRadius: '10px', padding: '20px', marginBottom: '20px' }}>
       <div style={{ color: '#00ff88', fontWeight: 700, fontSize: '13px', marginBottom: '16px' }}>{title}</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
         <div>
-          <label style={lbl}>이름 *</label>
-          <input value={link.name || ''} onChange={e => onChange({ ...link, name: e.target.value })} style={inp} placeholder="Product Hunt" />
+          <label style={labelStyle}>이름 *</label>
+          <input value={link.name || ''} onChange={e => onChange({ ...link, name: e.target.value })} style={inputStyle} placeholder="Product Hunt" />
         </div>
         <div>
-          <label style={lbl}>카테고리 *</label>
-          <select value={link.category || 'community'} onChange={e => onChange({ ...link, category: e.target.value })} style={inp}>
+          <label style={labelStyle}>카테고리 *</label>
+          <select value={link.category || 'community'} onChange={e => onChange({ ...link, category: e.target.value })}
+            style={{ ...inputStyle }}>
             <option value="books">books</option>
             <option value="devtools">devtools</option>
             <option value="community">community</option>
@@ -866,20 +663,20 @@ function LinkForm({ link, onChange, onSave, onCancel, title }: {
           </select>
         </div>
         <div style={{ gridColumn: '1/-1' }}>
-          <label style={lbl}>URL *</label>
-          <input value={link.url || ''} onChange={e => onChange({ ...link, url: e.target.value })} style={inp} placeholder="https://..." />
+          <label style={labelStyle}>URL *</label>
+          <input value={link.url || ''} onChange={e => onChange({ ...link, url: e.target.value })} style={inputStyle} placeholder="https://..." />
         </div>
         <div>
-          <label style={lbl}>설명 (영문)</label>
-          <input value={link.description || ''} onChange={e => onChange({ ...link, description: e.target.value })} style={inp} placeholder="English description" />
+          <label style={labelStyle}>설명 (영문)</label>
+          <input value={link.description || ''} onChange={e => onChange({ ...link, description: e.target.value })} style={inputStyle} placeholder="English description" />
         </div>
         <div>
-          <label style={lbl}>설명 (한글)</label>
-          <input value={link.description_ko || ''} onChange={e => onChange({ ...link, description_ko: e.target.value })} style={inp} placeholder="한글 설명" />
+          <label style={labelStyle}>설명 (한글)</label>
+          <input value={link.description_ko || ''} onChange={e => onChange({ ...link, description_ko: e.target.value })} style={inputStyle} placeholder="한글 설명" />
         </div>
         <div>
-          <label style={lbl}>정렬 순서</label>
-          <input type="number" value={link.sort_order || 99} onChange={e => onChange({ ...link, sort_order: Number(e.target.value) })} style={inp} />
+          <label style={labelStyle}>정렬 순서</label>
+          <input type="number" value={link.sort_order || 99} onChange={e => onChange({ ...link, sort_order: Number(e.target.value) })} style={inputStyle} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '20px' }}>
           <input type="checkbox" checked={link.is_visible ?? true} onChange={e => onChange({ ...link, is_visible: e.target.checked })} style={{ width: '14px', height: '14px', accentColor: '#00ff88' }} />
