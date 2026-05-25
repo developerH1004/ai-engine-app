@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react'
 
-const SECTIONS = ['대시보드', '비AI 탐지', '중복 탐지', '날짜 검색', '로그'] as const
+const SECTIONS = ['대시보드', '비AI 탐지', '중복 탐지', '날짜 검색', 'Links 관리', 'URL 무결성', '로그'] as const
 type Section = typeof SECTIONS[number]
 
 interface Product {
@@ -17,6 +17,29 @@ interface Product {
   _reason?: string
   _duplicate_of_id?: number
 }
+
+interface LinkItem {
+  id: number
+  category: string
+  name: string
+  url: string
+  description: string | null
+  description_ko: string | null
+  sort_order: number
+  is_visible: boolean
+}
+
+interface UrlCheckResult {
+  id: number
+  product_name: string
+  manufacturer: string
+  official_url: string
+  status: 'ok' | 'dead' | 'error' | 'checking'
+  statusCode?: number
+  error?: string
+}
+
+const LINK_CATEGORIES = ['books', 'devtools', 'community', 'research']
 
 export default function AdminPage() {
   const [auth, setAuth]               = useState(false)
@@ -33,6 +56,26 @@ export default function AdminPage() {
   const [dateResults, setDateResults] = useState<any[]>([])
   const [dateSummary, setDateSummary] = useState<any>(null)
   const [logs, setLogs]               = useState<any[]>([])
+
+  // Links 관리 상태
+  const [links, setLinks]             = useState<LinkItem[]>([])
+  const [linksLoading, setLinksLoading] = useState(false)
+  const [linksMsg, setLinksMsg]       = useState('')
+  const [editLink, setEditLink]       = useState<LinkItem | null>(null)
+  const [newLink, setNewLink]         = useState<Partial<LinkItem>>({ category: 'community', is_visible: true })
+  const [showNewForm, setShowNewForm] = useState(false)
+
+  // URL 무결성 상태
+  const [urlResults, setUrlResults]   = useState<UrlCheckResult[]>([])
+  const [urlChecking, setUrlChecking] = useState(false)
+  const [urlProgress, setUrlProgress] = useState(0)
+  const [urlTotal, setUrlTotal]       = useState(0)
+  const [urlMsg, setUrlMsg]           = useState('')
+  const [urlFilter, setUrlFilter]     = useState<'all' | 'dead' | 'error'>('all')
+  const [urlSelected, setUrlSelected] = useState<Set<number>>(new Set())
+
+  const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const SB_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
   async function callAPI(action: string, extra: any = {}) {
     const res = await fetch('/api/admin/cleanup', {
@@ -98,31 +141,128 @@ export default function AdminPage() {
 
   async function loadLogs() {
     setLoading(true)
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/update_logs?select=*&order=created_at.desc&limit=50`, {
-      headers: {
-        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
-      }
+    const res = await fetch(`${SB_URL}/rest/v1/update_logs?select=*&order=created_at.desc&limit=50`, {
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
     })
     const data = await res.json()
     setLogs(Array.isArray(data) ? data : [])
     setLoading(false)
   }
 
-  function toggleSelect(id: number) {
-    setSelected(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
+  // ── Links 관리 ──────────────────────────────────────────
+  async function loadLinks() {
+    setLinksLoading(true)
+    const res = await fetch(`${SB_URL}/rest/v1/links?order=category.asc,sort_order.asc`, {
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
     })
+    const data = await res.json()
+    setLinks(Array.isArray(data) ? data : [])
+    setLinksLoading(false)
   }
 
+  async function saveLink(link: Partial<LinkItem>) {
+    if (!link.name || !link.url || !link.category) { setLinksMsg('이름, URL, 카테고리는 필수입니다'); return }
+    const body = { name: link.name, url: link.url, category: link.category, description: link.description || null, description_ko: link.description_ko || null, sort_order: link.sort_order || 99, is_visible: link.is_visible ?? true }
+    let res
+    if (link.id) {
+      res = await fetch(`${SB_URL}/rest/v1/links?id=eq.${link.id}`, {
+        method: 'PATCH', headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+        body: JSON.stringify(body)
+      })
+    } else {
+      res = await fetch(`${SB_URL}/rest/v1/links`, {
+        method: 'POST', headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+        body: JSON.stringify(body)
+      })
+    }
+    if (res.ok) {
+      setLinksMsg(link.id ? '✅ 수정 완료' : '✅ 추가 완료')
+      setEditLink(null); setShowNewForm(false); setNewLink({ category: 'community', is_visible: true })
+      loadLinks()
+    } else {
+      setLinksMsg('❌ 저장 실패')
+    }
+  }
+
+  async function deleteLink(id: number) {
+    if (!confirm('이 링크를 삭제하시겠습니까?')) return
+    const res = await fetch(`${SB_URL}/rest/v1/links?id=eq.${id}`, {
+      method: 'DELETE', headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+    })
+    if (res.ok) { setLinksMsg('✅ 삭제 완료'); loadLinks() }
+    else setLinksMsg('❌ 삭제 실패')
+  }
+
+  // ── URL 무결성 검사 ──────────────────────────────────────
+  async function startUrlCheck() {
+    if (!confirm('전체 AI 엔진 URL을 검사합니다. 시간이 걸릴 수 있어요. 시작할까요?')) return
+    setUrlChecking(true); setUrlResults([]); setUrlSelected(new Set()); setUrlMsg('')
+
+    // URL 있는 제품만 가져오기
+    const res = await fetch(`${SB_URL}/rest/v1/ai_products?select=id,product_name,manufacturer,official_url&official_url=not.is.null&official_url=neq.`, {
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+    })
+    const products = await res.json()
+    if (!Array.isArray(products)) { setUrlMsg('❌ 데이터 로드 실패'); setUrlChecking(false); return }
+
+    setUrlTotal(products.length)
+    setUrlMsg(`총 ${products.length}개 URL 검사 시작...`)
+
+    const results: UrlCheckResult[] = []
+    const BATCH = 20 // 동시 20개씩
+
+    for (let i = 0; i < products.length; i += BATCH) {
+      const batch = products.slice(i, i + BATCH)
+      const checks = await Promise.allSettled(
+        batch.map(async (p: any) => {
+          try {
+            const r = await fetch(`/api/admin/url-check`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url: p.official_url, password: pw })
+            })
+            const d = await r.json()
+            return { id: p.id, product_name: p.product_name, manufacturer: p.manufacturer, official_url: p.official_url, status: d.status, statusCode: d.statusCode, error: d.error } as UrlCheckResult
+          } catch {
+            return { id: p.id, product_name: p.product_name, manufacturer: p.manufacturer, official_url: p.official_url, status: 'error' as const, error: 'fetch failed' }
+          }
+        })
+      )
+      checks.forEach(c => { if (c.status === 'fulfilled') results.push(c.value) })
+      setUrlProgress(Math.min(i + BATCH, products.length))
+      setUrlResults([...results])
+    }
+
+    const dead = results.filter(r => r.status === 'dead').length
+    const err = results.filter(r => r.status === 'error').length
+    setUrlMsg(`✅ 검사 완료 — 정상: ${results.length - dead - err}개 / 불량: ${dead}개 / 오류: ${err}개`)
+    setUrlChecking(false)
+  }
+
+  async function deleteUrlSelected() {
+    if (urlSelected.size === 0) { setUrlMsg('삭제할 항목을 선택하세요'); return }
+    if (!confirm(`${urlSelected.size}개를 삭제하시겠습니까? 복구 불가합니다.`)) return
+    const data = await callAPI('delete_items', { ids: Array.from(urlSelected) })
+    if (data.error) { setUrlMsg('❌ ' + data.error); return }
+    setUrlMsg(`✅ ${data.deleted}개 삭제 완료`)
+    setUrlResults(prev => prev.filter(r => !urlSelected.has(r.id)))
+    setUrlSelected(new Set())
+    loadStats()
+  }
+
+  const filteredUrlResults = urlResults.filter(r => urlFilter === 'all' ? r.status !== 'ok' : r.status === urlFilter)
+
+  function toggleSelect(id: number) {
+    setSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
+  }
   function toggleAll() {
     if (selected.size === results.length) setSelected(new Set())
     else setSelected(new Set(results.map(r => r.id)))
   }
+  function toggleUrlSelect(id: number) {
+    setUrlSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
+  }
 
-  // ── 로그인 화면 ─────────────────────────────────────────
   if (!auth) {
     return (
       <div style={{ minHeight: '100vh', background: '#0d1117', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -132,14 +272,9 @@ export default function AdminPage() {
             <h1 style={{ color: '#b89640', fontSize: '20px', fontWeight: 700 }}>AI MAP 관리자</h1>
             <p style={{ color: '#666', fontSize: '13px', marginTop: '4px' }}>Admin Back Office</p>
           </div>
-          <input
-            type="password"
-            placeholder="관리자 비밀번호"
-            value={pw}
-            onChange={e => setPw(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleLogin()}
-            style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
-          />
+          <input type="password" placeholder="관리자 비밀번호" value={pw}
+            onChange={e => setPw(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleLogin()}
+            style={{ width: '100%', padding: '12px 16px', borderRadius: '8px', background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
           {pwError && <p style={{ color: '#ff4444', fontSize: '12px', marginTop: '6px' }}>{pwError}</p>}
           <button onClick={handleLogin}
             style={{ width: '100%', marginTop: '16px', padding: '12px', borderRadius: '8px', background: '#b89640', border: 'none', color: '#000', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>
@@ -153,63 +288,46 @@ export default function AdminPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#0d1117', color: '#e6edf3', fontFamily: 'monospace' }}>
       {/* 네비 */}
-      <div style={{ background: '#161b22', borderBottom: '1px solid rgba(184,150,64,0.2)', padding: '0 24px', display: 'flex', alignItems: 'center', gap: '0', height: '52px' }}>
-        <span style={{ color: '#b89640', fontWeight: 700, fontSize: '15px', marginRight: '32px' }}>🛡️ AI MAP Admin</span>
+      <nav style={{ background: '#161b22', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 24px', display: 'flex', alignItems: 'center', gap: '4px', overflowX: 'auto' }}>
+        <span style={{ color: '#b89640', fontWeight: 700, fontSize: '14px', marginRight: '16px', whiteSpace: 'nowrap' }}>🛡️ AI MAP Admin</span>
         {SECTIONS.map(s => (
-          <button key={s} onClick={() => { setSection(s); setResults([]); setMessage(''); setDateResults([]); setDateSummary(null) }}
-            style={{ padding: '0 16px', height: '52px', background: 'none', border: 'none', color: section === s ? '#b89640' : '#666', fontSize: '13px', cursor: 'pointer', borderBottom: section === s ? '2px solid #b89640' : '2px solid transparent', fontWeight: section === s ? 700 : 400 }}>
+          <button key={s} onClick={() => { setSection(s); setMessage(''); if (s === 'Links 관리') loadLinks(); if (s === '로그') loadLogs() }}
+            style={{ padding: '14px 14px', background: 'transparent', border: 'none', borderBottom: section === s ? '2px solid #b89640' : '2px solid transparent', color: section === s ? '#b89640' : '#666', fontSize: '12px', fontWeight: section === s ? 700 : 400, cursor: 'pointer', whiteSpace: 'nowrap' }}>
             {s}
           </button>
         ))}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {stats && (
-            <span style={{ color: '#666', fontSize: '12px' }}>
-              총 {stats.total?.toLocaleString()}개 · 오늘 {stats.today}개 신규
-            </span>
-          )}
-          <button onClick={() => { setAuth(false); setPw('') }}
-            style={{ padding: '4px 12px', borderRadius: '6px', background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: '#888', fontSize: '12px', cursor: 'pointer' }}>
-            로그아웃
-          </button>
-        </div>
-      </div>
+      </nav>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
-
-        {/* 메시지 */}
-        {message && (
-          <div style={{ marginBottom: '16px', padding: '10px 16px', borderRadius: '8px', background: message.startsWith('❌') ? 'rgba(255,68,68,0.1)' : 'rgba(0,255,136,0.07)', border: `1px solid ${message.startsWith('❌') ? 'rgba(255,68,68,0.3)' : 'rgba(0,255,136,0.2)'}`, color: message.startsWith('❌') ? '#ff4444' : '#00ff88', fontSize: '13px' }}>
-            {message}
-          </div>
-        )}
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' }}>
 
         {/* ── 대시보드 ── */}
         {section === '대시보드' && (
           <div>
             <h2 style={{ color: '#b89640', marginBottom: '24px' }}>📊 대시보드</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+            {stats ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
+                {[
+                  { label: '전체 AI 엔진', value: stats.total?.toLocaleString(), color: '#00ff88' },
+                  { label: '오늘 신규', value: stats.todayNew || 0, color: '#4a8adf' },
+                  { label: '글로서리 용어', value: stats.glossary?.toLocaleString(), color: '#b89640' },
+                ].map(s => (
+                  <div key={s.label} style={{ background: '#161b22', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '20px 24px' }}>
+                    <div style={{ color: '#666', fontSize: '12px', marginBottom: '8px' }}>{s.label}</div>
+                    <div style={{ color: s.color, fontSize: '28px', fontWeight: 700 }}>{s.value}</div>
+                  </div>
+                ))}
+              </div>
+            ) : <div style={{ color: '#555' }}>로딩 중...</div>}
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               {[
-                { label: '전체 AI 엔진', value: stats?.total?.toLocaleString() || '-', color: '#00ff88' },
-                { label: '오늘 신규', value: stats?.today || '0', color: '#4a8adf' },
-                { label: '글로서리 용어', value: stats?.glossary?.toLocaleString() || '-', color: '#b89640' },
-              ].map(card => (
-                <div key={card.label} style={{ background: '#161b22', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '20px' }}>
-                  <div style={{ color: '#666', fontSize: '12px', marginBottom: '8px' }}>{card.label}</div>
-                  <div style={{ color: card.color, fontSize: '28px', fontWeight: 700 }}>{card.value}</div>
-                </div>
-              ))}
-            </div>
-            <h3 style={{ color: '#888', marginBottom: '16px', fontSize: '14px' }}>빠른 실행</h3>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              {[
-                { label: '🔍 비AI 항목 탐지', action: () => { setSection('비AI 탐지'); setTimeout(findInvalid, 100) } },
-                { label: '🔄 중복 탐지', action: () => { setSection('중복 탐지'); setTimeout(findDuplicates, 100) } },
+                { label: '🔍 비AI 항목 탐지', action: () => { setSection('비AI 탐지'); findInvalid() } },
+                { label: '🔄 중복 탐지', action: () => { setSection('중복 탐지'); findDuplicates() } },
                 { label: '📅 날짜 검색', action: () => setSection('날짜 검색') },
-                { label: '📋 로그 보기', action: () => { setSection('로그'); setTimeout(loadLogs, 100) } },
-              ].map(btn => (
-                <button key={btn.label} onClick={btn.action}
-                  style={{ padding: '10px 20px', borderRadius: '8px', background: 'rgba(184,150,64,0.1)', border: '1px solid rgba(184,150,64,0.3)', color: '#b89640', fontSize: '13px', cursor: 'pointer', fontWeight: 600 }}>
-                  {btn.label}
+                { label: '🔗 URL 무결성 검사', action: () => setSection('URL 무결성') },
+              ].map(b => (
+                <button key={b.label} onClick={b.action}
+                  style={{ padding: '10px 20px', borderRadius: '8px', background: '#161b22', border: '1px solid rgba(184,150,64,0.3)', color: '#b89640', fontSize: '13px', cursor: 'pointer' }}>
+                  {b.label}
                 </button>
               ))}
             </div>
@@ -220,22 +338,22 @@ export default function AdminPage() {
         {section === '비AI 탐지' && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
-              <h2 style={{ color: '#b89640', margin: 0 }}>🔍 비AI/폰트 항목 탐지</h2>
+              <h2 style={{ color: '#b89640', margin: 0 }}>🔍 비AI 항목 탐지</h2>
               <button onClick={findInvalid} disabled={loading}
                 style={{ padding: '8px 20px', borderRadius: '8px', background: '#b89640', border: 'none', color: '#000', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
                 {loading ? '탐지 중...' : '탐지 실행'}
               </button>
               {results.length > 0 && <>
-                <button onClick={toggleAll}
-                  style={{ padding: '8px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#ccc', fontSize: '13px', cursor: 'pointer' }}>
+                <button onClick={toggleAll} style={{ padding: '8px 16px', borderRadius: '8px', background: '#161b22', border: '1px solid rgba(255,255,255,0.1)', color: '#888', fontSize: '12px', cursor: 'pointer' }}>
                   {selected.size === results.length ? '전체 해제' : '전체 선택'}
                 </button>
-                <button onClick={deleteSelected} disabled={selected.size === 0 || loading}
-                  style={{ padding: '8px 16px', borderRadius: '8px', background: selected.size > 0 ? 'rgba(255,68,68,0.15)' : 'rgba(255,255,255,0.03)', border: `1px solid ${selected.size > 0 ? 'rgba(255,68,68,0.4)' : 'rgba(255,255,255,0.08)'}`, color: selected.size > 0 ? '#ff6666' : '#444', fontSize: '13px', cursor: selected.size > 0 ? 'pointer' : 'default' }}>
+                <button onClick={deleteSelected} disabled={loading || selected.size === 0}
+                  style={{ padding: '8px 20px', borderRadius: '8px', background: selected.size > 0 ? '#ff4444' : '#333', border: 'none', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
                   선택 삭제 ({selected.size})
                 </button>
               </>}
             </div>
+            {message && <div style={{ marginBottom: '16px', color: '#b89640', fontSize: '13px' }}>{message}</div>}
             <ResultTable results={results} selected={selected} onToggle={toggleSelect} />
           </div>
         )}
@@ -244,22 +362,22 @@ export default function AdminPage() {
         {section === '중복 탐지' && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
-              <h2 style={{ color: '#b89640', margin: 0 }}>🔄 중복 항목 탐지</h2>
+              <h2 style={{ color: '#b89640', margin: 0 }}>🔄 중복 탐지</h2>
               <button onClick={findDuplicates} disabled={loading}
                 style={{ padding: '8px 20px', borderRadius: '8px', background: '#b89640', border: 'none', color: '#000', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
                 {loading ? '탐지 중...' : '탐지 실행'}
               </button>
               {results.length > 0 && <>
-                <button onClick={toggleAll}
-                  style={{ padding: '8px 16px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#ccc', fontSize: '13px', cursor: 'pointer' }}>
+                <button onClick={toggleAll} style={{ padding: '8px 16px', borderRadius: '8px', background: '#161b22', border: '1px solid rgba(255,255,255,0.1)', color: '#888', fontSize: '12px', cursor: 'pointer' }}>
                   {selected.size === results.length ? '전체 해제' : '전체 선택'}
                 </button>
-                <button onClick={deleteSelected} disabled={selected.size === 0 || loading}
-                  style={{ padding: '8px 16px', borderRadius: '8px', background: selected.size > 0 ? 'rgba(255,68,68,0.15)' : 'rgba(255,255,255,0.03)', border: `1px solid ${selected.size > 0 ? 'rgba(255,68,68,0.4)' : 'rgba(255,255,255,0.08)'}`, color: selected.size > 0 ? '#ff6666' : '#444', fontSize: '13px', cursor: selected.size > 0 ? 'pointer' : 'default' }}>
+                <button onClick={deleteSelected} disabled={loading || selected.size === 0}
+                  style={{ padding: '8px 20px', borderRadius: '8px', background: selected.size > 0 ? '#ff4444' : '#333', border: 'none', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
                   선택 삭제 ({selected.size})
                 </button>
               </>}
             </div>
+            {message && <div style={{ marginBottom: '16px', color: '#b89640', fontSize: '13px' }}>{message}</div>}
             <ResultTable results={results} selected={selected} onToggle={toggleSelect} showDupeOf />
           </div>
         )}
@@ -271,14 +389,12 @@ export default function AdminPage() {
             <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', marginBottom: '24px', flexWrap: 'wrap' }}>
               <div>
                 <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '6px' }}>시작일 (260520 또는 2026-05-20)</label>
-                <input value={dateFrom} onChange={e => setDateFrom(e.target.value)}
-                  placeholder="260520"
+                <input value={dateFrom} onChange={e => setDateFrom(e.target.value)} placeholder="260520"
                   style={{ padding: '10px 14px', borderRadius: '8px', background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '13px', outline: 'none', width: '200px' }} />
               </div>
               <div>
                 <label style={{ display: 'block', color: '#888', fontSize: '12px', marginBottom: '6px' }}>종료일 (비우면 시작일과 동일)</label>
-                <input value={dateTo} onChange={e => setDateTo(e.target.value)}
-                  placeholder="260524"
+                <input value={dateTo} onChange={e => setDateTo(e.target.value)} placeholder="260524"
                   style={{ padding: '10px 14px', borderRadius: '8px', background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '13px', outline: 'none', width: '200px' }} />
               </div>
               <button onClick={searchByDate} disabled={loading}
@@ -286,7 +402,7 @@ export default function AdminPage() {
                 {loading ? '검색 중...' : '검색'}
               </button>
             </div>
-
+            {message && <div style={{ marginBottom: '16px', color: '#b89640', fontSize: '13px' }}>{message}</div>}
             {dateSummary && (
               <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
                 <span style={{ padding: '4px 12px', borderRadius: '99px', background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)', color: '#00ff88', fontSize: '12px', fontWeight: 600 }}>🆕 신규 {dateSummary.newCount}개</span>
@@ -294,7 +410,6 @@ export default function AdminPage() {
                 <span style={{ padding: '4px 12px', borderRadius: '99px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#aaa', fontSize: '12px' }}>총 {dateResults.length}개</span>
               </div>
             )}
-
             {dateResults.length > 0 && (
               <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
@@ -317,9 +432,7 @@ export default function AdminPage() {
                             </span>
                           </td>
                           <td style={{ padding: '8px 14px', color: '#e6edf3', fontWeight: 500 }}>
-                            {r.official_url
-                              ? <a href={r.official_url} target="_blank" rel="noopener noreferrer" style={{ color: '#e6edf3', textDecoration: 'none' }}>{r.product_name}</a>
-                              : r.product_name}
+                            {r.official_url ? <a href={r.official_url} target="_blank" rel="noopener noreferrer" style={{ color: '#e6edf3', textDecoration: 'none' }}>{r.product_name}</a> : r.product_name}
                           </td>
                           <td style={{ padding: '8px 14px', color: '#aaa' }}>{r.manufacturer || '-'}</td>
                           <td style={{ padding: '8px 14px', color: '#888', fontSize: '12px' }}>{(r.category_main || '-').replace(/^\d+\.\s/, '')}</td>
@@ -331,6 +444,151 @@ export default function AdminPage() {
                   </tbody>
                 </table>
               </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Links 관리 ── */}
+        {section === 'Links 관리' && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+              <h2 style={{ color: '#b89640', margin: 0 }}>🔗 Links 관리</h2>
+              <button onClick={loadLinks} style={{ padding: '8px 16px', borderRadius: '8px', background: '#161b22', border: '1px solid rgba(255,255,255,0.1)', color: '#888', fontSize: '12px', cursor: 'pointer' }}>새로고침</button>
+              <button onClick={() => { setShowNewForm(true); setEditLink(null) }}
+                style={{ padding: '8px 20px', borderRadius: '8px', background: '#00ff88', border: 'none', color: '#000', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                + 새 링크 추가
+              </button>
+            </div>
+            {linksMsg && <div style={{ marginBottom: '16px', color: '#00ff88', fontSize: '13px' }}>{linksMsg}</div>}
+
+            {/* 새 링크 추가 폼 */}
+            {showNewForm && (
+              <LinkForm link={newLink} onChange={setNewLink} onSave={() => saveLink(newLink)} onCancel={() => setShowNewForm(false)} title="새 링크 추가" />
+            )}
+
+            {/* 수정 폼 */}
+            {editLink && (
+              <LinkForm link={editLink} onChange={(v) => setEditLink(v as LinkItem)} onSave={() => saveLink(editLink)} onCancel={() => setEditLink(null)} title="링크 수정" />
+            )}
+
+            {linksLoading ? (
+              <div style={{ color: '#555', textAlign: 'center', padding: '40px' }}>로딩 중...</div>
+            ) : (
+              LINK_CATEGORIES.map(cat => {
+                const catLinks = links.filter(l => l.category === cat)
+                if (catLinks.length === 0) return null
+                return (
+                  <div key={cat} style={{ marginBottom: '24px' }}>
+                    <div style={{ fontSize: '11px', color: '#b89640', fontWeight: 700, letterSpacing: '1px', marginBottom: '8px', textTransform: 'uppercase' }}>{cat} ({catLinks.length})</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      {catLinks.map(link => (
+                        <div key={link.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px', borderRadius: '8px', background: '#161b22', border: '1px solid rgba(255,255,255,0.06)' }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: link.is_visible ? '#e6edf3' : '#555' }}>{link.name}</div>
+                            <div style={{ fontSize: '11px', color: '#555', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{link.url}</div>
+                            {link.description && <div style={{ fontSize: '11px', color: '#666' }}>{link.description}</div>}
+                          </div>
+                          <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '4px', background: link.is_visible ? 'rgba(0,255,136,0.1)' : 'rgba(255,255,255,0.05)', color: link.is_visible ? '#00ff88' : '#555' }}>
+                            {link.is_visible ? '노출' : '숨김'}
+                          </span>
+                          <span style={{ fontSize: '11px', color: '#555' }}>#{link.sort_order}</span>
+                          <button onClick={() => { setEditLink(link); setShowNewForm(false) }}
+                            style={{ padding: '4px 10px', borderRadius: '4px', background: 'rgba(74,138,223,0.1)', border: '1px solid rgba(74,138,223,0.2)', color: '#4a8adf', fontSize: '11px', cursor: 'pointer' }}>수정</button>
+                          <button onClick={() => deleteLink(link.id)}
+                            style={{ padding: '4px 10px', borderRadius: '4px', background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.2)', color: '#ff4444', fontSize: '11px', cursor: 'pointer' }}>삭제</button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </div>
+        )}
+
+        {/* ── URL 무결성 검사 ── */}
+        {section === 'URL 무결성' && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+              <h2 style={{ color: '#b89640', margin: 0 }}>🌐 URL 무결성 검사</h2>
+              <button onClick={startUrlCheck} disabled={urlChecking}
+                style={{ padding: '8px 20px', borderRadius: '8px', background: '#b89640', border: 'none', color: '#000', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                {urlChecking ? `검사 중... (${urlProgress}/${urlTotal})` : '검사 시작'}
+              </button>
+              {urlResults.length > 0 && urlSelected.size > 0 && (
+                <button onClick={deleteUrlSelected}
+                  style={{ padding: '8px 20px', borderRadius: '8px', background: '#ff4444', border: 'none', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                  선택 삭제 ({urlSelected.size})
+                </button>
+              )}
+            </div>
+
+            <div style={{ background: '#161b22', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '14px 18px', marginBottom: '20px', fontSize: '12px', color: '#888' }}>
+              ℹ️ ai_products 테이블의 official_url 전체를 실제 접속 테스트합니다. 404/서비스종료 URL을 찾아서 삭제 여부를 결정할 수 있어요. 시간이 다소 걸릴 수 있어요.
+            </div>
+
+            {urlChecking && (
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ height: '6px', borderRadius: '99px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden', marginBottom: '8px' }}>
+                  <div style={{ height: '100%', width: `${urlTotal ? (urlProgress / urlTotal) * 100 : 0}%`, background: '#00ff88', transition: 'width 0.3s', borderRadius: '99px' }} />
+                </div>
+                <div style={{ fontSize: '12px', color: '#666' }}>{urlProgress} / {urlTotal} 검사 완료</div>
+              </div>
+            )}
+
+            {urlMsg && <div style={{ marginBottom: '16px', color: '#b89640', fontSize: '13px' }}>{urlMsg}</div>}
+
+            {urlResults.length > 0 && (
+              <>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                  {[
+                    { key: 'all', label: `전체 불량 (${urlResults.filter(r => r.status !== 'ok').length})` },
+                    { key: 'dead', label: `💀 불량 (${urlResults.filter(r => r.status === 'dead').length})` },
+                    { key: 'error', label: `⚠️ 오류 (${urlResults.filter(r => r.status === 'error').length})` },
+                  ].map(f => (
+                    <button key={f.key} onClick={() => setUrlFilter(f.key as any)}
+                      style={{ padding: '6px 14px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer', background: urlFilter === f.key ? 'rgba(184,150,64,0.15)' : 'rgba(255,255,255,0.04)', border: urlFilter === f.key ? '1px solid rgba(184,150,64,0.5)' : '1px solid rgba(255,255,255,0.08)', color: urlFilter === f.key ? '#b89640' : '#888' }}>
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+
+                {filteredUrlResults.length > 0 && (
+                  <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                      <thead>
+                        <tr style={{ background: '#161b22' }}>
+                          <th style={{ padding: '10px 14px', color: '#b89640', borderBottom: '1px solid rgba(184,150,64,0.3)', width: '40px' }}>✓</th>
+                          {['상태','AI 엔진명','제조사','URL','오류'].map(h => (
+                            <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', borderBottom: '1px solid rgba(184,150,64,0.3)', whiteSpace: 'nowrap' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredUrlResults.map(r => (
+                          <tr key={r.id} onClick={() => toggleUrlSelect(r.id)}
+                            style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', background: urlSelected.has(r.id) ? 'rgba(255,68,68,0.07)' : 'transparent' }}>
+                            <td style={{ padding: '8px 14px' }}>
+                              <input type="checkbox" readOnly checked={urlSelected.has(r.id)} style={{ accentColor: '#ff4444', width: '14px', height: '14px' }} />
+                            </td>
+                            <td style={{ padding: '8px 14px' }}>
+                              <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 600, background: r.status === 'dead' ? 'rgba(255,68,68,0.1)' : 'rgba(255,150,50,0.1)', border: `1px solid ${r.status === 'dead' ? 'rgba(255,68,68,0.3)' : 'rgba(255,150,50,0.3)'}`, color: r.status === 'dead' ? '#ff4444' : '#ff9632', whiteSpace: 'nowrap' }}>
+                                {r.status === 'dead' ? `💀 ${r.statusCode || 'Dead'}` : '⚠️ 오류'}
+                              </span>
+                            </td>
+                            <td style={{ padding: '8px 14px', color: '#e6edf3', fontWeight: 500 }}>{r.product_name}</td>
+                            <td style={{ padding: '8px 14px', color: '#aaa', fontSize: '12px' }}>{r.manufacturer || '-'}</td>
+                            <td style={{ padding: '8px 14px', fontSize: '11px', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <a href={r.official_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#4a8adf' }}>{r.official_url}</a>
+                            </td>
+                            <td style={{ padding: '8px 14px', color: '#666', fontSize: '11px' }}>{r.error || '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
@@ -376,7 +634,64 @@ export default function AdminPage() {
   )
 }
 
-// ── 공통 결과 테이블 ─────────────────────────────────────────
+// ── 링크 폼 컴포넌트 ──────────────────────────────────────────
+function LinkForm({ link, onChange, onSave, onCancel, title }: {
+  link: Partial<LinkItem>
+  onChange: (v: Partial<LinkItem>) => void
+  onSave: () => void
+  onCancel: () => void
+  title: string
+}) {
+  const inputStyle = { width: '100%', padding: '8px 12px', borderRadius: '6px', background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }
+  const labelStyle = { display: 'block' as const, color: '#888', fontSize: '11px', marginBottom: '4px' }
+  return (
+    <div style={{ background: '#161b22', border: '1px solid rgba(0,255,136,0.2)', borderRadius: '10px', padding: '20px', marginBottom: '20px' }}>
+      <div style={{ color: '#00ff88', fontWeight: 700, fontSize: '13px', marginBottom: '16px' }}>{title}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+        <div>
+          <label style={labelStyle}>이름 *</label>
+          <input value={link.name || ''} onChange={e => onChange({ ...link, name: e.target.value })} style={inputStyle} placeholder="Product Hunt" />
+        </div>
+        <div>
+          <label style={labelStyle}>카테고리 *</label>
+          <select value={link.category || 'community'} onChange={e => onChange({ ...link, category: e.target.value })}
+            style={{ ...inputStyle }}>
+            <option value="books">books</option>
+            <option value="devtools">devtools</option>
+            <option value="community">community</option>
+            <option value="research">research</option>
+          </select>
+        </div>
+        <div style={{ gridColumn: '1/-1' }}>
+          <label style={labelStyle}>URL *</label>
+          <input value={link.url || ''} onChange={e => onChange({ ...link, url: e.target.value })} style={inputStyle} placeholder="https://..." />
+        </div>
+        <div>
+          <label style={labelStyle}>설명 (영문)</label>
+          <input value={link.description || ''} onChange={e => onChange({ ...link, description: e.target.value })} style={inputStyle} placeholder="English description" />
+        </div>
+        <div>
+          <label style={labelStyle}>설명 (한글)</label>
+          <input value={link.description_ko || ''} onChange={e => onChange({ ...link, description_ko: e.target.value })} style={inputStyle} placeholder="한글 설명" />
+        </div>
+        <div>
+          <label style={labelStyle}>정렬 순서</label>
+          <input type="number" value={link.sort_order || 99} onChange={e => onChange({ ...link, sort_order: Number(e.target.value) })} style={inputStyle} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '20px' }}>
+          <input type="checkbox" checked={link.is_visible ?? true} onChange={e => onChange({ ...link, is_visible: e.target.checked })} style={{ width: '14px', height: '14px', accentColor: '#00ff88' }} />
+          <label style={{ color: '#888', fontSize: '12px' }}>노출</label>
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <button onClick={onSave} style={{ padding: '8px 20px', borderRadius: '6px', background: '#00ff88', border: 'none', color: '#000', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>저장</button>
+        <button onClick={onCancel} style={{ padding: '8px 16px', borderRadius: '6px', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: '#888', fontSize: '13px', cursor: 'pointer' }}>취소</button>
+      </div>
+    </div>
+  )
+}
+
+// ── 공통 결과 테이블 ──────────────────────────────────────────
 function ResultTable({ results, selected, onToggle, showDupeOf }: {
   results: Product[]
   selected: Set<number>
@@ -408,9 +723,7 @@ function ResultTable({ results, selected, onToggle, showDupeOf }: {
               <td style={{ padding: '8px 14px', color: '#ff8888', fontSize: '12px' }}>{r._reason || '-'}</td>
               <td style={{ padding: '8px 14px', color: '#888', fontSize: '12px', whiteSpace: 'nowrap' }}>{(r.created_at || '').slice(0, 10)}</td>
               <td style={{ padding: '8px 14px', fontSize: '11px', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {r.official_url
-                  ? <a href={r.official_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#4a8adf' }}>{r.official_url}</a>
-                  : '-'}
+                {r.official_url ? <a href={r.official_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#4a8adf' }}>{r.official_url}</a> : '-'}
               </td>
               {showDupeOf && <td style={{ padding: '8px 14px', color: '#666', fontSize: '12px' }}>{(r as any)._duplicate_of_id || '-'}</td>}
             </tr>
