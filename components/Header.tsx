@@ -69,6 +69,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [expandedMain, setExpandedMain] = useState<string | null>(null)
   const hubBtnRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
   const { lang, setLang } = useLang()
   const tx = (key: string) => t[key]?.[lang] ?? key
   const ko = lang === 'ko'
