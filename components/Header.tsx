@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useLang } from '@/lib/LangContext'
 import { t } from '@/lib/i18n'
@@ -63,88 +63,12 @@ export function dispatchCategorySelect(main: string, sub: string) {
   window.dispatchEvent(new CustomEvent('aimap:categorySelect', { detail: { main, sub } }))
 }
 
-// ── 서브카테고리 패널: 데스크탑=오른쪽 플라이아웃, 모바일=아래 겹침 ──────
-function SubMenu({ main, ko, getMainLabel, getSubLabel, onSelect }: {
-  main: string
-  ko: boolean
-  getMainLabel: (k: string) => string
-  getSubLabel: (k: string) => string
-  onSelect: (m: string, s: string) => void
-}) {
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
-
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        // 모바일: 대분류 항목 위에 겹쳐서 표시 (top=0, left=0, 전체 너비)
-        // 데스크탑: 오른쪽으로 플라이아웃
-        ...(isMobile
-          ? { top: 0, left: 0, width: '100%', marginLeft: 0 }
-          : { top: '-6px', left: '100%', marginLeft: '6px', width: '260px' }
-        ),
-        background: 'rgba(10,14,20,0.99)',
-        border: '1px solid rgba(0,255,136,0.18)',
-        borderRadius: '10px',
-        boxShadow: '0 8px 40px rgba(0,0,0,0.8)',
-        backdropFilter: 'blur(24px)',
-        maxHeight: '65vh',
-        overflowY: 'auto',
-        padding: '6px 0',
-        zIndex: 202,
-      }}
-    >
-      {/* 대분류 전체 선택 */}
-      <button
-        onClick={() => onSelect(main, '')}
-        style={{
-          display: 'flex', alignItems: 'center', gap: '8px',
-          width: '100%', padding: '9px 16px',
-          background: 'none', border: 'none', cursor: 'pointer',
-          color: '#00ff88', fontSize: '13px', fontWeight: 700,
-          textAlign: 'left', transition: 'background 0.1s',
-          borderBottom: '1px solid rgba(255,255,255,0.07)',
-          marginBottom: '4px',
-        }}
-        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,255,136,0.08)')}
-        onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-      >
-        <span>{ICONS[main]}</span>
-        {getMainLabel(main)} — {ko ? '전체' : 'All'}
-      </button>
-
-      {/* 서브카테고리 목록 */}
-      {CATEGORIES_EN[main].map(sub => (
-        <button
-          key={sub}
-          onClick={() => onSelect(main, sub)}
-          style={{
-            display: 'block', width: '100%', padding: '8px 16px',
-            background: 'none', border: 'none', cursor: 'pointer',
-            color: '#8b949e', fontSize: '13px', textAlign: 'left',
-            transition: 'all 0.1s', lineHeight: 1.4,
-          }}
-          onMouseEnter={e => {
-            ;(e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.08)'
-            ;(e.currentTarget as HTMLElement).style.color = '#00d4ff'
-          }}
-          onMouseLeave={e => {
-            ;(e.currentTarget as HTMLElement).style.background = 'none'
-            ;(e.currentTarget as HTMLElement).style.color = '#8b949e'
-          }}
-        >
-          {getSubLabel(sub)}
-        </button>
-      ))}
-    </div>
-  )
-}
 
 export default function Header() {
   const [hubOpen, setHubOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [hoveredMain, setHoveredMain] = useState<string | null>(null)
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [expandedMain, setExpandedMain] = useState<string | null>(null)
+  const hubBtnRef = useRef<HTMLButtonElement>(null)
   const { lang, setLang } = useLang()
   const tx = (key: string) => t[key]?.[lang] ?? key
   const ko = lang === 'ko'
@@ -152,23 +76,24 @@ export default function Header() {
   const getMainLabel = (key: string) => ko ? (MAIN_KO[key] ?? key.replace(/^\d+\.\s/, '')) : key.replace(/^\d+\.\s/, '')
   const getSubLabel  = (key: string) => ko ? (SUB_KO[key]  ?? key.replace(/^\d+-\d+\.\s/, '')) : key.replace(/^\d+-\d+\.\s/, '')
 
-  // 메뉴 닫기 (딜레이 — 서브메뉴로 마우스 이동 시 깜빡임 방지)
-  const startClose = useCallback(() => {
-    closeTimer.current = setTimeout(() => {
-      setMenuOpen(false)
-      setHoveredMain(null)
-    }, 180)
-  }, [])
-
-  const cancelClose = useCallback(() => {
-    if (closeTimer.current) clearTimeout(closeTimer.current)
-  }, [])
-
   function handleCategoryClick(main: string, sub: string) {
     dispatchCategorySelect(main, sub)
     setMenuOpen(false)
-    setHoveredMain(null)
+    setExpandedMain(null)
   }
+
+  // 메뉴 바깥 클릭 시 닫기
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      const target = e.target as Node
+      if (menuRef.current && !menuRef.current.contains(target)) {
+        setMenuOpen(false)
+        setExpandedMain(null)
+      }
+    }
+    document.addEventListener('mousedown', handleOutside)
+    return () => document.removeEventListener('mousedown', handleOutside)
+  }, [])
 
   return (
     <>
@@ -194,11 +119,9 @@ export default function Header() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
 
             {/* 햄버거 버튼 */}
-            <div style={{ position: 'relative' }}>
+            <div ref={menuRef} style={{ position: 'relative' }}>
               <button
-                onClick={() => { setMenuOpen(o => !o); setHoveredMain(null) }}
-                onMouseLeave={startClose}
-                onMouseEnter={cancelClose}
+                onClick={() => { setMenuOpen(o => !o); setExpandedMain(null) }}
                 title={ko ? '카테고리' : 'Categories'}
                 style={{
                   display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -236,91 +159,133 @@ export default function Header() {
                 ))}
               </button>
 
-              {/* ── 카테고리 드롭다운 메뉴 ── */}
+              {/* ── 카테고리 드롭다운 메뉴 (아코디언) ── */}
               {menuOpen && (
                 <div
-                  onMouseEnter={cancelClose}
-                  onMouseLeave={startClose}
                   style={{
                     position: 'absolute', top: '42px', left: 0,
                     zIndex: 200,
                     background: 'rgba(10,14,20,0.98)',
                     border: '1px solid rgba(0,255,136,0.15)',
                     borderRadius: '12px',
-                    boxShadow: '0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,255,136,0.05)',
+                    boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
                     backdropFilter: 'blur(24px)',
-                    minWidth: '240px',
-                    overflow: 'visible',
+                    width: '260px',
+                    maxHeight: '80vh',
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
                     padding: '6px 0',
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: 'rgba(0,255,136,0.15) transparent',
                   }}
                 >
-                  {/* All 버튼 */}
+                  {/* View All */}
                   <button
                     onClick={() => handleCategoryClick('', '')}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '10px',
-                      width: '100%', padding: '9px 16px',
+                      width: '100%', padding: '10px 16px',
                       background: 'none', border: 'none', cursor: 'pointer',
                       color: '#00ff88', fontSize: '13px', fontWeight: 700,
-                      textAlign: 'left', transition: 'background 0.1s',
+                      textAlign: 'left',
                       borderBottom: '1px solid rgba(255,255,255,0.06)',
-                      marginBottom: '4px',
+                      marginBottom: '2px',
                     }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,255,136,0.08)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                   >
-                    <span style={{ fontSize: '14px' }}>✦</span>
+                    <span>✦</span>
                     {ko ? '전체 보기' : 'View All'}
                   </button>
 
-                  {/* 대분류 목록 */}
-                  {Object.keys(CATEGORIES_EN).map(main => (
-                    <div
-                      key={main}
-                      style={{ position: 'relative' }}
-                      onMouseEnter={() => { cancelClose(); setHoveredMain(main) }}
-                      onMouseLeave={() => setHoveredMain(null)}
-                    >
-                      <button
-                        onClick={() => {
-                          // 모바일: 클릭으로 서브메뉴 토글 / 데스크탑: 바로 카테고리 이동
-                          if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                            setHoveredMain(prev => prev === main ? null : main)
-                          } else {
-                            handleCategoryClick(main, '')
-                          }
-                        }}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: '10px',
-                          justifyContent: 'space-between',
-                          width: '100%', padding: '10px 16px',
-                          background: hoveredMain === main ? 'rgba(0,255,136,0.07)' : 'none',
-                          border: 'none', cursor: 'pointer',
-                          color: hoveredMain === main ? '#e6edf3' : '#8b949e',
-                          fontSize: '13px', textAlign: 'left',
-                          transition: 'all 0.1s',
-                        }}
-                      >
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span style={{ fontSize: '15px', width: '20px', textAlign: 'center' }}>{ICONS[main]}</span>
-                          {getMainLabel(main)}
-                        </span>
-                        <span style={{
-                          color: hoveredMain === main ? '#00ff88' : '#444',
-                          fontSize: '12px',
-                          transform: hoveredMain === main ? 'rotate(90deg)' : 'none',
-                          transition: 'all 0.15s',
-                          display: 'inline-block',
-                        }}>›</span>
-                      </button>
+                  {/* 대분류 아코디언 */}
+                  {Object.keys(CATEGORIES_EN).map(main => {
+                    const isOpen = expandedMain === main
+                    return (
+                      <div key={main}>
+                        {/* 대분류 버튼 — 클릭 시 서브 토글 */}
+                        <button
+                          onClick={() => setExpandedMain(isOpen ? null : main)}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: '10px',
+                            justifyContent: 'space-between',
+                            width: '100%', padding: '10px 16px',
+                            background: isOpen ? 'rgba(0,255,136,0.07)' : 'none',
+                            border: 'none', cursor: 'pointer',
+                            color: isOpen ? '#e6edf3' : '#8b949e',
+                            fontSize: '13px', textAlign: 'left',
+                            transition: 'all 0.12s',
+                          }}
+                          onMouseEnter={e => { if (!isOpen) (e.currentTarget.style.background = 'rgba(255,255,255,0.04)') }}
+                          onMouseLeave={e => { if (!isOpen) (e.currentTarget.style.background = 'none') }}
+                        >
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span style={{ fontSize: '15px', width: '20px', textAlign: 'center' }}>{ICONS[main]}</span>
+                            {getMainLabel(main)}
+                          </span>
+                          <span style={{
+                            color: isOpen ? '#00ff88' : '#555',
+                            fontSize: '11px',
+                            transform: isOpen ? 'rotate(90deg)' : 'none',
+                            transition: 'transform 0.18s',
+                            display: 'inline-block',
+                            flexShrink: 0,
+                          }}>›</span>
+                        </button>
 
-                      {/* ── 서브카테고리: 데스크탑=오른쪽, 모바일=아래 겹침 ── */}
-                      {hoveredMain === main && (
-                        <SubMenu main={main} ko={ko} getMainLabel={getMainLabel} getSubLabel={getSubLabel} onSelect={handleCategoryClick} />
-                      )}
+                        {/* 서브카테고리 — 아코디언으로 인라인 펼침 */}
+                        {isOpen && (
+                          <div style={{
+                            background: 'rgba(0,0,0,0.25)',
+                            borderTop: '1px solid rgba(255,255,255,0.04)',
+                            borderBottom: '1px solid rgba(255,255,255,0.04)',
+                          }}>
+                            {/* 대분류 전체 선택 */}
+                            <button
+                              onClick={() => handleCategoryClick(main, '')}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: '8px',
+                                width: '100%', padding: '8px 16px 8px 46px',
+                                background: 'none', border: 'none', cursor: 'pointer',
+                                color: '#00cc6a', fontSize: '12px', fontWeight: 600,
+                                textAlign: 'left',
+                                borderBottom: '1px solid rgba(255,255,255,0.04)',
+                              }}
+                              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,255,136,0.07)')}
+                              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                            >
+                              {ko ? '— 전체' : '— All'}
+                            </button>
 
-                    </div>
-                  ))}
+                            {/* 서브 항목들 */}
+                            {CATEGORIES_EN[main].map(sub => (
+                              <button
+                                key={sub}
+                                onClick={() => handleCategoryClick(main, sub)}
+                                style={{
+                                  display: 'block', width: '100%',
+                                  padding: '8px 16px 8px 46px',
+                                  background: 'none', border: 'none', cursor: 'pointer',
+                                  color: '#6e7681', fontSize: '12px', textAlign: 'left',
+                                  transition: 'all 0.1s',
+                                }}
+                                onMouseEnter={e => {
+                                  ;(e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.07)'
+                                  ;(e.currentTarget as HTMLElement).style.color = '#00d4ff'
+                                }}
+                                onMouseLeave={e => {
+                                  ;(e.currentTarget as HTMLElement).style.background = 'none'
+                                  ;(e.currentTarget as HTMLElement).style.color = '#6e7681'
+                                }}
+                              >
+                                {getSubLabel(sub)}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -359,8 +324,8 @@ export default function Header() {
             10.5281/zenodo.20248631
           </div>
 
-          {/* ── 우측: 네비 (데스크탑 + 모바일 통합, 중복 제거) ── */}
-          <nav style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          {/* ── 우측: 네비 ── */}
+          <nav style={{ display: 'flex', alignItems: 'center', gap: '4px', position: 'relative' }}>
 
             {/* Explore / Request — 데스크탑만 */}
             <Link href="/" className="hidden md:inline-flex" style={{
@@ -381,25 +346,7 @@ export default function Header() {
             onMouseLeave={e => (e.currentTarget.style.color = '#8b949e')}
             >{tx('navRequest')}</Link>
 
-            {/* Serial Auth */}
-            <Link href="/auth" style={{
-              padding: '5px 14px', borderRadius: '6px', fontSize: '12px',
-              fontWeight: 700, color: '#000',
-              background: 'var(--accent)',
-              textDecoration: 'none', transition: 'all 0.15s',
-              marginLeft: '4px',
-            }}
-            onMouseEnter={e => {
-              ;(e.currentTarget as HTMLElement).style.background = '#00ff99'
-              ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(0,255,136,0.4)'
-            }}
-            onMouseLeave={e => {
-              ;(e.currentTarget as HTMLElement).style.background = 'var(--accent)'
-              ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
-            }}
-            >{tx('navAuth')}</Link>
-
-            {/* 언어 전환 — 하나만 */}
+            {/* 언어 전환 */}
             <button
               onClick={() => setLang(lang === 'ko' ? 'en' : 'ko')}
               style={{
@@ -412,32 +359,38 @@ export default function Header() {
               }}
             >{lang === 'ko' ? 'EN' : 'KO'}</button>
 
-            {/* 링크 허브 ☰ — 하나만 */}
+            {/* 링크 허브 ☰ — 드롭다운 */}
             <button
-              onClick={() => setHubOpen(true)}
+              ref={hubBtnRef}
+              onClick={() => setHubOpen(o => !o)}
               title={lang === 'ko' ? '링크 허브' : 'Link Hub'}
               style={{
                 padding: '5px 8px', borderRadius: '6px', fontSize: '16px',
-                color: '#8b949e', background: 'transparent',
-                border: '1px solid rgba(255,255,255,0.08)',
+                color: hubOpen ? 'var(--accent)' : '#8b949e',
+                background: hubOpen ? 'rgba(0,255,136,0.1)' : 'transparent',
+                border: hubOpen ? '1px solid rgba(0,255,136,0.3)' : '1px solid rgba(255,255,255,0.08)',
                 cursor: 'pointer', marginLeft: '4px',
                 transition: 'all 0.15s', lineHeight: 1,
               }}
               onMouseEnter={e => {
-                ;(e.currentTarget as HTMLElement).style.color = 'var(--accent)'
-                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,255,136,0.3)'
+                if (!hubOpen) {
+                  ;(e.currentTarget as HTMLElement).style.color = 'var(--accent)'
+                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,255,136,0.3)'
+                }
               }}
               onMouseLeave={e => {
-                ;(e.currentTarget as HTMLElement).style.color = '#8b949e'
-                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'
+                if (!hubOpen) {
+                  ;(e.currentTarget as HTMLElement).style.color = '#8b949e'
+                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'
+                }
               }}
             >☰</button>
+
+            {/* 링크 허브 드롭다운 패널 */}
+            {hubOpen && <LinkHub onClose={() => setHubOpen(false)} anchorRef={hubBtnRef} />}
           </nav>
         </div>
       </header>
-
-      {/* 링크 허브 드로어 */}
-      {hubOpen && <LinkHub onClose={() => setHubOpen(false)} />}
     </>
   )
 }
