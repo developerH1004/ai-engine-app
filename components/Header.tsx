@@ -131,13 +131,13 @@ export default function Header() {
                   border: menuOpen ? '1px solid rgba(0,255,136,0.3)' : '1px solid rgba(255,255,255,0.08)',
                   cursor: 'pointer', transition: 'all 0.15s', padding: 0,
                 }}
-                onMouseEnterCapture={e => {
+                onMouseOver={e => {
                   if (!menuOpen) {
                     ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,255,136,0.3)'
                     ;(e.currentTarget as HTMLElement).style.background = 'rgba(0,255,136,0.07)'
                   }
                 }}
-                onMouseLeaveCapture={e => {
+                onMouseOut={e => {
                   if (!menuOpen) {
                     ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'
                     ;(e.currentTarget as HTMLElement).style.background = 'transparent'
