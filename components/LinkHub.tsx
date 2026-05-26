@@ -20,7 +20,7 @@ const CATEGORIES = [
 
 export default function LinkHub({ onClose, anchorRef }: {
   onClose: () => void
-  anchorRef?: React.RefObject<HTMLButtonElement>
+  anchorRef?: React.RefObject<HTMLButtonElement | null>
 }) {
   const { lang } = useLang()
   const ko = lang === 'ko'
