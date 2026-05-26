@@ -1,4 +1,3 @@
-// app/api/admin/url-check/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin1234'

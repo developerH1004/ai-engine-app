@@ -228,23 +228,38 @@ export default function AdminPage() {
 
   // ── URL 무결성 검사 ──────────────────────────────────────
   async function startUrlCheck() {
-    if (!confirm('전체 AI 엔진 URL을 검사합니다. 시간이 걸릴 수 있어요. 시작할까요?')) return
+    if (!confirm('전체 AI 엔진 URL을 검사합니다. 6,500개 이상이라 시간이 걸려요. 시작할까요?')) return
     setUrlChecking(true); setUrlResults([]); setUrlSelected(new Set()); setUrlMsg('')
 
-    const res = await fetch(`${SB_URL}/rest/v1/ai_products?select=id,product_name,manufacturer,official_url&official_url=not.is.null&official_url=neq.&limit=5000`, {
-      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
-    })
-    const products = await res.json()
-    if (!Array.isArray(products)) { setUrlMsg('❌ 데이터 로드 실패'); setUrlChecking(false); return }
+    // Supabase 1000개 제한 → 페이지네이션으로 전체 수집
+    let allProducts: any[] = []
+    let offset = 0
+    const PAGE = 1000
 
-    setUrlTotal(products.length)
-    setUrlMsg(`총 ${products.length}개 URL 검사 시작...`)
+    setUrlMsg('데이터 불러오는 중...')
+    while (true) {
+      const res = await fetch(
+        `${SB_URL}/rest/v1/ai_products?select=id,product_name,manufacturer,official_url&official_url=not.is.null&official_url=neq.&order=id.asc&limit=${PAGE}&offset=${offset}`,
+        { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } }
+      )
+      const batch = await res.json()
+      if (!Array.isArray(batch) || batch.length === 0) break
+      allProducts = allProducts.concat(batch)
+      setUrlMsg(`데이터 로딩 중... ${allProducts.length}개`)
+      if (batch.length < PAGE) break
+      offset += PAGE
+    }
+
+    if (allProducts.length === 0) { setUrlMsg('❌ 데이터 로드 실패'); setUrlChecking(false); return }
+
+    setUrlTotal(allProducts.length)
+    setUrlMsg(`총 ${allProducts.length}개 URL 검사 시작...`)
 
     const allResults: UrlCheckResult[] = []
     const BATCH = 20
 
-    for (let i = 0; i < products.length; i += BATCH) {
-      const batch = products.slice(i, i + BATCH)
+    for (let i = 0; i < allProducts.length; i += BATCH) {
+      const batch = allProducts.slice(i, i + BATCH)
       const checks = await Promise.allSettled(
         batch.map(async (p: any) => {
           try {
@@ -261,7 +276,7 @@ export default function AdminPage() {
         })
       )
       checks.forEach(c => { if (c.status === 'fulfilled') allResults.push(c.value) })
-      setUrlProgress(Math.min(i + BATCH, products.length))
+      setUrlProgress(Math.min(i + BATCH, allProducts.length))
       setUrlResults([...allResults])
     }
 
