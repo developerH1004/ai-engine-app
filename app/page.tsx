@@ -21,7 +21,7 @@ export default function Home() {
   const ko = lang === 'ko'
 
   const [products, setProducts]               = useState<AIProduct[]>([])
-  const [loading, setLoading]                 = useState(true)
+  const [loading, setLoading]                 = useState(false)
   const [searchQuery, setSearchQuery]         = useState('')
   const [selectedMain, setSelectedMain]       = useState('')
   const [selectedSub, setSelectedSub]         = useState('')
@@ -37,9 +37,28 @@ export default function Home() {
   const [dateRangeLoading, setDateRangeLoading]   = useState(false)
   const [dateRangeQuery, setDateRangeQuery]       = useState<{from:string, to:string} | null>(null)
 
+  // ── 리스트 표시 여부: 카테고리 선택 or 검색 시에만 true ──
+  const [listVisible, setListVisible] = useState(false)
+
   useEffect(() => {
     supabase.from('ai_products').select('id', { count: 'exact', head: true })
       .then(({ count }) => setTotalCount(count || 0))
+  }, [])
+
+  // ── 헤더 햄버거 메뉴에서 카테고리 선택 이벤트 수신 ──────
+  useEffect(() => {
+    function onCategorySelect(e: Event) {
+      const { main, sub } = (e as CustomEvent).detail
+      setSelectedMain(main)
+      setSelectedSub(sub)
+      setPage(0)
+      setSearchQuery('')
+      setDateRangeResults(null)
+      setDateRangeQuery(null)
+      setListVisible(true)
+    }
+    window.addEventListener('aimap:categorySelect', onCategorySelect)
+    return () => window.removeEventListener('aimap:categorySelect', onCategorySelect)
   }, [])
 
   function buildOrQuery(terms: string[]) {
@@ -98,17 +117,20 @@ export default function Home() {
   }, [selectedMain, selectedSub, searchQuery, page, pageSize])
 
   useEffect(() => {
-    // 날짜 범위 검색 중이면 일반 검색 스킵
+    if (!listVisible) return
     if (dateRangeResults !== null) return
     fetchProducts()
-  }, [fetchProducts, dateRangeResults])
+  }, [fetchProducts, dateRangeResults, listVisible])
 
   // ── 검색 핸들러 ─────────────────────────────────────────
   async function handleSearch(val: string) {
     setSearchQuery(val)
     setPage(0)
 
-    // 날짜 범위 패턴 감지
+    if (val.trim()) {
+      setListVisible(true)
+    }
+
     const dateRange = parseDateRangeQuery(val)
     if (dateRange) {
       setDateRangeLoading(true)
@@ -125,7 +147,6 @@ export default function Home() {
       return
     }
 
-    // 날짜 범위 아니면 초기화
     setDateRangeResults(null)
     setDateRangeQuery(null)
   }
@@ -137,6 +158,7 @@ export default function Home() {
     setSearchQuery('')
     setDateRangeResults(null)
     setDateRangeQuery(null)
+    setListVisible(true)
   }
 
   function handlePageSize(n: number) { setPageSize(n); setPage(0) }
@@ -158,16 +180,9 @@ export default function Home() {
     : selectedMain ? selectedMain.replace(/^\d+\.\s/, '')
     : tx('allCategory')
 
-  const expandedTerms = searchQuery ? expandSearchTerms(searchQuery).filter(t => t !== searchQuery.toLowerCase()) : []
-
-  // 날짜 범위 결과 요약
   const dateRangeSummary = dateRangeResults ? summarizeDateRangeResults(dateRangeResults) : null
-
-  // [FIX 1] 언어별 날짜검색 placeholder
   const dateSearchHint = ko ? '날짜검색: 260520-260524' : 'Date search: 260520-260524'
   const searchPlaceholder = tx('searchPlaceholder') + ' | ' + dateSearchHint
-
-  // [FIX 3&4] 총 페이지 수 계산
   const totalPages = Math.max(1, Math.ceil((isFiltered ? filteredCount : totalCount) / pageSize))
 
   return (
@@ -193,6 +208,8 @@ export default function Home() {
       )}
 
       <main className="max-w-screen-xl mx-auto px-4 pb-20">
+
+        {/* ── 히어로 섹션 ── */}
         <section style={{ padding: "32px 0 12px", textAlign: "center", position: "relative", overflow: "hidden" }}>
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '600px', height: '300px', background: 'radial-gradient(ellipse, rgba(0,255,136,0.06) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
           <p className="font-mono text-xs text-green-400 tracking-widest pulse" style={{ position: 'relative', zIndex: 1 }}>{tx('liveUpdate')}</p>
@@ -207,10 +224,17 @@ export default function Home() {
               <span className="font-mono" style={{ color: '#888', fontSize: '13px' }}>{displayLabel} · {isFiltered ? tx('searchResult') : tx('totalRegistered')}</span>
             </div>
           </div>
+
+          {/* 첫 화면 힌트 — 리스트 미표시 상태일 때 */}
+          {!listVisible && (
+            <p style={{ marginTop: '16px', color: '#444', fontSize: '11px', fontFamily: 'monospace', letterSpacing: '0.05em' }}>
+              {ko ? '☰ 왼쪽 메뉴에서 카테고리를 선택하거나 검색해 보세요' : '☰ Select a category from the left menu or search above'}
+            </p>
+          )}
         </section>
 
+        {/* ── 검색창 ── */}
         <div className="mb-2">
-          {/* [FIX 1] 언어별 placeholder */}
           <SearchBar
             value={searchQuery}
             onChange={handleSearch}
@@ -218,13 +242,14 @@ export default function Home() {
           />
         </div>
 
-        {/* ── 날짜 범위 검색 결과 ── */}
+        {/* ── 날짜 범위 로딩 ── */}
         {dateRangeLoading && (
           <div style={{ textAlign: 'center', padding: '40px', color: '#00ff88', fontFamily: 'monospace' }}>
             📅 {ko ? '날짜 범위 검색 중...' : 'Searching date range...'}
           </div>
         )}
 
+        {/* ── 날짜 범위 결과 ── */}
         {dateRangeResults !== null && !dateRangeLoading && (
           <div style={{ marginBottom: '24px' }}>
             <div style={{ background: 'rgba(26,43,74,0.8)', border: '1px solid rgba(184,150,64,0.3)', borderRadius: '12px', padding: '16px 20px', marginBottom: '12px' }}>
@@ -322,14 +347,13 @@ export default function Home() {
           </div>
         )}
 
-        {/* ── 일반 검색 결과 ── */}
-        {dateRangeResults === null && (
+        {/* ── 일반 검색 결과 (listVisible일 때만 표시) ── */}
+        {dateRangeResults === null && listVisible && (
           <>
             <div className="mb-6">
               <CategoryNav selectedMain={selectedMain} selectedSub={selectedSub} onSelect={handleCategory} />
             </div>
 
-            {/* [FIX 3] 페이지당 표시 개수 + 페이지 정보 */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
               <span style={{ fontSize: '12px', color: '#666', fontFamily: 'monospace' }}>
                 {ko ? `페이지 ${page + 1} / ${totalPages}` : `Page ${page + 1} / ${totalPages}`}
@@ -372,29 +396,12 @@ export default function Home() {
               )}
             </div>
 
-            {/* [FIX 4] 페이지네이션 */}
             {totalPages > 1 && (
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '32px', flexWrap: 'wrap' }}>
-                <button
-                  onClick={() => setPage(0)}
-                  disabled={page === 0}
-                  style={{
-                    padding: '6px 12px', borderRadius: '6px', fontSize: '12px',
-                    cursor: page === 0 ? 'default' : 'pointer',
-                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-                    color: page === 0 ? '#444' : '#888', fontFamily: 'monospace',
-                  }}
-                >«</button>
-                <button
-                  onClick={() => setPage(p => Math.max(0, p - 1))}
-                  disabled={page === 0}
-                  style={{
-                    padding: '6px 14px', borderRadius: '6px', fontSize: '12px',
-                    cursor: page === 0 ? 'default' : 'pointer',
-                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-                    color: page === 0 ? '#444' : '#888', fontFamily: 'monospace',
-                  }}
-                >{ko ? '이전' : 'Prev'}</button>
+                <button onClick={() => setPage(0)} disabled={page === 0}
+                  style={{ padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: page === 0 ? 'default' : 'pointer', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: page === 0 ? '#444' : '#888', fontFamily: 'monospace' }}>«</button>
+                <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
+                  style={{ padding: '6px 14px', borderRadius: '6px', fontSize: '12px', cursor: page === 0 ? 'default' : 'pointer', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: page === 0 ? '#444' : '#888', fontFamily: 'monospace' }}>{ko ? '이전' : 'Prev'}</button>
 
                 {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
                   let p: number
@@ -403,41 +410,15 @@ export default function Home() {
                   else if (page > totalPages - 5) { p = totalPages - 7 + i }
                   else { p = page - 3 + i }
                   return (
-                    <button
-                      key={p}
-                      onClick={() => setPage(p)}
-                      style={{
-                        padding: '6px 12px', borderRadius: '6px', fontSize: '12px',
-                        cursor: 'pointer', minWidth: '36px',
-                        background: page === p ? 'rgba(0,255,136,0.15)' : 'rgba(255,255,255,0.04)',
-                        border: page === p ? '1px solid rgba(0,255,136,0.5)' : '1px solid rgba(255,255,255,0.1)',
-                        color: page === p ? '#00ff88' : '#888',
-                        fontFamily: 'monospace', fontWeight: page === p ? 700 : 400,
-                      }}
-                    >{p + 1}</button>
+                    <button key={p} onClick={() => setPage(p)}
+                      style={{ padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer', minWidth: '36px', background: page === p ? 'rgba(0,255,136,0.15)' : 'rgba(255,255,255,0.04)', border: page === p ? '1px solid rgba(0,255,136,0.5)' : '1px solid rgba(255,255,255,0.1)', color: page === p ? '#00ff88' : '#888', fontFamily: 'monospace', fontWeight: page === p ? 700 : 400 }}>{p + 1}</button>
                   )
                 })}
 
-                <button
-                  onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-                  disabled={page >= totalPages - 1}
-                  style={{
-                    padding: '6px 14px', borderRadius: '6px', fontSize: '12px',
-                    cursor: page >= totalPages - 1 ? 'default' : 'pointer',
-                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-                    color: page >= totalPages - 1 ? '#444' : '#888', fontFamily: 'monospace',
-                  }}
-                >{ko ? '다음' : 'Next'}</button>
-                <button
-                  onClick={() => setPage(totalPages - 1)}
-                  disabled={page >= totalPages - 1}
-                  style={{
-                    padding: '6px 12px', borderRadius: '6px', fontSize: '12px',
-                    cursor: page >= totalPages - 1 ? 'default' : 'pointer',
-                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-                    color: page >= totalPages - 1 ? '#444' : '#888', fontFamily: 'monospace',
-                  }}
-                >»</button>
+                <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}
+                  style={{ padding: '6px 14px', borderRadius: '6px', fontSize: '12px', cursor: page >= totalPages - 1 ? 'default' : 'pointer', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: page >= totalPages - 1 ? '#444' : '#888', fontFamily: 'monospace' }}>{ko ? '다음' : 'Next'}</button>
+                <button onClick={() => setPage(totalPages - 1)} disabled={page >= totalPages - 1}
+                  style={{ padding: '6px 12px', borderRadius: '6px', fontSize: '12px', cursor: page >= totalPages - 1 ? 'default' : 'pointer', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: page >= totalPages - 1 ? '#444' : '#888', fontFamily: 'monospace' }}>»</button>
               </div>
             )}
           </>
@@ -445,6 +426,44 @@ export default function Home() {
       </main>
 
       {showCompare && <ComparePanel products={compareList} onClose={() => setShowCompare(false)} />}
+
+      {/* ── 푸터 ── */}
+      <footer style={{
+        borderTop: '1px solid rgba(255,255,255,0.05)',
+        background: 'rgba(8,10,15,0.8)',
+        padding: '24px 20px',
+        textAlign: 'center',
+      }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+
+          {/* DOI 등록 정보 */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '5px 16px', borderRadius: '99px',
+            background: 'rgba(0,255,136,0.05)',
+            border: '1px solid rgba(0,255,136,0.1)',
+          }}>
+            <span style={{ fontSize: '10px', color: '#555', fontFamily: 'monospace' }}>📄 DOI</span>
+            <span style={{ fontSize: '12px', color: '#00cc6a', fontFamily: 'monospace', fontWeight: 600, letterSpacing: '0.05em' }}>
+              10.5281/zenodo.20248631
+            </span>
+          </div>
+
+          {/* GAIT 69 설명 */}
+          <p style={{ fontSize: '11px', color: '#444', fontFamily: 'monospace', margin: 0 }}>
+            Based on <span style={{ color: '#555' }}>GAIT 69: Global AI Index Taxonomy</span>
+          </p>
+
+          {/* 카피라이트 */}
+          <p style={{ fontSize: '11px', color: '#333', margin: 0 }}>
+            © {new Date().getFullYear()} DO HUN, KIM · AI MAP — GAIT 69 · All rights reserved
+          </p>
+
+          <p style={{ fontSize: '10px', color: '#2a2a2a', fontFamily: 'monospace', margin: 0 }}>
+            ai-engine-app.vercel.app
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }
