@@ -104,6 +104,7 @@ export default function AdminPage() {
     manufacturer: string
     official_url: string
     match: boolean
+    makerMatch: boolean
     reason: string
   }
   const [verifyResults, setVerifyResults]       = useState<VerifyResult[]>([])
@@ -111,7 +112,7 @@ export default function AdminPage() {
   const [verifyProgress, setVerifyProgress]     = useState(0)
   const [verifyTotal, setVerifyTotal]           = useState(0)
   const [verifyMsg, setVerifyMsg]               = useState('')
-  const [verifyFilter, setVerifyFilter]         = useState<'all' | 'mismatch' | 'match'>('mismatch')
+  const [verifyFilter, setVerifyFilter]         = useState<'all' | 'mismatch_both' | 'mismatch_maker' | 'match'>('mismatch_both')
   const [verifyPageSize, setVerifyPageSize]     = useState(100)
   const [verifyOffset, setVerifyOffset]         = useState(0)
   const [verifyStopped, setVerifyStopped]       = useState(false)
@@ -426,9 +427,9 @@ export default function AdminPage() {
           body: JSON.stringify({ url: item.official_url, product_name: item.product_name, manufacturer: item.manufacturer, password: pw })
         })
         const data = await res.json()
-        results.push({ id: item.id, product_name: item.product_name, manufacturer: item.manufacturer, official_url: item.official_url, match: data.match, reason: data.reason || '' })
+        results.push({ id: item.id, product_name: item.product_name, manufacturer: item.manufacturer, official_url: item.official_url, match: data.match, makerMatch: data.makerMatch ?? false, reason: data.reason || '' })
       } catch {
-        results.push({ id: item.id, product_name: item.product_name, manufacturer: item.manufacturer, official_url: item.official_url, match: false, reason: '검증 실패' })
+        results.push({ id: item.id, product_name: item.product_name, manufacturer: item.manufacturer, official_url: item.official_url, match: false, makerMatch: false, reason: '검증 실패' })
       }
       setVerifyResults([...results])
       await new Promise(r => setTimeout(r, 400))
@@ -1170,9 +1171,10 @@ export default function AdminPage() {
               <>
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
                   {[
-                    { key: 'mismatch', label: `⚠️ 불일치 (${verifyResults.filter(r => !r.match).length})` },
-                    { key: 'match',    label: `✅ 일치 (${verifyResults.filter(r => r.match).length})` },
-                    { key: 'all',      label: `전체 (${verifyResults.length})` },
+                    { key: 'mismatch_both',  label: `❌ 불일치/불일치 (${verifyResults.filter(r => !r.match && !r.makerMatch).length})` },
+                    { key: 'mismatch_maker', label: `⚠️ 불일치/일치 (${verifyResults.filter(r => !r.match && r.makerMatch).length})` },
+                    { key: 'match',          label: `✅ 일치 (${verifyResults.filter(r => r.match).length})` },
+                    { key: 'all',            label: `전체 (${verifyResults.length})` },
                   ].map(f => (
                     <button key={f.key} onClick={() => setVerifyFilter(f.key as any)}
                       style={{ padding: '6px 14px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer', background: verifyFilter === f.key ? 'rgba(74,138,223,0.15)' : 'rgba(255,255,255,0.04)', border: verifyFilter === f.key ? '1px solid rgba(74,138,223,0.5)' : '1px solid rgba(255,255,255,0.08)', color: verifyFilter === f.key ? '#4a8adf' : '#888' }}>
@@ -1192,13 +1194,23 @@ export default function AdminPage() {
                     </thead>
                     <tbody>
                       {verifyResults
-                        .filter(r => verifyFilter === 'all' ? true : verifyFilter === 'match' ? r.match : !r.match)
+                        .filter(r => verifyFilter === 'all' ? true : verifyFilter === 'match' ? r.match : verifyFilter === 'mismatch_both' ? (!r.match && !r.makerMatch) : (!r.match && r.makerMatch))
                         .map(r => (
                           <tr key={r.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: r.match ? 'transparent' : 'rgba(255,200,0,0.03)' }}>
                             <td style={{ padding: '8px 14px' }}>
-                              <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 600, background: r.match ? 'rgba(0,255,136,0.08)' : 'rgba(255,200,0,0.1)', border: `1px solid ${r.match ? 'rgba(0,255,136,0.25)' : 'rgba(255,200,0,0.3)'}`, color: r.match ? '#00cc6a' : '#ffcc00', whiteSpace: 'nowrap' }}>
-                                {r.match ? '✅ 일치' : '⚠️ 불일치'}
-                              </span>
+                              {r.match ? (
+                                <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 600, background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.25)', color: '#00cc6a', whiteSpace: 'nowrap', display: 'inline-block' }}>✅ 일치</span>
+                              ) : r.makerMatch ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                  <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '10px', fontWeight: 600, background: 'rgba(255,200,0,0.1)', border: '1px solid rgba(255,200,0,0.3)', color: '#ffcc00', whiteSpace: 'nowrap', display: 'inline-block' }}>⚠️ 불일치</span>
+                                  <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '10px', fontWeight: 600, background: 'rgba(0,255,136,0.06)', border: '1px solid rgba(0,255,136,0.2)', color: '#00cc6a', whiteSpace: 'nowrap', display: 'inline-block' }}>✅ 제조사일치</span>
+                                </div>
+                              ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                  <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '10px', fontWeight: 600, background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', color: '#ff4444', whiteSpace: 'nowrap', display: 'inline-block' }}>❌ 불일치</span>
+                                  <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '10px', fontWeight: 600, background: 'rgba(255,68,68,0.06)', border: '1px solid rgba(255,68,68,0.2)', color: '#ff6666', whiteSpace: 'nowrap', display: 'inline-block' }}>❌ 제조사불일치</span>
+                                </div>
+                              )}
                             </td>
                             <td style={{ padding: '8px 14px', color: '#e6edf3', fontWeight: 500 }}>{r.product_name}</td>
                             <td style={{ padding: '8px 14px', color: '#aaa', fontSize: '12px' }}>{r.manufacturer || '-'}</td>
