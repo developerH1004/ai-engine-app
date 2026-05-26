@@ -92,6 +92,18 @@ export default function AdminPage() {
   const [urlMsg, setUrlMsg]           = useState('')
   const [urlFilter, setUrlFilter]     = useState<'all' | 'dead' | 'error'>('all')
   const [urlSelected, setUrlSelected] = useState<Set<number>>(new Set())
+  // URL 인라인 편집
+  const [editingUrlId, setEditingUrlId]   = useState<number | null>(null)
+  const [editingUrlVal, setEditingUrlVal] = useState('')
+  // URL 없는 항목 관리
+  const [emptyUrlProducts, setEmptyUrlProducts] = useState<any[]>([])
+  const [emptyUrlLoading, setEmptyUrlLoading]   = useState(false)
+  const [emptyUrlMsg, setEmptyUrlMsg]           = useState('')
+  const [emptyEditId, setEmptyEditId]           = useState<number | null>(null)
+  const [emptyEditVal, setEmptyEditVal]         = useState('')
+  // 자동 검색 후보
+  const [searchingId, setSearchingId]           = useState<number | null>(null)
+  const [urlCandidates, setUrlCandidates]       = useState<Record<number, {url:string;title:string;snippet:string}[]>>({})
 
   // 모니터링 상태
   const [monitor, setMonitor]         = useState<MonitorData | null>(null)
@@ -295,6 +307,121 @@ export default function AdminPage() {
     setUrlResults(prev => prev.filter(r => !urlSelected.has(r.id)))
     setUrlSelected(new Set())
     loadStats()
+  }
+
+  // URL 인라인 수정 저장
+  async function saveUrlEdit(id: number) {
+    const trimmed = editingUrlVal.trim()
+    if (!trimmed) { setUrlMsg('❌ URL을 입력해주세요'); return }
+    const res = await fetch(`${SB_URL}/rest/v1/ai_products?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ official_url: trimmed })
+    })
+    if (res.ok) {
+      setUrlResults(prev => prev.map(r => r.id === id ? { ...r, official_url: trimmed } : r))
+      setEditingUrlId(null)
+      setUrlMsg(`✅ URL 수정 완료`)
+    } else {
+      setUrlMsg('❌ 수정 실패')
+    }
+  }
+
+  // URL 없는 항목 로드
+  async function loadEmptyUrls() {
+    setEmptyUrlLoading(true); setEmptyUrlMsg('')
+    let all: any[] = []
+    let offset = 0
+    const PAGE = 1000
+    while (true) {
+      const res = await fetch(
+        `${SB_URL}/rest/v1/ai_products?select=id,product_name,manufacturer,category_main&or=(official_url.is.null,official_url.eq.)&order=category_main.asc,product_name.asc&limit=${PAGE}&offset=${offset}`,
+        { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } }
+      )
+      const batch = await res.json()
+      if (!Array.isArray(batch) || batch.length === 0) break
+      all = all.concat(batch)
+      if (batch.length < PAGE) break
+      offset += PAGE
+    }
+    setEmptyUrlProducts(all)
+    setEmptyUrlMsg(`URL 없는 항목 ${all.length}개`)
+    setEmptyUrlLoading(false)
+  }
+
+  // 빈 URL 항목에 URL 저장
+  async function saveEmptyUrl(id: number) {
+    const trimmed = emptyEditVal.trim()
+    if (!trimmed) return
+    const res = await fetch(`${SB_URL}/rest/v1/ai_products?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ official_url: trimmed })
+    })
+    if (res.ok) {
+      setEmptyUrlProducts(prev => prev.filter(p => p.id !== id))
+      setEmptyEditId(null)
+      setEmptyUrlMsg(`✅ 저장 완료 — 남은 항목: ${emptyUrlProducts.length - 1}개`)
+    } else {
+      setEmptyUrlMsg('❌ 저장 실패')
+    }
+  }
+
+  // 후보 URL 선택 저장
+  async function selectCandidateUrl(id: number, url: string) {
+    const res = await fetch(`${SB_URL}/rest/v1/ai_products?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ official_url: url })
+    })
+    if (res.ok) {
+      setEmptyUrlProducts(prev => prev.filter(p => p.id !== id))
+      setUrlCandidates(prev => { const n = {...prev}; delete n[id]; return n })
+      setEmptyUrlMsg(`✅ URL 저장 완료 — 남은 항목: ${emptyUrlProducts.length - 1}개`)
+    }
+  }
+
+  // URL 자동 검색
+  async function autoSearchUrl(p: any) {
+    setSearchingId(p.id)
+    try {
+      const res = await fetch('/api/admin/url-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_name: p.product_name, manufacturer: p.manufacturer, password: pw })
+      })
+      const data = await res.json()
+      setUrlCandidates(prev => ({ ...prev, [p.id]: data.candidates || [] }))
+      if (data.note) setEmptyUrlMsg(`ℹ️ ${data.note}`)
+    } catch {
+      setEmptyUrlMsg('❌ 검색 실패')
+    } finally {
+      setSearchingId(null)
+    }
+  }
+
+  // 전체 자동 검색 (배치)
+  async function autoSearchAll() {
+    if (!confirm(`URL 없는 ${emptyUrlProducts.length}개 항목을 자동 검색합니다. 시간이 걸릴 수 있어요.`)) return
+    setEmptyUrlMsg('자동 검색 중...')
+    for (let i = 0; i < emptyUrlProducts.length; i++) {
+      const p = emptyUrlProducts[i]
+      setEmptyUrlMsg(`자동 검색 중... (${i + 1}/${emptyUrlProducts.length}) — ${p.product_name}`)
+      try {
+        const res = await fetch('/api/admin/url-search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product_name: p.product_name, manufacturer: p.manufacturer, password: pw })
+        })
+        const data = await res.json()
+        if (data.candidates?.length > 0) {
+          setUrlCandidates(prev => ({ ...prev, [p.id]: data.candidates }))
+        }
+      } catch { /* skip */ }
+      // rate limit 방지
+      await new Promise(r => setTimeout(r, 300))
+    }
+    setEmptyUrlMsg(`✅ 자동 검색 완료 — 목록에서 후보를 선택하거나 직접 입력하세요`)
   }
 
   // ── 모니터링 ──────────────────────────────────────────────
@@ -672,27 +799,44 @@ export default function AdminPage() {
                       <thead>
                         <tr style={{ background: '#161b22' }}>
                           <th style={{ padding: '10px 14px', color: '#b89640', borderBottom: '1px solid rgba(184,150,64,0.3)', width: '40px' }}>✓</th>
-                          {['상태','AI 엔진명','제조사','URL','오류'].map(h => (
+                          {['상태','AI 엔진명','제조사','URL','관리'].map(h => (
                             <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: '#b89640', borderBottom: '1px solid rgba(184,150,64,0.3)', whiteSpace: 'nowrap' }}>{h}</th>
                           ))}
                         </tr>
                       </thead>
                       <tbody>
                         {filteredUrlResults.map(r => (
-                          <tr key={r.id} onClick={() => toggleUrlSelect(r.id)}
-                            style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', background: urlSelected.has(r.id) ? 'rgba(255,68,68,0.07)' : 'transparent' }}>
-                            <td style={{ padding: '8px 14px' }}>
-                              <input type="checkbox" readOnly checked={urlSelected.has(r.id)} style={{ accentColor: '#ff4444', width: '14px', height: '14px' }} />
+                          <tr key={r.id}
+                            style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: urlSelected.has(r.id) ? 'rgba(255,68,68,0.07)' : 'transparent' }}>
+                            <td style={{ padding: '8px 14px' }} onClick={() => toggleUrlSelect(r.id)}>
+                              <input type="checkbox" readOnly checked={urlSelected.has(r.id)} style={{ accentColor: '#ff4444', width: '14px', height: '14px', cursor: 'pointer' }} />
                             </td>
-                            <td style={{ padding: '8px 14px' }}>
+                            <td style={{ padding: '8px 14px' }} onClick={() => toggleUrlSelect(r.id)}>
                               <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 600, background: r.status === 'dead' ? 'rgba(255,68,68,0.1)' : 'rgba(255,150,50,0.1)', border: `1px solid ${r.status === 'dead' ? 'rgba(255,68,68,0.3)' : 'rgba(255,150,50,0.3)'}`, color: r.status === 'dead' ? '#ff4444' : '#ff9632', whiteSpace: 'nowrap' }}>
                                 {r.status === 'dead' ? `💀 ${r.statusCode || 'Dead'}` : '⚠️ 오류'}
                               </span>
                             </td>
-                            <td style={{ padding: '8px 14px', color: '#e6edf3', fontWeight: 500 }}>{r.product_name}</td>
-                            <td style={{ padding: '8px 14px', color: '#aaa', fontSize: '12px' }}>{r.manufacturer || '-'}</td>
-                            <td style={{ padding: '8px 14px', fontSize: '11px', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              <a href={r.official_url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: '#4a8adf' }}>{r.official_url}</a>
+                            <td style={{ padding: '8px 14px', color: '#e6edf3', fontWeight: 500 }} onClick={() => toggleUrlSelect(r.id)}>{r.product_name}</td>
+                            <td style={{ padding: '8px 14px', color: '#aaa', fontSize: '12px' }} onClick={() => toggleUrlSelect(r.id)}>{r.manufacturer || '-'}</td>
+                            <td style={{ padding: '8px 14px', fontSize: '11px', maxWidth: '220px' }}>
+                              {editingUrlId === r.id ? (
+                                <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                  <input
+                                    value={editingUrlVal}
+                                    onChange={e => setEditingUrlVal(e.target.value)}
+                                    onKeyDown={e => { if (e.key === 'Enter') saveUrlEdit(r.id); if (e.key === 'Escape') setEditingUrlId(null) }}
+                                    autoFocus
+                                    style={{ flex: 1, padding: '3px 7px', borderRadius: '4px', background: '#0d1117', border: '1px solid rgba(0,255,136,0.3)', color: '#e6edf3', fontSize: '11px', minWidth: 0 }}
+                                  />
+                                  <button onClick={() => saveUrlEdit(r.id)} style={{ padding: '3px 8px', borderRadius: '4px', background: 'rgba(0,255,136,0.15)', border: '1px solid rgba(0,255,136,0.3)', color: '#00ff88', fontSize: '11px', cursor: 'pointer', flexShrink: 0 }}>저장</button>
+                                  <button onClick={() => setEditingUrlId(null)} style={{ padding: '3px 8px', borderRadius: '4px', background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: '#666', fontSize: '11px', cursor: 'pointer', flexShrink: 0 }}>취소</button>
+                                </div>
+                              ) : (
+                                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                  <a href={r.official_url} target="_blank" rel="noopener noreferrer" style={{ color: '#4a8adf', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '140px', display: 'block' }}>{r.official_url}</a>
+                                  <button onClick={() => { setEditingUrlId(r.id); setEditingUrlVal(r.official_url) }} style={{ padding: '2px 7px', borderRadius: '4px', background: 'rgba(74,138,223,0.1)', border: '1px solid rgba(74,138,223,0.2)', color: '#4a8adf', fontSize: '10px', cursor: 'pointer', flexShrink: 0 }}>수정</button>
+                                </div>
+                              )}
                             </td>
                             <td style={{ padding: '8px 14px', color: '#666', fontSize: '11px' }}>{r.error || '-'}</td>
                           </tr>
@@ -703,6 +847,109 @@ export default function AdminPage() {
                 )}
               </>
             )}
+
+            {/* ── URL 없는 항목 관리 ── */}
+            <div style={{ marginTop: '40px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                <h3 style={{ color: '#4a8adf', margin: 0 }}>🔗 URL 없는 항목 관리</h3>
+                <button onClick={loadEmptyUrls} disabled={emptyUrlLoading}
+                  style={{ padding: '7px 16px', borderRadius: '7px', background: 'rgba(74,138,223,0.12)', border: '1px solid rgba(74,138,223,0.3)', color: '#4a8adf', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
+                  {emptyUrlLoading ? '로딩 중...' : '목록 불러오기'}
+                </button>
+                {emptyUrlProducts.length > 0 && (
+                  <button onClick={autoSearchAll} disabled={searchingId !== null}
+                    style={{ padding: '7px 16px', borderRadius: '7px', background: 'rgba(0,255,136,0.1)', border: '1px solid rgba(0,255,136,0.3)', color: '#00ff88', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
+                    🤖 전체 자동 검색
+                  </button>
+                )}
+              </div>
+
+              <div style={{ background: '#161b22', border: '1px solid rgba(74,138,223,0.1)', borderRadius: '8px', padding: '10px 14px', marginBottom: '16px', fontSize: '11px', color: '#666' }}>
+                ℹ️ Google Search API 키(<code>GOOGLE_SEARCH_API_KEY</code>, <code>GOOGLE_SEARCH_CX</code>)가 Vercel 환경변수에 설정되면 실제 검색 결과를 가져와요. 미설정 시 도메인 추론 방식으로 동작해요.
+              </div>
+
+              {emptyUrlMsg && <div style={{ marginBottom: '12px', color: '#4a8adf', fontSize: '13px' }}>{emptyUrlMsg}</div>}
+              {emptyUrlProducts.length > 0 && (
+                <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid rgba(74,138,223,0.15)' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                    <thead>
+                      <tr style={{ background: 'rgba(74,138,223,0.06)' }}>
+                        {['AI 엔진명','제조사','카테고리','URL 관리'].map(h => (
+                          <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: '#4a8adf', borderBottom: '1px solid rgba(74,138,223,0.2)', whiteSpace: 'nowrap' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {emptyUrlProducts.map(p => (
+                        <tr key={p.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                          <td style={{ padding: '8px 14px', color: '#e6edf3', fontWeight: 500 }}>{p.product_name}</td>
+                          <td style={{ padding: '8px 14px', color: '#aaa', fontSize: '12px' }}>{p.manufacturer || '-'}</td>
+                          <td style={{ padding: '8px 14px', color: '#666', fontSize: '11px' }}>{(p.category_main || '-').replace(/^\d+\.\s/, '')}</td>
+                          <td style={{ padding: '8px 14px', minWidth: '320px' }}>
+                            {/* 자동 검색 후보 표시 */}
+                            {urlCandidates[p.id] && urlCandidates[p.id].length > 0 && (
+                              <div style={{ marginBottom: '6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {urlCandidates[p.id].map((c, i) => (
+                                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 8px', borderRadius: '5px', background: 'rgba(0,255,136,0.04)', border: '1px solid rgba(0,255,136,0.1)' }}>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <div style={{ fontSize: '11px', color: '#4a8adf', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        <a href={c.url} target="_blank" rel="noopener noreferrer" style={{ color: '#4a8adf' }}>{c.url}</a>
+                                      </div>
+                                      <div style={{ fontSize: '10px', color: '#555', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.title}</div>
+                                    </div>
+                                    <button onClick={() => selectCandidateUrl(p.id, c.url)}
+                                      style={{ padding: '3px 9px', borderRadius: '4px', background: 'rgba(0,255,136,0.15)', border: '1px solid rgba(0,255,136,0.3)', color: '#00ff88', fontSize: '10px', cursor: 'pointer', flexShrink: 0 }}>
+                                      선택
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* 직접 입력 or 자동검색 버튼 */}
+                            {emptyEditId === p.id ? (
+                              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                <input
+                                  value={emptyEditVal}
+                                  onChange={e => setEmptyEditVal(e.target.value)}
+                                  onKeyDown={e => { if (e.key === 'Enter') saveEmptyUrl(p.id); if (e.key === 'Escape') setEmptyEditId(null) }}
+                                  placeholder="https://..."
+                                  autoFocus
+                                  style={{ flex: 1, padding: '4px 8px', borderRadius: '4px', background: '#0d1117', border: '1px solid rgba(0,255,136,0.3)', color: '#e6edf3', fontSize: '12px', minWidth: '180px' }}
+                                />
+                                <button onClick={() => saveEmptyUrl(p.id)} style={{ padding: '4px 10px', borderRadius: '4px', background: 'rgba(0,255,136,0.15)', border: '1px solid rgba(0,255,136,0.3)', color: '#00ff88', fontSize: '11px', cursor: 'pointer', flexShrink: 0 }}>저장</button>
+                                <button onClick={() => setEmptyEditId(null)} style={{ padding: '4px 8px', borderRadius: '4px', background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: '#666', fontSize: '11px', cursor: 'pointer', flexShrink: 0 }}>취소</button>
+                              </div>
+                            ) : (
+                              <div style={{ display: 'flex', gap: '6px' }}>
+                                <button onClick={() => autoSearchUrl(p)} disabled={searchingId === p.id}
+                                  style={{ padding: '4px 10px', borderRadius: '4px', background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.2)', color: '#00cc6a', fontSize: '11px', cursor: 'pointer' }}>
+                                  {searchingId === p.id ? '검색 중...' : '🤖 자동 검색'}
+                                </button>
+                                <button onClick={() => { setEmptyEditId(p.id); setEmptyEditVal('') }}
+                                  style={{ padding: '4px 10px', borderRadius: '4px', background: 'rgba(74,138,223,0.08)', border: '1px solid rgba(74,138,223,0.2)', color: '#4a8adf', fontSize: '11px', cursor: 'pointer' }}>
+                                  ✏️ 직접 입력
+                                </button>
+                                <button onClick={async () => {
+                                  if (!confirm('이 항목을 삭제하시겠습니까?')) return
+                                  const res = await fetch(`${SB_URL}/rest/v1/ai_products?id=eq.${p.id}`, {
+                                    method: 'DELETE',
+                                    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+                                  })
+                                  if (res.ok) setEmptyUrlProducts(prev => prev.filter(x => x.id !== p.id))
+                                }} style={{ padding: '4px 10px', borderRadius: '4px', background: 'rgba(255,68,68,0.08)', border: '1px solid rgba(255,68,68,0.2)', color: '#ff4444', fontSize: '11px', cursor: 'pointer' }}>
+                                  🗑️ 삭제
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
