@@ -37,6 +37,10 @@ interface UrlCheckResult {
   status: 'ok' | 'dead' | 'error'
   statusCode?: number
   error?: string
+  // 내용 검증 결과
+  verifyMatch?: boolean
+  verifyReason?: string
+  verifying?: boolean
 }
 
 interface MonitorData {
@@ -90,7 +94,8 @@ export default function AdminPage() {
   const [urlProgress, setUrlProgress] = useState(0)
   const [urlTotal, setUrlTotal]       = useState(0)
   const [urlMsg, setUrlMsg]           = useState('')
-  const [urlFilter, setUrlFilter]     = useState<'all' | 'dead' | 'error'>('all')
+  const [urlFilter, setUrlFilter]     = useState<'all' | 'dead' | 'error' | 'mismatch'>('all')
+  const [verifyingAll, setVerifyingAll] = useState(false)
   const [urlSelected, setUrlSelected] = useState<Set<number>>(new Set())
   // URL 인라인 편집
   const [editingUrlId, setEditingUrlId]   = useState<number | null>(null)
@@ -309,6 +314,52 @@ export default function AdminPage() {
     loadStats()
   }
 
+  // 단일 URL 내용 검증
+  async function verifyUrl(id: number) {
+    const item = urlResults.find(r => r.id === id)
+    if (!item) return
+    setUrlResults(prev => prev.map(r => r.id === id ? { ...r, verifying: true } : r))
+    try {
+      const res = await fetch('/api/admin/url-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: item.official_url, product_name: item.product_name, manufacturer: item.manufacturer, password: pw })
+      })
+      const data = await res.json()
+      setUrlResults(prev => prev.map(r => r.id === id ? { ...r, verifying: false, verifyMatch: data.match, verifyReason: data.reason } : r))
+    } catch {
+      setUrlResults(prev => prev.map(r => r.id === id ? { ...r, verifying: false, verifyReason: '검증 실패' } : r))
+    }
+  }
+
+  // 전체 내용 검증 (정상 URL만)
+  async function verifyAllUrls() {
+    const targets = urlResults.filter(r => r.status === 'ok' && r.verifyMatch === undefined)
+    if (targets.length === 0) { setUrlMsg('검증할 항목이 없어요 (정상 URL만 검증 가능)'); return }
+    if (!confirm(`정상 URL ${targets.length}개의 내용을 검증합니다. 시간이 걸릴 수 있어요.`)) return
+    setVerifyingAll(true)
+    for (let i = 0; i < targets.length; i++) {
+      const item = targets[i]
+      setUrlMsg(`내용 검증 중... (${i + 1}/${targets.length}) — ${item.product_name}`)
+      setUrlResults(prev => prev.map(r => r.id === item.id ? { ...r, verifying: true } : r))
+      try {
+        const res = await fetch('/api/admin/url-verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: item.official_url, product_name: item.product_name, manufacturer: item.manufacturer, password: pw })
+        })
+        const data = await res.json()
+        setUrlResults(prev => prev.map(r => r.id === item.id ? { ...r, verifying: false, verifyMatch: data.match, verifyReason: data.reason } : r))
+      } catch {
+        setUrlResults(prev => prev.map(r => r.id === item.id ? { ...r, verifying: false, verifyReason: '검증 실패' } : r))
+      }
+      await new Promise(r => setTimeout(r, 500))
+    }
+    const mismatched = urlResults.filter(r => r.verifyMatch === false).length
+    setUrlMsg(`✅ 내용 검증 완료 — 불일치 ${mismatched}개 발견`)
+    setVerifyingAll(false)
+  }
+
   // URL 인라인 수정 저장
   async function saveUrlEdit(id: number) {
     const trimmed = editingUrlVal.trim()
@@ -402,8 +453,11 @@ export default function AdminPage() {
 
   // 전체 자동 검색 (배치)
   async function autoSearchAll() {
-    if (!confirm(`URL 없는 ${emptyUrlProducts.length}개 항목을 자동 검색합니다. 시간이 걸릴 수 있어요.`)) return
+    if (!confirm(`URL 없는 ${emptyUrlProducts.length}개 항목을 자동 검색합니다. 찾은 URL은 자동 저장돼요.`)) return
     setEmptyUrlMsg('자동 검색 중...')
+    let saved = 0
+    const remaining: any[] = []
+
     for (let i = 0; i < emptyUrlProducts.length; i++) {
       const p = emptyUrlProducts[i]
       setEmptyUrlMsg(`자동 검색 중... (${i + 1}/${emptyUrlProducts.length}) — ${p.product_name}`)
@@ -415,13 +469,22 @@ export default function AdminPage() {
         })
         const data = await res.json()
         if (data.candidates?.length > 0) {
-          setUrlCandidates(prev => ({ ...prev, [p.id]: data.candidates }))
+          const best = data.candidates[0].url
+          const saveRes = await fetch(`${SB_URL}/rest/v1/ai_products?id=eq.${p.id}`, {
+            method: 'PATCH',
+            headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+            body: JSON.stringify({ official_url: best })
+          })
+          if (saveRes.ok) { saved++ } else { remaining.push(p) }
+        } else {
+          remaining.push(p)
         }
-      } catch { /* skip */ }
-      // rate limit 방지
+      } catch { remaining.push(p) }
       await new Promise(r => setTimeout(r, 300))
     }
-    setEmptyUrlMsg(`✅ 자동 검색 완료 — 목록에서 후보를 선택하거나 직접 입력하세요`)
+    setEmptyUrlProducts(remaining)
+    setUrlCandidates({})
+    setEmptyUrlMsg(`✅ 완료 — 자동 저장 ${saved}개 / 못 찾은 항목 ${remaining.length}개 (수동 처리 필요)`)
   }
 
   // ── 모니터링 ──────────────────────────────────────────────
@@ -493,7 +556,11 @@ export default function AdminPage() {
     setVisitorsLoading(false)
   }
 
-  const filteredUrlResults = urlResults.filter(r => urlFilter === 'all' ? r.status !== 'ok' : r.status === urlFilter)
+  const filteredUrlResults = urlResults.filter(r => {
+    if (urlFilter === 'mismatch') return r.verifyMatch === false
+    if (urlFilter === 'all') return r.status !== 'ok' || r.verifyMatch === false
+    return r.status === urlFilter
+  })
 
   function toggleSelect(id: number) {
     setSelected(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
@@ -766,9 +833,15 @@ export default function AdminPage() {
                   선택 삭제 ({urlSelected.size})
                 </button>
               )}
+              {urlResults.filter(r => r.status === 'ok').length > 0 && (
+                <button onClick={verifyAllUrls} disabled={verifyingAll}
+                  style={{ padding: '8px 20px', borderRadius: '8px', background: 'rgba(74,138,223,0.15)', border: '1px solid rgba(74,138,223,0.4)', color: '#4a8adf', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                  {verifyingAll ? '내용 검증 중...' : '🔍 내용 검증'}
+                </button>
+              )}
             </div>
             <div style={{ background: '#161b22', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '14px 18px', marginBottom: '20px', fontSize: '12px', color: '#888' }}>
-              ℹ️ ai_products의 official_url 전체를 실제 접속 테스트합니다. 404/서비스종료 URL을 찾아 삭제 여부를 결정할 수 있어요.
+              ℹ️ <b>무결성 검사</b>: URL 생존 여부 확인 / <b>내용 검증</b>: 해당 페이지가 실제 그 AI 제품 페이지인지 키워드로 확인
             </div>
             {urlChecking && (
               <div style={{ marginBottom: '16px' }}>
@@ -786,6 +859,7 @@ export default function AdminPage() {
                     { key: 'all', label: `전체 불량 (${urlResults.filter(r => r.status !== 'ok').length})` },
                     { key: 'dead', label: `💀 불량 (${urlResults.filter(r => r.status === 'dead').length})` },
                     { key: 'error', label: `⚠️ 오류 (${urlResults.filter(r => r.status === 'error').length})` },
+                    { key: 'mismatch', label: `🔍 내용불일치 (${urlResults.filter(r => r.verifyMatch === false).length})` },
                   ].map(f => (
                     <button key={f.key} onClick={() => setUrlFilter(f.key as any)}
                       style={{ padding: '6px 14px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer', background: urlFilter === f.key ? 'rgba(184,150,64,0.15)' : 'rgba(255,255,255,0.04)', border: urlFilter === f.key ? '1px solid rgba(184,150,64,0.5)' : '1px solid rgba(255,255,255,0.08)', color: urlFilter === f.key ? '#b89640' : '#888' }}>
@@ -812,9 +886,16 @@ export default function AdminPage() {
                               <input type="checkbox" readOnly checked={urlSelected.has(r.id)} style={{ accentColor: '#ff4444', width: '14px', height: '14px', cursor: 'pointer' }} />
                             </td>
                             <td style={{ padding: '8px 14px' }} onClick={() => toggleUrlSelect(r.id)}>
-                              <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 600, background: r.status === 'dead' ? 'rgba(255,68,68,0.1)' : 'rgba(255,150,50,0.1)', border: `1px solid ${r.status === 'dead' ? 'rgba(255,68,68,0.3)' : 'rgba(255,150,50,0.3)'}`, color: r.status === 'dead' ? '#ff4444' : '#ff9632', whiteSpace: 'nowrap' }}>
-                                {r.status === 'dead' ? `💀 ${r.statusCode || 'Dead'}` : '⚠️ 오류'}
-                              </span>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                                <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 600, background: r.status === 'dead' ? 'rgba(255,68,68,0.1)' : 'rgba(255,150,50,0.1)', border: `1px solid ${r.status === 'dead' ? 'rgba(255,68,68,0.3)' : 'rgba(255,150,50,0.3)'}`, color: r.status === 'dead' ? '#ff4444' : '#ff9632', whiteSpace: 'nowrap', display: 'inline-block' }}>
+                                  {r.status === 'dead' ? `💀 ${r.statusCode || 'Dead'}` : '⚠️ 오류'}
+                                </span>
+                                {r.verifyMatch !== undefined && (
+                                  <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '10px', fontWeight: 600, background: r.verifyMatch ? 'rgba(0,255,136,0.08)' : 'rgba(255,200,0,0.1)', border: `1px solid ${r.verifyMatch ? 'rgba(0,255,136,0.25)' : 'rgba(255,200,0,0.3)'}`, color: r.verifyMatch ? '#00cc6a' : '#ffcc00', whiteSpace: 'nowrap', display: 'inline-block' }}>
+                                    {r.verifyMatch ? '✅ 내용일치' : '⚠️ 내용불일치'}
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td style={{ padding: '8px 14px', color: '#e6edf3', fontWeight: 500 }} onClick={() => toggleUrlSelect(r.id)}>{r.product_name}</td>
                             <td style={{ padding: '8px 14px', color: '#aaa', fontSize: '12px' }} onClick={() => toggleUrlSelect(r.id)}>{r.manufacturer || '-'}</td>
@@ -832,9 +913,17 @@ export default function AdminPage() {
                                   <button onClick={() => setEditingUrlId(null)} style={{ padding: '3px 8px', borderRadius: '4px', background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: '#666', fontSize: '11px', cursor: 'pointer', flexShrink: 0 }}>취소</button>
                                 </div>
                               ) : (
-                                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                  <a href={r.official_url} target="_blank" rel="noopener noreferrer" style={{ color: '#4a8adf', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '140px', display: 'block' }}>{r.official_url}</a>
-                                  <button onClick={() => { setEditingUrlId(r.id); setEditingUrlVal(r.official_url) }} style={{ padding: '2px 7px', borderRadius: '4px', background: 'rgba(74,138,223,0.1)', border: '1px solid rgba(74,138,223,0.2)', color: '#4a8adf', fontSize: '10px', cursor: 'pointer', flexShrink: 0 }}>수정</button>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                    <a href={r.official_url} target="_blank" rel="noopener noreferrer" style={{ color: '#4a8adf', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '130px', display: 'block' }}>{r.official_url}</a>
+                                    <button onClick={() => { setEditingUrlId(r.id); setEditingUrlVal(r.official_url) }} style={{ padding: '2px 7px', borderRadius: '4px', background: 'rgba(74,138,223,0.1)', border: '1px solid rgba(74,138,223,0.2)', color: '#4a8adf', fontSize: '10px', cursor: 'pointer', flexShrink: 0 }}>수정</button>
+                                    <button onClick={() => verifyUrl(r.id)} disabled={r.verifying} style={{ padding: '2px 7px', borderRadius: '4px', background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.2)', color: '#00cc6a', fontSize: '10px', cursor: 'pointer', flexShrink: 0 }}>
+                                      {r.verifying ? '...' : '🔍'}
+                                    </button>
+                                  </div>
+                                  {r.verifyReason && (
+                                    <div style={{ fontSize: '10px', color: r.verifyMatch ? '#00cc6a' : '#ffcc00' }}>{r.verifyReason}</div>
+                                  )}
                                 </div>
                               )}
                             </td>
