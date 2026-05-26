@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 
-const SECTIONS = ['대시보드', '비AI 탐지', '중복 탐지', '날짜 검색', 'Links 관리', 'URL 무결성', '모니터링', '로그'] as const
+const SECTIONS = ['대시보드', '비AI 탐지', '중복 탐지', '날짜 검색', 'Links 관리', 'URL 무결성', '내용 검증', '모니터링', '로그'] as const
 type Section = typeof SECTIONS[number]
 
 interface Product {
@@ -96,6 +96,26 @@ export default function AdminPage() {
   const [urlMsg, setUrlMsg]           = useState('')
   const [urlFilter, setUrlFilter]     = useState<'all' | 'dead' | 'error' | 'mismatch'>('all')
   const [verifyingAll, setVerifyingAll] = useState(false)
+
+  // 내용 검증 독립 섹션 상태
+  interface VerifyResult {
+    id: number
+    product_name: string
+    manufacturer: string
+    official_url: string
+    match: boolean
+    reason: string
+  }
+  const [verifyResults, setVerifyResults]       = useState<VerifyResult[]>([])
+  const [verifyChecking, setVerifyChecking]     = useState(false)
+  const [verifyProgress, setVerifyProgress]     = useState(0)
+  const [verifyTotal, setVerifyTotal]           = useState(0)
+  const [verifyMsg, setVerifyMsg]               = useState('')
+  const [verifyFilter, setVerifyFilter]         = useState<'all' | 'mismatch' | 'match'>('mismatch')
+  const [verifyPageSize, setVerifyPageSize]     = useState(100)
+  const [verifyOffset, setVerifyOffset]         = useState(0)
+  const [verifyStopped, setVerifyStopped]       = useState(false)
+  const verifyStopRef = { current: false }
   const [urlSelected, setUrlSelected] = useState<Set<number>>(new Set())
   // URL 인라인 편집
   const [editingUrlId, setEditingUrlId]   = useState<number | null>(null)
@@ -358,6 +378,73 @@ export default function AdminPage() {
     const mismatched = urlResults.filter(r => r.verifyMatch === false).length
     setUrlMsg(`✅ 내용 검증 완료 — 불일치 ${mismatched}개 발견`)
     setVerifyingAll(false)
+  }
+
+  // ── 내용 검증 독립 섹션 함수 ──────────────────────────────
+  const verifyStopFlag = { current: false }
+
+  async function startContentVerify(batchSize: number) {
+    if (!confirm(`전체 DB에서 URL 있는 항목을 ${batchSize}개씩 내용 검증합니다.`)) return
+    verifyStopFlag.current = false
+    setVerifyChecking(true)
+    setVerifyResults([])
+    setVerifyMsg('데이터 로딩 중...')
+
+    // URL 있는 항목 전체 로드
+    let allProducts: any[] = []
+    let offset = 0
+    const PAGE = 1000
+    while (true) {
+      const res = await fetch(
+        `${SB_URL}/rest/v1/ai_products?select=id,product_name,manufacturer,official_url&official_url=not.is.null&official_url=neq.&order=id.asc&limit=${PAGE}&offset=${offset}`,
+        { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } }
+      )
+      const batch = await res.json()
+      if (!Array.isArray(batch) || batch.length === 0) break
+      allProducts = allProducts.concat(batch)
+      if (batch.length < PAGE) break
+      offset += PAGE
+    }
+
+    const targets = allProducts.slice(0, batchSize)
+    setVerifyTotal(targets.length)
+    setVerifyMsg(`총 ${allProducts.length}개 중 ${targets.length}개 검증 시작...`)
+
+    const results: VerifyResult[] = []
+    for (let i = 0; i < targets.length; i++) {
+      if (verifyStopFlag.current) {
+        setVerifyMsg(`⏹ 중단됨 — ${i}개 검증 완료`)
+        break
+      }
+      const item = targets[i]
+      setVerifyProgress(i + 1)
+      setVerifyMsg(`검증 중... (${i + 1}/${targets.length}) — ${item.product_name}`)
+      try {
+        const res = await fetch('/api/admin/url-verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: item.official_url, product_name: item.product_name, manufacturer: item.manufacturer, password: pw })
+        })
+        const data = await res.json()
+        results.push({ id: item.id, product_name: item.product_name, manufacturer: item.manufacturer, official_url: item.official_url, match: data.match, reason: data.reason || '' })
+      } catch {
+        results.push({ id: item.id, product_name: item.product_name, manufacturer: item.manufacturer, official_url: item.official_url, match: false, reason: '검증 실패' })
+      }
+      setVerifyResults([...results])
+      await new Promise(r => setTimeout(r, 400))
+    }
+    const mismatch = results.filter(r => !r.match).length
+    setVerifyMsg(`✅ 완료 — 일치 ${results.length - mismatch}개 / 불일치 ${mismatch}개`)
+    setVerifyChecking(false)
+  }
+
+  async function fixVerifyUrl(id: number, newUrl: string) {
+    const res = await fetch(`${SB_URL}/rest/v1/ai_products?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ official_url: newUrl || null })
+    })
+    if (res.ok) setVerifyResults(prev => prev.filter(r => r.id !== id))
   }
 
   // URL 인라인 수정 저장
@@ -1039,6 +1126,109 @@ export default function AdminPage() {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* ── 내용 검증 ── */}
+        {section === '내용 검증' && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
+              <h2 style={{ color: '#4a8adf', margin: 0 }}>🔍 내용 검증</h2>
+              {!verifyChecking ? (
+                <>
+                  {[100, 500, 1000, 0].map(n => (
+                    <button key={n} onClick={() => startContentVerify(n === 0 ? 99999 : n)}
+                      style={{ padding: '7px 16px', borderRadius: '7px', background: 'rgba(74,138,223,0.12)', border: '1px solid rgba(74,138,223,0.3)', color: '#4a8adf', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
+                      {n === 0 ? '전체 검증' : `${n}개 검증`}
+                    </button>
+                  ))}
+                </>
+              ) : (
+                <button onClick={() => { verifyStopFlag.current = true }}
+                  style={{ padding: '7px 16px', borderRadius: '7px', background: 'rgba(255,68,68,0.12)', border: '1px solid rgba(255,68,68,0.3)', color: '#ff4444', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
+                  ⏹ 중단
+                </button>
+              )}
+            </div>
+
+            <div style={{ background: '#161b22', border: '1px solid rgba(74,138,223,0.1)', borderRadius: '8px', padding: '10px 14px', marginBottom: '16px', fontSize: '11px', color: '#666' }}>
+              ℹ️ URL이 있는 전체 항목을 대상으로 해당 페이지에 제품명·제조사 키워드가 실제로 있는지 확인해요. 무결성 검사와 독립적으로 실행돼요.
+            </div>
+
+            {verifyChecking && (
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ height: '6px', borderRadius: '99px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden', marginBottom: '8px' }}>
+                  <div style={{ height: '100%', width: `${verifyTotal ? (verifyProgress / verifyTotal) * 100 : 0}%`, background: '#4a8adf', transition: 'width 0.3s', borderRadius: '99px' }} />
+                </div>
+                <div style={{ fontSize: '12px', color: '#666' }}>{verifyProgress} / {verifyTotal} 검증 완료</div>
+              </div>
+            )}
+
+            {verifyMsg && <div style={{ marginBottom: '16px', color: '#4a8adf', fontSize: '13px' }}>{verifyMsg}</div>}
+
+            {verifyResults.length > 0 && (
+              <>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                  {[
+                    { key: 'mismatch', label: `⚠️ 불일치 (${verifyResults.filter(r => !r.match).length})` },
+                    { key: 'match',    label: `✅ 일치 (${verifyResults.filter(r => r.match).length})` },
+                    { key: 'all',      label: `전체 (${verifyResults.length})` },
+                  ].map(f => (
+                    <button key={f.key} onClick={() => setVerifyFilter(f.key as any)}
+                      style={{ padding: '6px 14px', borderRadius: '6px', fontSize: '12px', cursor: 'pointer', background: verifyFilter === f.key ? 'rgba(74,138,223,0.15)' : 'rgba(255,255,255,0.04)', border: verifyFilter === f.key ? '1px solid rgba(74,138,223,0.5)' : '1px solid rgba(255,255,255,0.08)', color: verifyFilter === f.key ? '#4a8adf' : '#888' }}>
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                    <thead>
+                      <tr style={{ background: '#161b22' }}>
+                        {['결과','AI 엔진명','제조사','URL','판정 이유','조치'].map(h => (
+                          <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: '#4a8adf', borderBottom: '1px solid rgba(74,138,223,0.2)', whiteSpace: 'nowrap' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {verifyResults
+                        .filter(r => verifyFilter === 'all' ? true : verifyFilter === 'match' ? r.match : !r.match)
+                        .map(r => (
+                          <tr key={r.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: r.match ? 'transparent' : 'rgba(255,200,0,0.03)' }}>
+                            <td style={{ padding: '8px 14px' }}>
+                              <span style={{ padding: '2px 8px', borderRadius: '99px', fontSize: '11px', fontWeight: 600, background: r.match ? 'rgba(0,255,136,0.08)' : 'rgba(255,200,0,0.1)', border: `1px solid ${r.match ? 'rgba(0,255,136,0.25)' : 'rgba(255,200,0,0.3)'}`, color: r.match ? '#00cc6a' : '#ffcc00', whiteSpace: 'nowrap' }}>
+                                {r.match ? '✅ 일치' : '⚠️ 불일치'}
+                              </span>
+                            </td>
+                            <td style={{ padding: '8px 14px', color: '#e6edf3', fontWeight: 500 }}>{r.product_name}</td>
+                            <td style={{ padding: '8px 14px', color: '#aaa', fontSize: '12px' }}>{r.manufacturer || '-'}</td>
+                            <td style={{ padding: '8px 14px', fontSize: '11px', maxWidth: '180px' }}>
+                              <a href={r.official_url} target="_blank" rel="noopener noreferrer" style={{ color: '#4a8adf', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{r.official_url}</a>
+                            </td>
+                            <td style={{ padding: '8px 14px', color: '#666', fontSize: '11px', maxWidth: '200px' }}>{r.reason}</td>
+                            <td style={{ padding: '8px 14px' }}>
+                              {!r.match && (
+                                <div style={{ display: 'flex', gap: '4px' }}>
+                                  <button onClick={() => fixVerifyUrl(r.id, '')}
+                                    style={{ padding: '3px 8px', borderRadius: '4px', background: 'rgba(255,150,50,0.1)', border: '1px solid rgba(255,150,50,0.3)', color: '#ff9632', fontSize: '10px', cursor: 'pointer' }}>
+                                    URL 비우기
+                                  </button>
+                                  <button onClick={async () => {
+                                    const newUrl = prompt('새 URL 입력:', r.official_url)
+                                    if (newUrl) await fixVerifyUrl(r.id, newUrl)
+                                  }} style={{ padding: '3px 8px', borderRadius: '4px', background: 'rgba(74,138,223,0.1)', border: '1px solid rgba(74,138,223,0.2)', color: '#4a8adf', fontSize: '10px', cursor: 'pointer' }}>
+                                    수정
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
           </div>
         )}
 
