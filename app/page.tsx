@@ -227,7 +227,7 @@ export default function Home() {
 
           {/* 첫 화면 힌트 — 리스트 미표시 상태일 때 */}
           {!listVisible && (
-            <p style={{ marginTop: '16px', color: '#444', fontSize: '11px', fontFamily: 'monospace', letterSpacing: '0.05em' }}>
+            <p style={{ marginTop: '16px', color: '#8b949e', fontSize: '12px', fontFamily: 'monospace', letterSpacing: '0.05em' }}>
               {ko ? '☰ 왼쪽 메뉴에서 카테고리를 선택하거나 검색해 보세요' : '☰ Select a category from the left menu or search above'}
             </p>
           )}
@@ -426,44 +426,6 @@ export default function Home() {
       </main>
 
       {showCompare && <ComparePanel products={compareList} onClose={() => setShowCompare(false)} />}
-
-      {/* ── 푸터 ── */}
-      <footer style={{
-        borderTop: '1px solid rgba(255,255,255,0.05)',
-        background: 'rgba(8,10,15,0.8)',
-        padding: '24px 20px',
-        textAlign: 'center',
-      }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
-
-          {/* DOI 등록 정보 */}
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '8px',
-            padding: '5px 16px', borderRadius: '99px',
-            background: 'rgba(0,255,136,0.05)',
-            border: '1px solid rgba(0,255,136,0.1)',
-          }}>
-            <span style={{ fontSize: '10px', color: '#555', fontFamily: 'monospace' }}>📄 DOI</span>
-            <span style={{ fontSize: '12px', color: '#00cc6a', fontFamily: 'monospace', fontWeight: 600, letterSpacing: '0.05em' }}>
-              10.5281/zenodo.20248631
-            </span>
-          </div>
-
-          {/* GAIT 69 설명 */}
-          <p style={{ fontSize: '11px', color: '#444', fontFamily: 'monospace', margin: 0 }}>
-            Based on <span style={{ color: '#555' }}>GAIT 69: Global AI Index Taxonomy</span>
-          </p>
-
-          {/* 카피라이트 */}
-          <p style={{ fontSize: '11px', color: '#333', margin: 0 }}>
-            © {new Date().getFullYear()} DO HUN, KIM · AI MAP — GAIT 69 · All rights reserved
-          </p>
-
-          <p style={{ fontSize: '10px', color: '#2a2a2a', fontFamily: 'monospace', margin: 0 }}>
-            ai-engine-app.vercel.app
-          </p>
-        </div>
-      </footer>
     </div>
   )
 }

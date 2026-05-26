@@ -63,6 +63,83 @@ export function dispatchCategorySelect(main: string, sub: string) {
   window.dispatchEvent(new CustomEvent('aimap:categorySelect', { detail: { main, sub } }))
 }
 
+// ── 서브카테고리 패널: 데스크탑=오른쪽 플라이아웃, 모바일=아래 겹침 ──────
+function SubMenu({ main, ko, getMainLabel, getSubLabel, onSelect }: {
+  main: string
+  ko: boolean
+  getMainLabel: (k: string) => string
+  getSubLabel: (k: string) => string
+  onSelect: (m: string, s: string) => void
+}) {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        // 모바일: 대분류 항목 위에 겹쳐서 표시 (top=0, left=0, 전체 너비)
+        // 데스크탑: 오른쪽으로 플라이아웃
+        ...(isMobile
+          ? { top: 0, left: 0, width: '100%', marginLeft: 0 }
+          : { top: '-6px', left: '100%', marginLeft: '6px', width: '260px' }
+        ),
+        background: 'rgba(10,14,20,0.99)',
+        border: '1px solid rgba(0,255,136,0.18)',
+        borderRadius: '10px',
+        boxShadow: '0 8px 40px rgba(0,0,0,0.8)',
+        backdropFilter: 'blur(24px)',
+        maxHeight: '65vh',
+        overflowY: 'auto',
+        padding: '6px 0',
+        zIndex: 202,
+      }}
+    >
+      {/* 대분류 전체 선택 */}
+      <button
+        onClick={() => onSelect(main, '')}
+        style={{
+          display: 'flex', alignItems: 'center', gap: '8px',
+          width: '100%', padding: '9px 16px',
+          background: 'none', border: 'none', cursor: 'pointer',
+          color: '#00ff88', fontSize: '13px', fontWeight: 700,
+          textAlign: 'left', transition: 'background 0.1s',
+          borderBottom: '1px solid rgba(255,255,255,0.07)',
+          marginBottom: '4px',
+        }}
+        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,255,136,0.08)')}
+        onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+      >
+        <span>{ICONS[main]}</span>
+        {getMainLabel(main)} — {ko ? '전체' : 'All'}
+      </button>
+
+      {/* 서브카테고리 목록 */}
+      {CATEGORIES_EN[main].map(sub => (
+        <button
+          key={sub}
+          onClick={() => onSelect(main, sub)}
+          style={{
+            display: 'block', width: '100%', padding: '8px 16px',
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: '#8b949e', fontSize: '13px', textAlign: 'left',
+            transition: 'all 0.1s', lineHeight: 1.4,
+          }}
+          onMouseEnter={e => {
+            ;(e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.08)'
+            ;(e.currentTarget as HTMLElement).style.color = '#00d4ff'
+          }}
+          onMouseLeave={e => {
+            ;(e.currentTarget as HTMLElement).style.background = 'none'
+            ;(e.currentTarget as HTMLElement).style.color = '#8b949e'
+          }}
+        >
+          {getSubLabel(sub)}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export default function Header() {
   const [hubOpen, setHubOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -205,85 +282,43 @@ export default function Header() {
                       onMouseLeave={() => setHoveredMain(null)}
                     >
                       <button
-                        onClick={() => handleCategoryClick(main, '')}
+                        onClick={() => {
+                          // 모바일: 클릭으로 서브메뉴 토글 / 데스크탑: 바로 카테고리 이동
+                          if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                            setHoveredMain(prev => prev === main ? null : main)
+                          } else {
+                            handleCategoryClick(main, '')
+                          }
+                        }}
                         style={{
                           display: 'flex', alignItems: 'center', gap: '10px',
                           justifyContent: 'space-between',
-                          width: '100%', padding: '8px 16px',
+                          width: '100%', padding: '10px 16px',
                           background: hoveredMain === main ? 'rgba(0,255,136,0.07)' : 'none',
                           border: 'none', cursor: 'pointer',
                           color: hoveredMain === main ? '#e6edf3' : '#8b949e',
-                          fontSize: '12px', textAlign: 'left',
+                          fontSize: '13px', textAlign: 'left',
                           transition: 'all 0.1s',
                         }}
                       >
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontSize: '14px', width: '18px', textAlign: 'center' }}>{ICONS[main]}</span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <span style={{ fontSize: '15px', width: '20px', textAlign: 'center' }}>{ICONS[main]}</span>
                           {getMainLabel(main)}
                         </span>
-                        <span style={{ color: '#444', fontSize: '10px' }}>›</span>
+                        <span style={{
+                          color: hoveredMain === main ? '#00ff88' : '#444',
+                          fontSize: '12px',
+                          transform: hoveredMain === main ? 'rotate(90deg)' : 'none',
+                          transition: 'all 0.15s',
+                          display: 'inline-block',
+                        }}>›</span>
                       </button>
 
-                      {/* ── 서브카테고리 플라이아웃 ── */}
+                      {/* ── 서브카테고리: 데스크탑=오른쪽, 모바일=아래 겹침 ── */}
                       {hoveredMain === main && (
-                        <div
-                          style={{
-                            position: 'absolute', top: '-6px', left: '100%',
-                            marginLeft: '6px',
-                            background: 'rgba(10,14,20,0.98)',
-                            border: '1px solid rgba(0,255,136,0.12)',
-                            borderRadius: '10px',
-                            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-                            backdropFilter: 'blur(24px)',
-                            minWidth: '280px',
-                            padding: '6px 0',
-                            zIndex: 201,
-                          }}
-                        >
-                          {/* 대분류 전체 선택 */}
-                          <button
-                            onClick={() => handleCategoryClick(main, '')}
-                            style={{
-                              display: 'flex', alignItems: 'center', gap: '8px',
-                              width: '100%', padding: '8px 16px',
-                              background: 'none', border: 'none', cursor: 'pointer',
-                              color: '#00ff88', fontSize: '12px', fontWeight: 600,
-                              textAlign: 'left', transition: 'background 0.1s',
-                              borderBottom: '1px solid rgba(255,255,255,0.06)',
-                              marginBottom: '4px',
-                            }}
-                            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,255,136,0.08)')}
-                            onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-                          >
-                            <span>{ICONS[main]}</span>
-                            {getMainLabel(main)} — {ko ? '전체' : 'All'}
-                          </button>
-
-                          {/* 서브카테고리 목록 */}
-                          {CATEGORIES_EN[main].map(sub => (
-                            <button
-                              key={sub}
-                              onClick={() => handleCategoryClick(main, sub)}
-                              style={{
-                                display: 'block', width: '100%', padding: '7px 16px',
-                                background: 'none', border: 'none', cursor: 'pointer',
-                                color: '#6e7681', fontSize: '12px', textAlign: 'left',
-                                transition: 'all 0.1s',
-                              }}
-                              onMouseEnter={e => {
-                                ;(e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.07)'
-                                ;(e.currentTarget as HTMLElement).style.color = '#00d4ff'
-                              }}
-                              onMouseLeave={e => {
-                                ;(e.currentTarget as HTMLElement).style.background = 'none'
-                                ;(e.currentTarget as HTMLElement).style.color = '#6e7681'
-                              }}
-                            >
-                              {getSubLabel(sub)}
-                            </button>
-                          ))}
-                        </div>
+                        <SubMenu main={main} ko={ko} getMainLabel={getMainLabel} getSubLabel={getSubLabel} onSelect={handleCategoryClick} />
                       )}
+
                     </div>
                   ))}
                 </div>
