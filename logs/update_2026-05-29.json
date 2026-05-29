@@ -1,39 +1,9 @@
 {
   "date": "2026-05-29",
-  "products_added": [
-    "cosyvoice3-0.5b-2512-GGUF",
-    "cosyvoice3-norwegian-lora",
-    "higgs-audio-v3-8b-stt-v2-Q4_K_M-GGUF",
-    "granite-speech-4.1-2b-nar-mlx-5bit",
-    "facebook-wav2vec2-xls-r-1b-km-indomain20-withac",
-    "ESRT-4B",
-    "roest-v3-whisper-1.5b-ct2",
-    "PaddleOCR-VL-1.6-i1-GGUF",
-    "PaddleOCR-VL-1.6-GGUF",
-    "GRM-OCR",
-    "speecht5_finetuned_gcr_5",
-    "speecht5_finetuned_gcr_4",
-    "speecht5_finetuned_gcr_3",
-    "speecht5_finetuned_gcr_2"
-  ],
+  "products_added": [],
   "major_updated": [],
-  "glossary_added": [
-    "cosyvoice3-0.5b-2512-GGUF",
-    "cosyvoice3-norwegian-lora",
-    "higgs-audio-v3-8b-stt-v2-Q4_K_M-GGUF",
-    "granite-speech-4.1-2b-nar-mlx-5bit",
-    "facebook-wav2vec2-xls-r-1b-km-indomain20-withac",
-    "ESRT-4B",
-    "roest-v3-whisper-1.5b-ct2",
-    "PaddleOCR-VL-1.6-i1-GGUF",
-    "PaddleOCR-VL-1.6-GGUF",
-    "GRM-OCR",
-    "speecht5_finetuned_gcr_5",
-    "speecht5_finetuned_gcr_4",
-    "speecht5_finetuned_gcr_3",
-    "speecht5_finetuned_gcr_2"
-  ],
-  "products_ko_enriched": 2,
+  "glossary_added": [],
+  "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
 }
