@@ -1,0 +1,33 @@
+{
+  "date": "2026-05-30",
+  "products_added": [
+    "hallucination_detector_v3",
+    "LongLive-1.0-Stage-1-Diffusers",
+    "piper-voices-GGUF",
+    "indic-parler-tts-nepali-finetuned-dgx-v5",
+    "kokoro-tts-petmind-ios",
+    "MOSS-TTS-v1.5",
+    "parakeet-cpp-gguf",
+    "wav2vec2bert-bengali-noisy-15db-1e5",
+    "speecht5_tailo_Hokkien_ver1.0.d",
+    "stable-audio-3-small-music",
+    "stable-audio-3-small-sfx"
+  ],
+  "major_updated": [],
+  "glossary_added": [
+    "hallucination_detector_v3",
+    "LongLive-1.0-Stage-1-Diffusers",
+    "piper-voices-GGUF",
+    "indic-parler-tts-nepali-finetuned-dgx-v5",
+    "kokoro-tts-petmind-ios",
+    "MOSS-TTS-v1.5",
+    "parakeet-cpp-gguf",
+    "wav2vec2bert-bengali-noisy-15db-1e5",
+    "speecht5_tailo_Hokkien_ver1.0.d",
+    "stable-audio-3-small-music",
+    "stable-audio-3-small-sfx"
+  ],
+  "products_ko_enriched": 1,
+  "glossary_ko_enriched": 0,
+  "errors": []
+}
