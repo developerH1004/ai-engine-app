@@ -1,0 +1,21 @@
+{
+  "date": "2026-06-02",
+  "products_added": [
+    "f5-tts-hindhi",
+    "ksa-arabic-v2",
+    "csm-1b-GGUF",
+    "whisper-tiny-id-v3"
+  ],
+  "major_updated": [
+    "DeepSeek: DeepSeek 1.0"
+  ],
+  "glossary_added": [
+    "f5-tts-hindhi",
+    "ksa-arabic-v2",
+    "csm-1b-GGUF",
+    "whisper-tiny-id-v3"
+  ],
+  "products_ko_enriched": 0,
+  "glossary_ko_enriched": 0,
+  "errors": []
+}
