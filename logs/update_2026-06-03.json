@@ -1,0 +1,27 @@
+{
+  "date": "2026-06-03",
+  "products_added": [
+    "Cosmos3-Nano-GPTQ-4bit",
+    "Cosmos3-Nano-Abliterated",
+    "F5-TTS-Hinglish",
+    "dia-1.6b-GGUF",
+    "VieNeu-TTS-Twi",
+    "parler-tts-mini-v1.1-GGUF",
+    "speecht5_finetuned_gcr_10"
+  ],
+  "major_updated": [
+    "DeepSeek: DeepSeek 1.0"
+  ],
+  "glossary_added": [
+    "Cosmos3-Nano-GPTQ-4bit",
+    "Cosmos3-Nano-Abliterated",
+    "F5-TTS-Hinglish",
+    "dia-1.6b-GGUF",
+    "VieNeu-TTS-Twi",
+    "parler-tts-mini-v1.1-GGUF",
+    "speecht5_finetuned_gcr_10"
+  ],
+  "products_ko_enriched": 0,
+  "glossary_ko_enriched": 0,
+  "errors": []
+}
