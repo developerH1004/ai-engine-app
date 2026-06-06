@@ -1,15 +1,12 @@
 {
   "date": "2026-06-06",
-  "products_added": [
-    "lolaby-llama-3b"
-  ],
+  "products_added": [],
   "major_updated": [
-    "Claude Pro: Claude 2"
+    "Claude Pro: Claude 2",
+    "Perplexity Pro: Perplexity Pro v3.5"
   ],
-  "glossary_added": [
-    "lolaby-llama-3b"
-  ],
-  "products_ko_enriched": 6,
+  "glossary_added": [],
+  "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
 }
