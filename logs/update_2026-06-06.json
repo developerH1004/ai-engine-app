@@ -1,55 +1,15 @@
 {
   "date": "2026-06-06",
   "products_added": [
-    "SmolLM-eppy-360m",
-    "Spacetoon-Ultimate-AI-v1",
-    "zonos-v0.1-transformer-GGUF",
-    "ViZipvoice",
-    "xtts-v2-indian-en",
-    "higgs-audio-v3-tts-4b-transformers",
-    "kugelaudio-0-open-GGUF",
-    "wosota-asr-medium-v2",
-    "whisper-small-zb",
-    "kairo-whisper-ptbr-v3-test",
-    "jem-whisper-yi-2026-06-04",
-    "nemotron-3.5-asr-streaming-0.6b-8bit",
-    "nemotron-3.5-asr-streaming-0.6b",
-    "Nemotron-3.5-ASR-Streaming-0.6B-MLX-8bit",
-    "Nemotron-3.5-ASR-Streaming-0.6B-MLX-bf16",
-    "bttr-handwritten-math-gguf",
-    "hmer-handwritten-math-gguf",
-    "trocr-math-handwritten-gguf",
-    "Rax-4.5-GGUF",
-    "magenta-realtime-2",
-    "magenta-realtime-2-small"
+    "lolaby-llama-3b"
   ],
   "major_updated": [
-    "Claude Pro: Claude 2.1"
+    "Claude Pro: Claude 2"
   ],
   "glossary_added": [
-    "SmolLM-eppy-360m",
-    "Spacetoon-Ultimate-AI-v1",
-    "zonos-v0.1-transformer-GGUF",
-    "ViZipvoice",
-    "xtts-v2-indian-en",
-    "higgs-audio-v3-tts-4b-transformers",
-    "kugelaudio-0-open-GGUF",
-    "wosota-asr-medium-v2",
-    "whisper-small-zb",
-    "kairo-whisper-ptbr-v3-test",
-    "jem-whisper-yi-2026-06-04",
-    "nemotron-3.5-asr-streaming-0.6b-8bit",
-    "nemotron-3.5-asr-streaming-0.6b",
-    "Nemotron-3.5-ASR-Streaming-0.6B-MLX-8bit",
-    "Nemotron-3.5-ASR-Streaming-0.6B-MLX-bf16",
-    "bttr-handwritten-math-gguf",
-    "hmer-handwritten-math-gguf",
-    "trocr-math-handwritten-gguf",
-    "Rax-4.5-GGUF",
-    "magenta-realtime-2",
-    "magenta-realtime-2-small"
+    "lolaby-llama-3b"
   ],
-  "products_ko_enriched": 5,
+  "products_ko_enriched": 6,
   "glossary_ko_enriched": 0,
   "errors": []
 }
