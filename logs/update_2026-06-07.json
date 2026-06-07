@@ -1,34 +1,10 @@
 {
   "date": "2026-06-07",
-  "products_added": [
-    "Klein-9B-Series",
-    "Klein-4B-Series",
-    "Bernini-R-GGUF",
-    "CosyVoice2-0.5B-Akan",
-    "kasanoma-tts-twi-v0.3",
-    "LongCat-Next-w8a8-int8-GB10",
-    "indic-parler-tts-nepali-finetuned-dgx-v9-cosine",
-    "VieNeu-TTS-v3-Turbo",
-    "GMM-sefai-model",
-    "lolaby-llama-3b-GGUF",
-    "SongGeneration-v2-large"
-  ],
+  "products_added": [],
   "major_updated": [
     "Claude Pro: Claude 2"
   ],
-  "glossary_added": [
-    "Klein-9B-Series",
-    "Klein-4B-Series",
-    "Bernini-R-GGUF",
-    "CosyVoice2-0.5B-Akan",
-    "kasanoma-tts-twi-v0.3",
-    "LongCat-Next-w8a8-int8-GB10",
-    "indic-parler-tts-nepali-finetuned-dgx-v9-cosine",
-    "VieNeu-TTS-v3-Turbo",
-    "GMM-sefai-model",
-    "lolaby-llama-3b-GGUF",
-    "SongGeneration-v2-large"
-  ],
+  "glossary_added": [],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
