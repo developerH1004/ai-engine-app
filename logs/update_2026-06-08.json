@@ -1,0 +1,30 @@
+{
+  "date": "2026-06-08",
+  "products_added": [
+    "ideogram-4-GGUF",
+    "dots.tts-soar-mlx",
+    "qwen3-tts-0.6b-q8_0-gguf",
+    "visualears-xlsr-300m-target269h-step7000",
+    "Qwen3-ASR-1.7B-Somali-GGUF",
+    "whisper-large-v3-turbo-lao-v2",
+    "tts_turkish_datasets",
+    "acestep-v15-xl-base-diffusers"
+  ],
+  "major_updated": [
+    "Claude Pro: Claude 2",
+    "Perplexity Pro: Perplexity Pro v1.8"
+  ],
+  "glossary_added": [
+    "ideogram-4-GGUF",
+    "dots.tts-soar-mlx",
+    "qwen3-tts-0.6b-q8_0-gguf",
+    "visualears-xlsr-300m-target269h-step7000",
+    "Qwen3-ASR-1.7B-Somali-GGUF",
+    "whisper-large-v3-turbo-lao-v2",
+    "tts_turkish_datasets",
+    "acestep-v15-xl-base-diffusers"
+  ],
+  "products_ko_enriched": 0,
+  "glossary_ko_enriched": 0,
+  "errors": []
+}
