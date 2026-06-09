@@ -1,0 +1,15 @@
+{
+  "date": "2026-06-09",
+  "products_added": [
+    "visualears-xlsr-300m-v2-cont-step1568",
+    "whisper-heb-ipa"
+  ],
+  "major_updated": [],
+  "glossary_added": [
+    "visualears-xlsr-300m-v2-cont-step1568",
+    "whisper-heb-ipa"
+  ],
+  "products_ko_enriched": 0,
+  "glossary_ko_enriched": 0,
+  "errors": []
+}
