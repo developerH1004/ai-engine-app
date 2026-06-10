@@ -1,10 +1,18 @@
 {
   "date": "2026-06-10",
-  "products_added": [],
+  "products_added": [
+    "mms-1b-ckt-pooled-all-dev",
+    "posformer-hw-GGUF",
+    "kivoic-yor-tts-v2"
+  ],
   "major_updated": [
     "Perplexity Pro: Perplexity Pro v1.8"
   ],
-  "glossary_added": [],
+  "glossary_added": [
+    "mms-1b-ckt-pooled-all-dev",
+    "posformer-hw-GGUF",
+    "kivoic-yor-tts-v2"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
