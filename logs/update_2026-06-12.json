@@ -1,33 +1,9 @@
 {
   "date": "2026-06-12",
-  "products_added": [
-    "orpheus-3b-turkish-tts-v2",
-    "kokoro-coreml",
-    "whisper-small-hindi",
-    "whisper-small-eo-v0.2",
-    "egyptian-whisper-large-v3-standalone",
-    "ppformulanet-l-gguf",
-    "trocr-small-handwritten-GGUF",
-    "trocr-base-printed-GGUF",
-    "trocr-small-printed-GGUF",
-    "texo-distill-gguf",
-    "posformer-crohme-GGUF"
-  ],
+  "products_added": [],
   "major_updated": [],
-  "glossary_added": [
-    "orpheus-3b-turkish-tts-v2",
-    "kokoro-coreml",
-    "whisper-small-hindi",
-    "whisper-small-eo-v0.2",
-    "egyptian-whisper-large-v3-standalone",
-    "ppformulanet-l-gguf",
-    "trocr-small-handwritten-GGUF",
-    "trocr-base-printed-GGUF",
-    "trocr-small-printed-GGUF",
-    "texo-distill-gguf",
-    "posformer-crohme-GGUF"
-  ],
-  "products_ko_enriched": 1,
+  "glossary_added": [],
+  "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
 }
