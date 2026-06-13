@@ -1,8 +1,26 @@
 {
   "date": "2026-06-13",
-  "products_added": [],
+  "products_added": [
+    "vibevoice-realtime-0.5b-with-encoder",
+    "jem-whisper-yi-2026-06-11",
+    "PP-OCRv6_medium_rec",
+    "PP-OCRv6_medium_det",
+    "PP-OCRv6_small_det_safetensors",
+    "PP-OCRv6_medium_det_safetensors",
+    "PP-OCRv6_medium_rec_safetensors",
+    "PP-OCRv6_small_rec_safetensors"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "vibevoice-realtime-0.5b-with-encoder",
+    "jem-whisper-yi-2026-06-11",
+    "PP-OCRv6_medium_rec",
+    "PP-OCRv6_medium_det",
+    "PP-OCRv6_small_det_safetensors",
+    "PP-OCRv6_medium_det_safetensors",
+    "PP-OCRv6_medium_rec_safetensors",
+    "PP-OCRv6_small_rec_safetensors"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
