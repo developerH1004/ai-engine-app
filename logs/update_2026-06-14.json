@@ -1,10 +1,22 @@
 {
   "date": "2026-06-14",
-  "products_added": [],
-  "major_updated": [
-    "Perplexity Pro: Perplexity Pro Q4 2023"
+  "products_added": [
+    "openvoice2-melo8k-zh-gguf",
+    "nemotron-3.5-asr-streaming-GGUF",
+    "qwen3-asr-0.6b-streaming",
+    "whisper-small-darija-v2-phone-aug",
+    "PP-OCRv6_tiny_det_safetensors",
+    "PP-OCRv6_tiny_rec_safetensors"
   ],
-  "glossary_added": [],
+  "major_updated": [],
+  "glossary_added": [
+    "openvoice2-melo8k-zh-gguf",
+    "nemotron-3.5-asr-streaming-GGUF",
+    "qwen3-asr-0.6b-streaming",
+    "whisper-small-darija-v2-phone-aug",
+    "PP-OCRv6_tiny_det_safetensors",
+    "PP-OCRv6_tiny_rec_safetensors"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
