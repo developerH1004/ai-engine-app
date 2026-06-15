@@ -1,34 +1,8 @@
 {
   "date": "2026-06-15",
-  "products_added": [
-    "video_generation_model-Q2_K-GGUF",
-    "Zyphra-ZONOS2",
-    "saudi-xtts-v2",
-    "aci-yoruba-phase3",
-    "qwen-asr-0.6b-he",
-    "Voxtral-Mini-3B-2507-GGUF",
-    "thedal_whisper_base_full_v2",
-    "QwenCleo-ASR",
-    "whisper-large-v3-yoruba-colab",
-    "thedal_whisper_small_full",
-    "gharscan-qwen2vl-gguf",
-    "PaddleOCR-VL-1.6-Manga-Finetuned"
-  ],
+  "products_added": [],
   "major_updated": [],
-  "glossary_added": [
-    "video_generation_model-Q2_K-GGUF",
-    "Zyphra-ZONOS2",
-    "saudi-xtts-v2",
-    "aci-yoruba-phase3",
-    "qwen-asr-0.6b-he",
-    "Voxtral-Mini-3B-2507-GGUF",
-    "thedal_whisper_base_full_v2",
-    "QwenCleo-ASR",
-    "whisper-large-v3-yoruba-colab",
-    "thedal_whisper_small_full",
-    "gharscan-qwen2vl-gguf",
-    "PaddleOCR-VL-1.6-Manga-Finetuned"
-  ],
+  "glossary_added": [],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
