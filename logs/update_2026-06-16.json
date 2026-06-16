@@ -1,8 +1,26 @@
 {
   "date": "2026-06-16",
-  "products_added": [],
+  "products_added": [
+    "wan2.2-t2v-a14b-mlx",
+    "sorotts",
+    "matcha-zh-tw-en-8k-gguf",
+    "visualears-fastconformer-fa-69m-256x40-warmstart",
+    "Voxtral-Mini-4B-Realtime-2602_W4A16_G128",
+    "wisper-large-gaurav-kaggle",
+    "Voxtral-Small-24B-2507-GGUF",
+    "tesseract-lstm-GGUF"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "wan2.2-t2v-a14b-mlx",
+    "sorotts",
+    "matcha-zh-tw-en-8k-gguf",
+    "visualears-fastconformer-fa-69m-256x40-warmstart",
+    "Voxtral-Mini-4B-Realtime-2602_W4A16_G128",
+    "wisper-large-gaurav-kaggle",
+    "Voxtral-Small-24B-2507-GGUF",
+    "tesseract-lstm-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
