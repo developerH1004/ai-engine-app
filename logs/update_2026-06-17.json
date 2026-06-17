@@ -1,10 +1,32 @@
 {
   "date": "2026-06-17",
-  "products_added": [],
-  "major_updated": [
-    "Perplexity Pro: Perplexity Pro v1.8"
+  "products_added": [
+    "IndicF5-Kannada-Bedtime-v2",
+    "x-asr-zh-en-streaming-zipformer2-gguf",
+    "whisper-large-hindi-V2",
+    "x-asr-zh-en-960ms-zipformer2-gguf",
+    "parakeet-unified-en-0.6b-GGUF",
+    "batisay-ko-turbo",
+    "whisper-tiny-grpo-d02ba1b-stream-en-t0.7-lr3e-6-20k-grpo-60d0d96-warmstart-60k",
+    "whisper-tiny-grpo-60d0d96-scratch-80k-longcos",
+    "firered-ocr-crispembed-GGUF",
+    "PP-OCRv6_small_rec",
+    "csm1b_howpeoplemakemoneyvoice_16bit"
   ],
-  "glossary_added": [],
+  "major_updated": [],
+  "glossary_added": [
+    "IndicF5-Kannada-Bedtime-v2",
+    "x-asr-zh-en-streaming-zipformer2-gguf",
+    "whisper-large-hindi-V2",
+    "x-asr-zh-en-960ms-zipformer2-gguf",
+    "parakeet-unified-en-0.6b-GGUF",
+    "batisay-ko-turbo",
+    "whisper-tiny-grpo-d02ba1b-stream-en-t0.7-lr3e-6-20k-grpo-60d0d96-warmstart-60k",
+    "whisper-tiny-grpo-60d0d96-scratch-80k-longcos",
+    "firered-ocr-crispembed-GGUF",
+    "PP-OCRv6_small_rec",
+    "csm1b_howpeoplemakemoneyvoice_16bit"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
