@@ -1,8 +1,26 @@
 {
   "date": "2026-06-19",
-  "products_added": [],
-  "major_updated": [],
-  "glossary_added": [],
+  "products_added": [
+    "LTX-2.3-22b-IC-LoRA-Cross-Eyed",
+    "Chatterbox-Multilingual-TTS-GGUF",
+    "OmniVoice-Pruned-100M",
+    "whisper-small-moore-v2",
+    "whisper-hinglish-preview",
+    "whisper-large-v3-igbo-v2",
+    "UniAR-SFT"
+  ],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro v1.8"
+  ],
+  "glossary_added": [
+    "LTX-2.3-22b-IC-LoRA-Cross-Eyed",
+    "Chatterbox-Multilingual-TTS-GGUF",
+    "OmniVoice-Pruned-100M",
+    "whisper-small-moore-v2",
+    "whisper-hinglish-preview",
+    "whisper-large-v3-igbo-v2",
+    "UniAR-SFT"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
