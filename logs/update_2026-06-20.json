@@ -1,8 +1,26 @@
 {
   "date": "2026-06-20",
-  "products_added": [],
+  "products_added": [
+    "Kokoro-Vietnamese",
+    "omnivoice_tr_finetune",
+    "Qwen3-TTS-12Hz-0.6B-GGUF",
+    "voxcpm2-krio-sft",
+    "TLT_spec_augment_whisper_small",
+    "whisper-tiny-grpo-fbd81c5-cv26-gl",
+    "SupraVL-Nano-900k",
+    "UniAR-RL"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Kokoro-Vietnamese",
+    "omnivoice_tr_finetune",
+    "Qwen3-TTS-12Hz-0.6B-GGUF",
+    "voxcpm2-krio-sft",
+    "TLT_spec_augment_whisper_small",
+    "whisper-tiny-grpo-fbd81c5-cv26-gl",
+    "SupraVL-Nano-900k",
+    "UniAR-RL"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
