@@ -1,9 +1,39 @@
 {
   "date": "2026-06-21",
-  "products_added": [],
+  "products_added": [
+    "bengali-orpheus-tts-adapter",
+    "Inflect-Nano-v1-GGUF",
+    "VoxCPM-0.5B-GGUF",
+    "VoxCPM1.5-GGUF",
+    "VoxCPM2-GGUF",
+    "VoiceTut-TTS",
+    "MOSS-TTSD-v0.7-GGUF",
+    "Fun-ASR-Nano-GGUF",
+    "Paraformer-GGUF",
+    "SenseVoiceSmall-GGUF",
+    "whisper-tiny-dioula",
+    "vekol-stt-ckb-base",
+    "vekol-stt-ckb-tiny",
+    "lightonocr-crispembed-GGUF"
+  ],
   "major_updated": [],
-  "glossary_added": [],
-  "products_ko_enriched": 0,
+  "glossary_added": [
+    "bengali-orpheus-tts-adapter",
+    "Inflect-Nano-v1-GGUF",
+    "VoxCPM-0.5B-GGUF",
+    "VoxCPM1.5-GGUF",
+    "VoxCPM2-GGUF",
+    "VoiceTut-TTS",
+    "MOSS-TTSD-v0.7-GGUF",
+    "Fun-ASR-Nano-GGUF",
+    "Paraformer-GGUF",
+    "SenseVoiceSmall-GGUF",
+    "whisper-tiny-dioula",
+    "vekol-stt-ckb-base",
+    "vekol-stt-ckb-tiny",
+    "lightonocr-crispembed-GGUF"
+  ],
+  "products_ko_enriched": 4,
   "glossary_ko_enriched": 0,
   "errors": []
 }
