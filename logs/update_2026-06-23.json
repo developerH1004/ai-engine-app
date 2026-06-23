@@ -1,10 +1,26 @@
 {
   "date": "2026-06-23",
-  "products_added": [],
-  "major_updated": [
-    "Perplexity Pro: Perplexity Pro v1.8"
+  "products_added": [
+    "FastWan-QAD-FP8-1.3B",
+    "FastWan-QAD-1.3B-SA2",
+    "FastWan-QAD-1.3B",
+    "orpheus-3b-tts-multilingual",
+    "Supertonic-3-CoreML",
+    "demodokos-foundry-tts-v4",
+    "chandra-ocr-2-GGUF",
+    "how-people-make-money-csm1b-16bit-10e"
   ],
-  "glossary_added": [],
+  "major_updated": [],
+  "glossary_added": [
+    "FastWan-QAD-FP8-1.3B",
+    "FastWan-QAD-1.3B-SA2",
+    "FastWan-QAD-1.3B",
+    "orpheus-3b-tts-multilingual",
+    "Supertonic-3-CoreML",
+    "demodokos-foundry-tts-v4",
+    "chandra-ocr-2-GGUF",
+    "how-people-make-money-csm1b-16bit-10e"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
