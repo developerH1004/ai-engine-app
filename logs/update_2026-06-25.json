@@ -1,10 +1,24 @@
 {
   "date": "2026-06-25",
-  "products_added": [],
+  "products_added": [
+    "Fasee7-Najdi-Small",
+    "Zyphra-ZONOS2-4bit",
+    "style-bert-vits2-gguf",
+    "moonshine_tiny_pt_v02",
+    "whisper-vaani-hindi-vani-v2",
+    "Unlimited-OCR-MLX"
+  ],
   "major_updated": [
     "Perplexity Pro: Perplexity Pro Q4 2023"
   ],
-  "glossary_added": [],
+  "glossary_added": [
+    "Fasee7-Najdi-Small",
+    "Zyphra-ZONOS2-4bit",
+    "style-bert-vits2-gguf",
+    "moonshine_tiny_pt_v02",
+    "whisper-vaani-hindi-vani-v2",
+    "Unlimited-OCR-MLX"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
