@@ -1,10 +1,18 @@
 {
   "date": "2026-06-26",
-  "products_added": [],
-  "major_updated": [
-    "Perplexity Pro: Perplexity Pro V1.8"
+  "products_added": [
+    "hindi-tts-190M",
+    "jalak-vits-multispeaker-slr44",
+    "xtts-v2-hinglish-synthetic",
+    "PP-OCRv6-medium-rec-mlx"
   ],
-  "glossary_added": [],
+  "major_updated": [],
+  "glossary_added": [
+    "hindi-tts-190M",
+    "jalak-vits-multispeaker-slr44",
+    "xtts-v2-hinglish-synthetic",
+    "PP-OCRv6-medium-rec-mlx"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
