@@ -1,8 +1,16 @@
 {
   "date": "2026-06-27",
-  "products_added": [],
+  "products_added": [
+    "Qwen3-ASR-0.6B-hf",
+    "Qwen3-ASR-1.7B-hf",
+    "PP-OCRv6-medium-det-mlx"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Qwen3-ASR-0.6B-hf",
+    "Qwen3-ASR-1.7B-hf",
+    "PP-OCRv6-medium-det-mlx"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
