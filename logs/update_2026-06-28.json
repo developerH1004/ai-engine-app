@@ -1,8 +1,24 @@
 {
   "date": "2026-06-28",
-  "products_added": [],
+  "products_added": [
+    "MOSS-TTS-v1.5-Q6_K-GGUF",
+    "swedish-kokoro",
+    "indic-parler-tts-nepali-finetuned-dgx-v2.5-cosine-oov",
+    "tada-tts-1b-GGUF",
+    "whisper-tiny-grpo-0029b82-cv22-tiny-sft",
+    "audiox-turbo-gguf",
+    "MOSS-SoundEffect-MLX-4bit"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "MOSS-TTS-v1.5-Q6_K-GGUF",
+    "swedish-kokoro",
+    "indic-parler-tts-nepali-finetuned-dgx-v2.5-cosine-oov",
+    "tada-tts-1b-GGUF",
+    "whisper-tiny-grpo-0029b82-cv22-tiny-sft",
+    "audiox-turbo-gguf",
+    "MOSS-SoundEffect-MLX-4bit"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
