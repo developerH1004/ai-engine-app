@@ -1,8 +1,14 @@
 {
   "date": "2026-06-30",
-  "products_added": [],
+  "products_added": [
+    "dots-tts-soar-GGUF",
+    "PP-OCRv6-tiny-det-mlx"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "dots-tts-soar-GGUF",
+    "PP-OCRv6-tiny-det-mlx"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
