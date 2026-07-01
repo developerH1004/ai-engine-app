@@ -1,8 +1,30 @@
 {
   "date": "2026-07-01",
-  "products_added": [],
-  "major_updated": [],
-  "glossary_added": [],
+  "products_added": [
+    "ltx_2.3_multi-ref-character-storyboard",
+    "roxi-tts-v2",
+    "VoxCPM2-Yoruba",
+    "vagdhenu",
+    "lift-GGUF",
+    "DeepSeek-OCR-2-GGUF",
+    "pp-ocrv6-one-piece-bubble-line-rec",
+    "thinksound-gguf",
+    "mms-tts-mai-pratik-codemix"
+  ],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro v1.8"
+  ],
+  "glossary_added": [
+    "ltx_2.3_multi-ref-character-storyboard",
+    "roxi-tts-v2",
+    "VoxCPM2-Yoruba",
+    "vagdhenu",
+    "lift-GGUF",
+    "DeepSeek-OCR-2-GGUF",
+    "pp-ocrv6-one-piece-bubble-line-rec",
+    "thinksound-gguf",
+    "mms-tts-mai-pratik-codemix"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
