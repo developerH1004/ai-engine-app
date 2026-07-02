@@ -1,8 +1,12 @@
 {
   "date": "2026-07-02",
-  "products_added": [],
+  "products_added": [
+    "VieNeu-TTS-v3-Turbo-CPP"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "VieNeu-TTS-v3-Turbo-CPP"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
