@@ -1,8 +1,18 @@
 {
   "date": "2026-07-03",
-  "products_added": [],
+  "products_added": [
+    "Krea-2-Turbo-sdnq-hadamard-uint4",
+    "Unlimited-OCR-mixed-nvfp4",
+    "senga-nt-fused-v3-tts",
+    "senga-nt-fused-tts"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Krea-2-Turbo-sdnq-hadamard-uint4",
+    "Unlimited-OCR-mixed-nvfp4",
+    "senga-nt-fused-v3-tts",
+    "senga-nt-fused-tts"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
