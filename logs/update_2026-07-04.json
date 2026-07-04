@@ -1,8 +1,16 @@
 {
   "date": "2026-07-04",
-  "products_added": [],
+  "products_added": [
+    "bananamind-tts-GGUF",
+    "kivoic-yor-tts-v2-top8",
+    "stable-audio-3-small-sfx-GGUF"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "bananamind-tts-GGUF",
+    "kivoic-yor-tts-v2-top8",
+    "stable-audio-3-small-sfx-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
