@@ -1,11 +1,49 @@
 {
   "date": "2026-07-05",
-  "products_added": [],
-  "major_updated": [
-    "DeepSeek: DeepSeek V3"
+  "products_added": [
+    "qupus_tts_0.8Bsbaselora",
+    "MOSS-TTS-PNY-GGUF",
+    "Chatterbox-TTS-Persian-gguf",
+    "KhanhTTS-OmniVoice-GGUF",
+    "orpheus-hmong-tts",
+    "Audar-TTS-V1-Flash",
+    "MSP-Visual",
+    "whisper-tiny-id",
+    "MSP-Audio",
+    "gpt2-stackformer-vision_V2",
+    "senga-LUK-20k-msmel-speecht5",
+    "senga-LUK-20k-l1-speecht5",
+    "senga-LUK-20k-clean-speecht5",
+    "senga-LUK-aligned-stoploss-speecht5",
+    "senga-LUK-aligned-degate60-speecht5",
+    "stable-audio-3-medium-GGUF",
+    "stable-audio-3-small-music-GGUF",
+    "t5gemma-b-b-ul2-GGUF"
   ],
-  "glossary_added": [],
-  "products_ko_enriched": 0,
+  "major_updated": [
+    "DeepSeek: DeepSeek 1.0"
+  ],
+  "glossary_added": [
+    "qupus_tts_0.8Bsbaselora",
+    "MOSS-TTS-PNY-GGUF",
+    "Chatterbox-TTS-Persian-gguf",
+    "KhanhTTS-OmniVoice-GGUF",
+    "orpheus-hmong-tts",
+    "Audar-TTS-V1-Flash",
+    "MSP-Visual",
+    "whisper-tiny-id",
+    "MSP-Audio",
+    "gpt2-stackformer-vision_V2",
+    "senga-LUK-20k-msmel-speecht5",
+    "senga-LUK-20k-l1-speecht5",
+    "senga-LUK-20k-clean-speecht5",
+    "senga-LUK-aligned-stoploss-speecht5",
+    "senga-LUK-aligned-degate60-speecht5",
+    "stable-audio-3-medium-GGUF",
+    "stable-audio-3-small-music-GGUF",
+    "t5gemma-b-b-ul2-GGUF"
+  ],
+  "products_ko_enriched": 5,
   "glossary_ko_enriched": 0,
   "errors": []
 }
