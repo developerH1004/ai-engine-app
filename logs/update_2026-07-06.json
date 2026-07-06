@@ -1,15 +1,11 @@
 {
   "date": "2026-07-06",
-  "products_added": [
-    "MSP-Audio-not-norm"
-  ],
+  "products_added": [],
   "major_updated": [
-    "Claude Pro: Claude 2.1"
+    "Perplexity Pro: Perplexity Pro Q4 2023"
   ],
-  "glossary_added": [
-    "MSP-Audio-not-norm"
-  ],
-  "products_ko_enriched": 3,
+  "glossary_added": [],
+  "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
 }
