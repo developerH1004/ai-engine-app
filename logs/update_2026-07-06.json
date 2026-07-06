@@ -1,10 +1,28 @@
 {
   "date": "2026-07-06",
-  "products_added": [],
-  "major_updated": [
-    "Perplexity Pro: Perplexity Pro Q4 2023"
+  "products_added": [
+    "irodori-tts-GGUF",
+    "Novax_Krio_V3",
+    "ghana-tts-36k-gguf",
+    "cadence-cv_r1",
+    "Chatterbox-TTS-Indonesian-gguf",
+    "splendor1811-omnivoice-vietnamese-GGUF",
+    "Qwen3-VL-8B-Contracts-OCR-GGUF",
+    "khmer-vits-mms-v2"
   ],
-  "glossary_added": [],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro v1.8"
+  ],
+  "glossary_added": [
+    "irodori-tts-GGUF",
+    "Novax_Krio_V3",
+    "ghana-tts-36k-gguf",
+    "cadence-cv_r1",
+    "Chatterbox-TTS-Indonesian-gguf",
+    "splendor1811-omnivoice-vietnamese-GGUF",
+    "Qwen3-VL-8B-Contracts-OCR-GGUF",
+    "khmer-vits-mms-v2"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
