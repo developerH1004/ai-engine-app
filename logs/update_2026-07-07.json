@@ -1,8 +1,26 @@
 {
   "date": "2026-07-07",
-  "products_added": [],
+  "products_added": [
+    "nsfw-helper-multi-concept-experimental-ltx-2.3",
+    "torongo-tts-as",
+    "quipus-0.6-speechv1",
+    "w2v-bert-waxal",
+    "xlsr-waxal-from-lingala",
+    "whisper-medium-hindi-aug",
+    "ka-ocr-v1-line",
+    "Omniverse-v1"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "nsfw-helper-multi-concept-experimental-ltx-2.3",
+    "torongo-tts-as",
+    "quipus-0.6-speechv1",
+    "w2v-bert-waxal",
+    "xlsr-waxal-from-lingala",
+    "whisper-medium-hindi-aug",
+    "ka-ocr-v1-line",
+    "Omniverse-v1"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
