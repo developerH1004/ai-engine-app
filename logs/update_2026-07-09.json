@@ -1,8 +1,36 @@
 {
   "date": "2026-07-09",
-  "products_added": [],
+  "products_added": [
+    "krea2_turbo_style_reference",
+    "ltx2.3-ic-lora-ingredients-multishot",
+    "IndexTTS2-MLX-fp16",
+    "reso1-3b-en-GGUF",
+    "Zamese-Ghanaian-female-accent",
+    "Zamese-Ghanaian-male-accent",
+    "Fasih-TTS-V1",
+    "YorubaEnglish-CodeSwitching-TTS",
+    "saudi-tts-4",
+    "dots.mocr-GGUF",
+    "MiniCPM-V-4.6-GGUF",
+    "senga-LUK-20k-nodegate-speecht5",
+    "senga-LUK-20k-quiet-speecht5"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "krea2_turbo_style_reference",
+    "ltx2.3-ic-lora-ingredients-multishot",
+    "IndexTTS2-MLX-fp16",
+    "reso1-3b-en-GGUF",
+    "Zamese-Ghanaian-female-accent",
+    "Zamese-Ghanaian-male-accent",
+    "Fasih-TTS-V1",
+    "YorubaEnglish-CodeSwitching-TTS",
+    "saudi-tts-4",
+    "dots.mocr-GGUF",
+    "MiniCPM-V-4.6-GGUF",
+    "senga-LUK-20k-nodegate-speecht5",
+    "senga-LUK-20k-quiet-speecht5"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
