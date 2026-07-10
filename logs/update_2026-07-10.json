@@ -1,11 +1,27 @@
 {
   "date": "2026-07-10",
   "products_added": [
-    "demodokos-foundry-music-v4"
+    "compdiff-chest-xray",
+    "DpSceneChange",
+    "Krea-2-vllm-darkbrush-LoRA",
+    "plt-neutts-gguf2",
+    "KazakhTTS-OmniVoice",
+    "mms-pa_necessary_nuktas_LongerSegments_EvenMoreSongs_LR3e5_batchsize8",
+    "MolParser-Mobile",
+    "finetune-tts-ur",
+    "ACE-Step-1.5-XL-Turbo-MLX-Serve-8bit"
   ],
   "major_updated": [],
   "glossary_added": [
-    "demodokos-foundry-music-v4"
+    "compdiff-chest-xray",
+    "DpSceneChange",
+    "Krea-2-vllm-darkbrush-LoRA",
+    "plt-neutts-gguf2",
+    "KazakhTTS-OmniVoice",
+    "mms-pa_necessary_nuktas_LongerSegments_EvenMoreSongs_LR3e5_batchsize8",
+    "MolParser-Mobile",
+    "finetune-tts-ur",
+    "ACE-Step-1.5-XL-Turbo-MLX-Serve-8bit"
   ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
