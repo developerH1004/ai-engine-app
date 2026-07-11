@@ -1,11 +1,45 @@
 {
   "date": "2026-07-11",
-  "products_added": [],
-  "major_updated": [
-    "Perplexity Pro: Perplexity Pro v3.5"
+  "products_added": [
+    "bc1k-background-klein-4b",
+    "carol",
+    "GLM-Image-bnb-4bit",
+    "qwen3.5-4b-gguf",
+    "mobilewan",
+    "voxtral-4b-tts-GGUF",
+    "F5TTS-v1-Base-MLX-fp16",
+    "f5-tts-quebec-french-finetune",
+    "mms-pa_necessary_nuktas_LongerSegments_EvenMoreSongs_LR3e5_batchsize32",
+    "gha-whisper-small-twi-v3",
+    "whisper-tiny-hausa4",
+    "whisper-tiny-yoruba3",
+    "whisper-medium-combined-lin-sna-lug-olusola",
+    "wav2vec2-large-xlsr-indonesian-artificial",
+    "mms-finetuned-pulaar",
+    "ACE-Step-1.5-XL-Turbo-MLX-Serve-4bit"
   ],
-  "glossary_added": [],
-  "products_ko_enriched": 0,
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro v1.8"
+  ],
+  "glossary_added": [
+    "bc1k-background-klein-4b",
+    "carol",
+    "GLM-Image-bnb-4bit",
+    "qwen3.5-4b-gguf",
+    "mobilewan",
+    "voxtral-4b-tts-GGUF",
+    "F5TTS-v1-Base-MLX-fp16",
+    "f5-tts-quebec-french-finetune",
+    "mms-pa_necessary_nuktas_LongerSegments_EvenMoreSongs_LR3e5_batchsize32",
+    "gha-whisper-small-twi-v3",
+    "whisper-tiny-hausa4",
+    "whisper-tiny-yoruba3",
+    "whisper-medium-combined-lin-sna-lug-olusola",
+    "wav2vec2-large-xlsr-indonesian-artificial",
+    "mms-finetuned-pulaar",
+    "ACE-Step-1.5-XL-Turbo-MLX-Serve-4bit"
+  ],
+  "products_ko_enriched": 6,
   "glossary_ko_enriched": 0,
   "errors": []
 }
