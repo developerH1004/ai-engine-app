@@ -1,8 +1,28 @@
 {
   "date": "2026-07-14",
-  "products_added": [],
+  "products_added": [
+    "penis-lora-ltx-2.3-sulphur-lora",
+    "ltx-2.3-ltx2-better-nsfw-motion",
+    "qwen3.5-latex-ocr-finetune",
+    "transcoda-omr-GGUF",
+    "smt-fp-grandstaff-GGUF",
+    "rokot-omr-2b-GGUF",
+    "flova-omr-GGUF",
+    "tromr-GGUF",
+    "pulaar_checkpoint_v2"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "penis-lora-ltx-2.3-sulphur-lora",
+    "ltx-2.3-ltx2-better-nsfw-motion",
+    "qwen3.5-latex-ocr-finetune",
+    "transcoda-omr-GGUF",
+    "smt-fp-grandstaff-GGUF",
+    "rokot-omr-2b-GGUF",
+    "flova-omr-GGUF",
+    "tromr-GGUF",
+    "pulaar_checkpoint_v2"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
