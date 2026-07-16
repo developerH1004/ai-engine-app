@@ -1,8 +1,32 @@
 {
   "date": "2026-07-16",
-  "products_added": [],
-  "major_updated": [],
-  "glossary_added": [],
+  "products_added": [
+    "ltx-2.3-2d-nsfw-motion-enhancer",
+    "ZONOS1-GGUF",
+    "indic-parler-tts-nepali-finetuned-dgx-v3-cosine-oov",
+    "Roo-Voice_MOSS_TTS_LT_mlx8",
+    "moss-tts-local-transformer-4.55b-voice-acting",
+    "khmer-tts-female-v2",
+    "audio.cpp-gguf",
+    "waxal_swahili-tts-mms",
+    "whisper_extended",
+    "pulaar_checkpoint_v3"
+  ],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro v1.8"
+  ],
+  "glossary_added": [
+    "ltx-2.3-2d-nsfw-motion-enhancer",
+    "ZONOS1-GGUF",
+    "indic-parler-tts-nepali-finetuned-dgx-v3-cosine-oov",
+    "Roo-Voice_MOSS_TTS_LT_mlx8",
+    "moss-tts-local-transformer-4.55b-voice-acting",
+    "khmer-tts-female-v2",
+    "audio.cpp-gguf",
+    "waxal_swahili-tts-mms",
+    "whisper_extended",
+    "pulaar_checkpoint_v3"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
