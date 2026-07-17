@@ -1,9 +1,39 @@
 {
   "date": "2026-07-17",
-  "products_added": [],
-  "major_updated": [],
-  "glossary_added": [],
-  "products_ko_enriched": 0,
+  "products_added": [
+    "bcrmpie",
+    "lahja-sa-huba-v1",
+    "lahja-sa-ahmad-v1",
+    "Roo-Voice_MOSS_TTS_LT_mlx4",
+    "Roo-Voice_MOSS_TTS_LT_GGUF",
+    "whisper-tiny-khmer",
+    "w2vbert-luganda-waxal-punct",
+    "whisper-base_ro-80mel",
+    "WAXAL-lug-ful-w2v-bert-2.0",
+    "Images_captioning_fine_tune_Florence-2-base",
+    "stable-audio-3-small-music-base-GGUF",
+    "stable-audio-3-small-sfx-base-GGUF",
+    "stable-audio-3-medium-base-GGUF"
+  ],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro Q4 2023"
+  ],
+  "glossary_added": [
+    "bcrmpie",
+    "lahja-sa-huba-v1",
+    "lahja-sa-ahmad-v1",
+    "Roo-Voice_MOSS_TTS_LT_mlx4",
+    "Roo-Voice_MOSS_TTS_LT_GGUF",
+    "whisper-tiny-khmer",
+    "w2vbert-luganda-waxal-punct",
+    "whisper-base_ro-80mel",
+    "WAXAL-lug-ful-w2v-bert-2.0",
+    "Images_captioning_fine_tune_Florence-2-base",
+    "stable-audio-3-small-music-base-GGUF",
+    "stable-audio-3-small-sfx-base-GGUF",
+    "stable-audio-3-medium-base-GGUF"
+  ],
+  "products_ko_enriched": 3,
   "glossary_ko_enriched": 0,
   "errors": []
 }
