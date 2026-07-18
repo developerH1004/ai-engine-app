@@ -1,9 +1,35 @@
 {
   "date": "2026-07-18",
-  "products_added": [],
-  "major_updated": [],
-  "glossary_added": [],
-  "products_ko_enriched": 0,
+  "products_added": [
+    "Loratime",
+    "pixelmodel-v1",
+    "helios-distilled-visualizer-bf16",
+    "amy-tts",
+    "robust-speaker-cloning",
+    "f5-tts-yoruba-155h-25peochs",
+    "Voxtral-Mini-3B-2507-AWQ4-GEN",
+    "Voxtral-Mini-3B-2507-AWQ4-ARG",
+    "Voxtral-Mini-3B-2507-AWQ4-EN",
+    "ipa-whipstr-large-48khz-cv-21",
+    "pulaar_checkpoint_v4"
+  ],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro Q4 2023"
+  ],
+  "glossary_added": [
+    "Loratime",
+    "pixelmodel-v1",
+    "helios-distilled-visualizer-bf16",
+    "amy-tts",
+    "robust-speaker-cloning",
+    "f5-tts-yoruba-155h-25peochs",
+    "Voxtral-Mini-3B-2507-AWQ4-GEN",
+    "Voxtral-Mini-3B-2507-AWQ4-ARG",
+    "Voxtral-Mini-3B-2507-AWQ4-EN",
+    "ipa-whipstr-large-48khz-cv-21",
+    "pulaar_checkpoint_v4"
+  ],
+  "products_ko_enriched": 1,
   "glossary_ko_enriched": 0,
   "errors": []
 }
