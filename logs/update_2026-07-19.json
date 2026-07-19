@@ -1,8 +1,24 @@
 {
   "date": "2026-07-19",
-  "products_added": [],
-  "major_updated": [],
-  "glossary_added": [],
+  "products_added": [
+    "Q4_0-nemotron-3.5-asr-streaming-0.6b",
+    "INT8-nemotron-3.5-asr-streaming-0.6b",
+    "whisper-small-malayalam",
+    "whisper-small-mn",
+    "llava-phi-3-mini-int4.gguf",
+    "EraX-VL-7B-V1.5.Q5_K_M.gguf"
+  ],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro v1.8"
+  ],
+  "glossary_added": [
+    "Q4_0-nemotron-3.5-asr-streaming-0.6b",
+    "INT8-nemotron-3.5-asr-streaming-0.6b",
+    "whisper-small-malayalam",
+    "whisper-small-mn",
+    "llava-phi-3-mini-int4.gguf",
+    "EraX-VL-7B-V1.5.Q5_K_M.gguf"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
