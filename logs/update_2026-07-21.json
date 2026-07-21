@@ -1,8 +1,32 @@
 {
   "date": "2026-07-21",
-  "products_added": [],
-  "major_updated": [],
-  "glossary_added": [],
+  "products_added": [
+    "pikadiffusion",
+    "Krea-2-Edit-Outfit-Transfer",
+    "JenniferConnellyEarly90s_krea2",
+    "joyai-echo-dit-q8-rm-gguf",
+    "AnimeGen-T2V-GGUF",
+    "voxcpm2-dagbani-sft",
+    "Roo-Voice-NeuTTS-GGUF",
+    "qaf-tasmi-v5",
+    "qwen3.5-latex-ocr-finetune-v2",
+    "csm-1b-aivoice-merged-v3"
+  ],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro Q4 2023"
+  ],
+  "glossary_added": [
+    "pikadiffusion",
+    "Krea-2-Edit-Outfit-Transfer",
+    "JenniferConnellyEarly90s_krea2",
+    "joyai-echo-dit-q8-rm-gguf",
+    "AnimeGen-T2V-GGUF",
+    "voxcpm2-dagbani-sft",
+    "Roo-Voice-NeuTTS-GGUF",
+    "qaf-tasmi-v5",
+    "qwen3.5-latex-ocr-finetune-v2",
+    "csm-1b-aivoice-merged-v3"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
