@@ -1,9 +1,39 @@
 {
   "date": "2026-07-26",
-  "products_added": [],
-  "major_updated": [],
-  "glossary_added": [],
-  "products_ko_enriched": 0,
+  "products_added": [
+    "inflect-v2-coreml",
+    "Kokoro",
+    "kokoro-v1-0-gguf",
+    "wav2vec2-xls-r-latin",
+    "vibevoice-asr-bitnet-GGUF",
+    "whisper-small-bhojpuri-merged",
+    "whisper-small-bhojpuri-lora",
+    "Sped_ParakeetRomanian_110M_TDT-CTC_gguf",
+    "wav2vec2-l2-arctic-gop-model",
+    "mms-pa_necessary_nuktas_LongerSegments_July24_NoDuplicates_MaleOnly_MoosaOnly",
+    "whisper-small-darija-combined",
+    "ocr-math-captcha",
+    "senga-nt-canon-mat-tts"
+  ],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro v1.8"
+  ],
+  "glossary_added": [
+    "inflect-v2-coreml",
+    "Kokoro",
+    "kokoro-v1-0-gguf",
+    "wav2vec2-xls-r-latin",
+    "vibevoice-asr-bitnet-GGUF",
+    "whisper-small-bhojpuri-merged",
+    "whisper-small-bhojpuri-lora",
+    "Sped_ParakeetRomanian_110M_TDT-CTC_gguf",
+    "wav2vec2-l2-arctic-gop-model",
+    "mms-pa_necessary_nuktas_LongerSegments_July24_NoDuplicates_MaleOnly_MoosaOnly",
+    "whisper-small-darija-combined",
+    "ocr-math-captcha",
+    "senga-nt-canon-mat-tts"
+  ],
+  "products_ko_enriched": 3,
   "glossary_ko_enriched": 0,
   "errors": []
 }
