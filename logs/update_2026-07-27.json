@@ -1,9 +1,37 @@
 {
   "date": "2026-07-27",
-  "products_added": [],
+  "products_added": [
+    "Hellgirl_Meru",
+    "wan22-i2v-a14b-lightning-endpoint",
+    "Ava-82M",
+    "Inflect-Micro-v2-GGUF",
+    "Inflect-Nano-v2-GGUF",
+    "VoiceClone",
+    "sakthai-tts-model",
+    "mms-pa_necessary_nuktas_LongerSegments_July26_Duplicates_MaleOnly",
+    "mms-pa_necessary_nuktas_LongerSegments_July26_NoDuplicates_MaleOnly",
+    "qwen3-asr-lora-ja-anime",
+    "Qwen3-ForcedAligner-0.6B-GGUF",
+    "sakthai-vision-7b",
+    "senga-nt-base-tts"
+  ],
   "major_updated": [],
-  "glossary_added": [],
-  "products_ko_enriched": 0,
+  "glossary_added": [
+    "Hellgirl_Meru",
+    "wan22-i2v-a14b-lightning-endpoint",
+    "Ava-82M",
+    "Inflect-Micro-v2-GGUF",
+    "Inflect-Nano-v2-GGUF",
+    "VoiceClone",
+    "sakthai-tts-model",
+    "mms-pa_necessary_nuktas_LongerSegments_July26_Duplicates_MaleOnly",
+    "mms-pa_necessary_nuktas_LongerSegments_July26_NoDuplicates_MaleOnly",
+    "qwen3-asr-lora-ja-anime",
+    "Qwen3-ForcedAligner-0.6B-GGUF",
+    "sakthai-vision-7b",
+    "senga-nt-base-tts"
+  ],
+  "products_ko_enriched": 1,
   "glossary_ko_enriched": 0,
   "errors": []
 }
