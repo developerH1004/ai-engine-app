@@ -1,11 +1,30 @@
 {
   "date": "2026-07-28",
-  "products_added": [],
-  "major_updated": [
-    "Perplexity Pro: Perplexity Pro Q4 2023",
-    "Notion AI: Notion AI 2023"
+  "products_added": [
+    "kage-sdxl",
+    "Self_Gradient_Forcing",
+    "moss-tts-local-gguf",
+    "VibeVoice-7B-hf",
+    "mms-pa_July26_armA_Duplicates_MaleOnly",
+    "mms-pa_necessary_nuktas_LongerSegments_July26_Duplicates_MaleOnly_LessData",
+    "cdli-whisper-ml-lug-swa-sunbird-full-a40",
+    "moss-soundeffect-gguf",
+    "speecht5_finetuned_emirhan_tr"
   ],
-  "glossary_added": [],
+  "major_updated": [
+    "Notion AI: Notion AI 1.0"
+  ],
+  "glossary_added": [
+    "kage-sdxl",
+    "Self_Gradient_Forcing",
+    "moss-tts-local-gguf",
+    "VibeVoice-7B-hf",
+    "mms-pa_July26_armA_Duplicates_MaleOnly",
+    "mms-pa_necessary_nuktas_LongerSegments_July26_Duplicates_MaleOnly_LessData",
+    "cdli-whisper-ml-lug-swa-sunbird-full-a40",
+    "moss-soundeffect-gguf",
+    "speecht5_finetuned_emirhan_tr"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
