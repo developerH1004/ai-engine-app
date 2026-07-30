@@ -1,12 +1,43 @@
 {
   "date": "2026-07-30",
-  "products_added": [],
+  "products_added": [
+    "sasori-flux2-klein-9b-tq3p",
+    "shiv-ai-wan-model",
+    "scrappy-voice-1",
+    "qwen3-tts-12hz-0-6b-customvoice-gguf",
+    "indic-parler-tts-nepali-finetuned-dgx-v4.1-slr",
+    "Qwen3-TTS-12Hz-1.7B-Vi",
+    "svara-tts-v1-bf16",
+    "MOSS-TTS-Realtime-GGUF",
+    "Audio8-TTS-Preview-0.6b",
+    "cdli-whisper-ml-lug-swa-sunbird-full-a40-lr5e5-5k",
+    "w2vbert-waxal-r2",
+    "de-htr-web",
+    "Koshur-OCR",
+    "uz-speecht5-own-voice",
+    "uz-speecht5-finetuned"
+  ],
   "major_updated": [
-    "Perplexity Pro: Perplexity Pro v1.8",
     "Notion AI: Notion AI 1.0"
   ],
-  "glossary_added": [],
-  "products_ko_enriched": 0,
+  "glossary_added": [
+    "sasori-flux2-klein-9b-tq3p",
+    "shiv-ai-wan-model",
+    "scrappy-voice-1",
+    "qwen3-tts-12hz-0-6b-customvoice-gguf",
+    "indic-parler-tts-nepali-finetuned-dgx-v4.1-slr",
+    "Qwen3-TTS-12Hz-1.7B-Vi",
+    "svara-tts-v1-bf16",
+    "MOSS-TTS-Realtime-GGUF",
+    "Audio8-TTS-Preview-0.6b",
+    "cdli-whisper-ml-lug-swa-sunbird-full-a40-lr5e5-5k",
+    "w2vbert-waxal-r2",
+    "de-htr-web",
+    "Koshur-OCR",
+    "uz-speecht5-own-voice",
+    "uz-speecht5-finetuned"
+  ],
+  "products_ko_enriched": 1,
   "glossary_ko_enriched": 0,
   "errors": []
 }
