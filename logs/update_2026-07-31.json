@@ -1,11 +1,33 @@
 {
   "date": "2026-07-31",
-  "products_added": [],
+  "products_added": [
+    "Kreamagine_v1.0",
+    "FLUX.2-klein-4B-1step-RDM-GGUF",
+    "AnyFlow-FAR-Wan2.1-14B-Diffusers",
+    "AnyFlow-Wan2.1-T2V-14B-Diffusers",
+    "pruna-vaed-modular-diffusers",
+    "DistillAlign",
+    "voxcpm2-ewe-sft",
+    "Qwen3-TTS-TBLive-Base",
+    "kikiri-turkish-base",
+    "senga-nt-nse-tts"
+  ],
   "major_updated": [
-    "Perplexity Pro: Perplexity Pro Q4 2023",
+    "Perplexity Pro: Perplexity Pro v3.5",
     "Notion AI: Notion AI 1.0"
   ],
-  "glossary_added": [],
+  "glossary_added": [
+    "Kreamagine_v1.0",
+    "FLUX.2-klein-4B-1step-RDM-GGUF",
+    "AnyFlow-FAR-Wan2.1-14B-Diffusers",
+    "AnyFlow-Wan2.1-T2V-14B-Diffusers",
+    "pruna-vaed-modular-diffusers",
+    "DistillAlign",
+    "voxcpm2-ewe-sft",
+    "Qwen3-TTS-TBLive-Base",
+    "kikiri-turkish-base",
+    "senga-nt-nse-tts"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
