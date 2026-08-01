@@ -1,8 +1,16 @@
 {
   "date": "2026-08-01",
-  "products_added": [],
-  "major_updated": [],
-  "glossary_added": [],
+  "products_added": [
+    "ltxvideo-2.3-distilled-convrot-int8",
+    "Coda-saudi-final"
+  ],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro Q4 2023"
+  ],
+  "glossary_added": [
+    "ltxvideo-2.3-distilled-convrot-int8",
+    "Coda-saudi-final"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
