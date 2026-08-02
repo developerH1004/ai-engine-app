@@ -1,10 +1,34 @@
 {
   "date": "2026-08-02",
-  "products_added": [],
-  "major_updated": [
-    "Perplexity Pro: Perplexity Pro Q4 2023"
+  "products_added": [
+    "Krea2_turbo_diff_loras",
+    "GingerLabs-Wan2.2-T2V-A14B",
+    "chatterbox-multilingual-v3",
+    "saraiki-vits-tts",
+    "qwen3-asr-0.6b-onnx",
+    "ft_wspr_sm_jt_256_512_fold5",
+    "ft_wspr_sm_jt_256_512_fold4",
+    "ft_wspr_sm_jt_256_512_fold3",
+    "ft_wspr_sm_jt_256_512_fold2",
+    "ft_wspr_sm_jt_256_512_fold1",
+    "tesseract-frk-GGUF"
   ],
-  "glossary_added": [],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro v1.8"
+  ],
+  "glossary_added": [
+    "Krea2_turbo_diff_loras",
+    "GingerLabs-Wan2.2-T2V-A14B",
+    "chatterbox-multilingual-v3",
+    "saraiki-vits-tts",
+    "qwen3-asr-0.6b-onnx",
+    "ft_wspr_sm_jt_256_512_fold5",
+    "ft_wspr_sm_jt_256_512_fold4",
+    "ft_wspr_sm_jt_256_512_fold3",
+    "ft_wspr_sm_jt_256_512_fold2",
+    "ft_wspr_sm_jt_256_512_fold1",
+    "tesseract-frk-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
