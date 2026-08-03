@@ -1,10 +1,20 @@
 {
   "date": "2026-08-03",
-  "products_added": [],
-  "major_updated": [
-    "Perplexity Pro: Perplexity Pro v1.8"
+  "products_added": [
+    "B4gged_Krea2_V3",
+    "fastwan-t2v-1.3b-hostmix-gguf",
+    "sulphur-2-base-nvfp4",
+    "mms-pa_August2_armB_NoDuplicates_MaleOnly_20NewSongs"
   ],
-  "glossary_added": [],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro Q4 2023"
+  ],
+  "glossary_added": [
+    "B4gged_Krea2_V3",
+    "fastwan-t2v-1.3b-hostmix-gguf",
+    "sulphur-2-base-nvfp4",
+    "mms-pa_August2_armB_NoDuplicates_MaleOnly_20NewSongs"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
