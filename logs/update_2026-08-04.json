@@ -1,10 +1,28 @@
 {
   "date": "2026-08-04",
-  "products_added": [],
-  "major_updated": [
-    "Perplexity Pro: Perplexity Pro V3"
+  "products_added": [
+    "ChristinaHendricks_krea2",
+    "SydneySweeney_Krea2",
+    "MiniMax-H3_GGUFs",
+    "MiniMax-H3-FL2VA-MLX-Serve-4bit",
+    "minimax-h3-nvfp4",
+    "MiniMax-H3-FL2VA-MLX-Serve-8bit",
+    "saraiki-speecht5",
+    "ARK-ASR-3B-GGUF"
   ],
-  "glossary_added": [],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro Q4 2023"
+  ],
+  "glossary_added": [
+    "ChristinaHendricks_krea2",
+    "SydneySweeney_Krea2",
+    "MiniMax-H3_GGUFs",
+    "MiniMax-H3-FL2VA-MLX-Serve-4bit",
+    "minimax-h3-nvfp4",
+    "MiniMax-H3-FL2VA-MLX-Serve-8bit",
+    "saraiki-speecht5",
+    "ARK-ASR-3B-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
