@@ -1,10 +1,22 @@
 {
   "date": "2026-08-08",
-  "products_added": [],
-  "major_updated": [
-    "Perplexity Pro: Perplexity Pro V3"
+  "products_added": [
+    "MiniMax-H3-Turbo-Lora-Diffusers",
+    "whisper-small-urdu",
+    "VibeVoice-ASR-BitNet-slim",
+    "paprika-whisper-lt",
+    "Qweenseer-2B-GGUF"
   ],
-  "glossary_added": [],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro Q4 2023"
+  ],
+  "glossary_added": [
+    "MiniMax-H3-Turbo-Lora-Diffusers",
+    "whisper-small-urdu",
+    "VibeVoice-ASR-BitNet-slim",
+    "paprika-whisper-lt",
+    "Qweenseer-2B-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
