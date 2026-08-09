@@ -1,8 +1,22 @@
 {
   "date": "2026-08-09",
-  "products_added": [],
+  "products_added": [
+    "MiniMax-H3-FL2VA-MLX-Serve-2bit-text-encoder",
+    "MiniMax-H3-GGUF-MiniStack",
+    "MiniMax-H3-REF2VA-MLX-Serve-8bit",
+    "mms-pa_August7_armF_Duplicates_MaleOnly_20MoreSongs_masktimeprob_010",
+    "shrutam-2-onnx-gguf",
+    "whisper-small-lingala-cased-3"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "MiniMax-H3-FL2VA-MLX-Serve-2bit-text-encoder",
+    "MiniMax-H3-GGUF-MiniStack",
+    "MiniMax-H3-REF2VA-MLX-Serve-8bit",
+    "mms-pa_August7_armF_Duplicates_MaleOnly_20MoreSongs_masktimeprob_010",
+    "shrutam-2-onnx-gguf",
+    "whisper-small-lingala-cased-3"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
