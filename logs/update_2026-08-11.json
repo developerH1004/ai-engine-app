@@ -1,8 +1,22 @@
 {
   "date": "2026-08-11",
-  "products_added": [],
-  "major_updated": [],
-  "glossary_added": [],
+  "products_added": [
+    "Qwen3-TTS-GGUF-fork",
+    "omnivoice-0-6b-gguf",
+    "orpheus-australian-en-tts-i1-GGUF",
+    "Qwen3-TTS-12Hz-1.7B-Vi-i1-GGUF",
+    "MSP-AVSR-MD"
+  ],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro Q4 2023"
+  ],
+  "glossary_added": [
+    "Qwen3-TTS-GGUF-fork",
+    "omnivoice-0-6b-gguf",
+    "orpheus-australian-en-tts-i1-GGUF",
+    "Qwen3-TTS-12Hz-1.7B-Vi-i1-GGUF",
+    "MSP-AVSR-MD"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
