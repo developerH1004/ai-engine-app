@@ -1,9 +1,37 @@
 {
   "date": "2026-08-16",
-  "products_added": [],
-  "major_updated": [],
-  "glossary_added": [],
-  "products_ko_enriched": 0,
+  "products_added": [
+    "Slap-Wan",
+    "MiniMax-H3-comfy-native-fl2va",
+    "negara-g2p-v2-homorich-disambiguated",
+    "QwenTTS-he-1.7B-GGUF",
+    "Kiseki-TTS",
+    "Fish-Audio-S2-Pro-He",
+    "paprika-whisper-lt-v3",
+    "PhoWhisper-large-ct2",
+    "mizo-asr-finetuned-v3",
+    "asr-whisper-51-african-languages-grpo",
+    "whisper-small-ar-fleurs",
+    "minimax_music3_text_encoder_fp16_fp8"
+  ],
+  "major_updated": [
+    "Perplexity Pro: Perplexity Pro v1.8"
+  ],
+  "glossary_added": [
+    "Slap-Wan",
+    "MiniMax-H3-comfy-native-fl2va",
+    "negara-g2p-v2-homorich-disambiguated",
+    "QwenTTS-he-1.7B-GGUF",
+    "Kiseki-TTS",
+    "Fish-Audio-S2-Pro-He",
+    "paprika-whisper-lt-v3",
+    "PhoWhisper-large-ct2",
+    "mizo-asr-finetuned-v3",
+    "asr-whisper-51-african-languages-grpo",
+    "whisper-small-ar-fleurs",
+    "minimax_music3_text_encoder_fp16_fp8"
+  ],
+  "products_ko_enriched": 2,
   "glossary_ko_enriched": 0,
   "errors": []
 }
