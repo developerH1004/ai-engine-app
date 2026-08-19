@@ -1,8 +1,28 @@
 {
   "date": "2026-08-19",
-  "products_added": [],
+  "products_added": [
+    "Izzy",
+    "Aisling2",
+    "Aisling",
+    "minimax-h3-loras",
+    "MiniMax-H3-10Eros-beta2-fl2va-w4a8",
+    "LTX-2.5-22b-distilled-GGUF",
+    "audio.cpp-gguf-fork",
+    "speecht5_finetuned_voxpopuli_nl",
+    "fb-mms-1b-punjabi-ccer-train-111760-epochs-15-test-1569"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Izzy",
+    "Aisling2",
+    "Aisling",
+    "minimax-h3-loras",
+    "MiniMax-H3-10Eros-beta2-fl2va-w4a8",
+    "LTX-2.5-22b-distilled-GGUF",
+    "audio.cpp-gguf-fork",
+    "speecht5_finetuned_voxpopuli_nl",
+    "fb-mms-1b-punjabi-ccer-train-111760-epochs-15-test-1569"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
