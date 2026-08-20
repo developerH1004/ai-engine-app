@@ -1,8 +1,14 @@
 {
   "date": "2026-08-20",
-  "products_added": [],
+  "products_added": [
+    "minimax-h3-Camera-Motion-lora",
+    "qwen3-tts-kss-finetuned"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "minimax-h3-Camera-Motion-lora",
+    "qwen3-tts-kss-finetuned"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
