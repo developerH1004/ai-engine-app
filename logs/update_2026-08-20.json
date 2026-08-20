@@ -1,13 +1,35 @@
 {
   "date": "2026-08-20",
   "products_added": [
-    "minimax-h3-Camera-Motion-lora",
-    "qwen3-tts-kss-finetuned"
+    "aros-9e2d1e78-GildedZenith",
+    "aros-b4a2bab7-WanderingVertex",
+    "My-Stars-Hana",
+    "OOO_ANIMA-29B-V10",
+    "MiniMax-H3-FL2VA-MLX-8bit",
+    "MiniMax-H3-FL2VA-MLX-BF16",
+    "MiniMax-H3-Turbo-Lora",
+    "joyai-echo-ltx25-echoVid-gguf",
+    "10Eros-Max-h3-fl2va-beta2-w4a8",
+    "Audio8-TTS-Preview-0.1b",
+    "whisper-small-santali-sanlish-1934_lr2-lr2e5",
+    "whisper-small-santali-sanlish-1934-lr1e5",
+    "speecht5_finetuned_iamwille_ig"
   ],
   "major_updated": [],
   "glossary_added": [
-    "minimax-h3-Camera-Motion-lora",
-    "qwen3-tts-kss-finetuned"
+    "aros-9e2d1e78-GildedZenith",
+    "aros-b4a2bab7-WanderingVertex",
+    "My-Stars-Hana",
+    "OOO_ANIMA-29B-V10",
+    "MiniMax-H3-FL2VA-MLX-8bit",
+    "MiniMax-H3-FL2VA-MLX-BF16",
+    "MiniMax-H3-Turbo-Lora",
+    "joyai-echo-ltx25-echoVid-gguf",
+    "10Eros-Max-h3-fl2va-beta2-w4a8",
+    "Audio8-TTS-Preview-0.1b",
+    "whisper-small-santali-sanlish-1934_lr2-lr2e5",
+    "whisper-small-santali-sanlish-1934-lr1e5",
+    "speecht5_finetuned_iamwille_ig"
   ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
