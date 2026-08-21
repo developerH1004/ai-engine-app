@@ -1,8 +1,32 @@
 {
   "date": "2026-08-21",
-  "products_added": [],
+  "products_added": [
+    "Qwen-Image-2512-Penis-Heretic",
+    "Claire-Flux",
+    "Caroline",
+    "SANA-Video_2.0_5B_720p",
+    "qwen3-tts-12hz-1-7b-voicedesign-gguf",
+    "speecht5-marathi-tts",
+    "Raon-OpenTTS-comfyui",
+    "poto-tts-kokoro-gh",
+    "chatterbox-onestep",
+    "parakeet-ctc-0.6b-vietnamese-bf16",
+    "Sunbird-2-sunbird-gikuyu-financial"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Qwen-Image-2512-Penis-Heretic",
+    "Claire-Flux",
+    "Caroline",
+    "SANA-Video_2.0_5B_720p",
+    "qwen3-tts-12hz-1-7b-voicedesign-gguf",
+    "speecht5-marathi-tts",
+    "Raon-OpenTTS-comfyui",
+    "poto-tts-kokoro-gh",
+    "chatterbox-onestep",
+    "parakeet-ctc-0.6b-vietnamese-bf16",
+    "Sunbird-2-sunbird-gikuyu-financial"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
