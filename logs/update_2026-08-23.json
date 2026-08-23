@@ -1,24 +1,8 @@
 {
   "date": "2026-08-23",
-  "products_added": [
-    "cielvox2-tts-1.7b-voicedesign-GGUF",
-    "cielvox2-tts-1.7b-base-GGUF",
-    "cielvox2-tts-1.7b-customvoice-GGUF",
-    "cielvox2-tts-0.6b-customvoice-GGUF",
-    "cielvox2-tts-0.6b-base-GGUF",
-    "cielvox2-asr-1.7b-GGUF",
-    "cielvox2-asr-0.6b-GGUF"
-  ],
+  "products_added": [],
   "major_updated": [],
-  "glossary_added": [
-    "cielvox2-tts-1.7b-voicedesign-GGUF",
-    "cielvox2-tts-1.7b-base-GGUF",
-    "cielvox2-tts-1.7b-customvoice-GGUF",
-    "cielvox2-tts-0.6b-customvoice-GGUF",
-    "cielvox2-tts-0.6b-base-GGUF",
-    "cielvox2-asr-1.7b-GGUF",
-    "cielvox2-asr-0.6b-GGUF"
-  ],
+  "glossary_added": [],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
