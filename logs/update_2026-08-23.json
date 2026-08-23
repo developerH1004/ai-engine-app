@@ -1,8 +1,36 @@
 {
   "date": "2026-08-23",
-  "products_added": [],
+  "products_added": [
+    "Flux-12B-abliterated-V2-GGUF",
+    "StableDiffusion-1.4-Pruned-openvino",
+    "MiniMax-H3-x-Z-Image-GGUF",
+    "MiniMax-H3-x-Z-Image-native",
+    "ltx-2.5-mlx-q8",
+    "MiniMax-H3-Qwen3-VL-NVFP4",
+    "chatterbox-s3gen-GGUF",
+    "kasanoma-tts-twi-v0.5",
+    "s1-mini-GGUF",
+    "Qwen3-ASR-1.7B-hf-orze",
+    "kodama-ja-streaming-small",
+    "Nawah-VL-50M",
+    "polish-metrical-htr-experimental"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Flux-12B-abliterated-V2-GGUF",
+    "StableDiffusion-1.4-Pruned-openvino",
+    "MiniMax-H3-x-Z-Image-GGUF",
+    "MiniMax-H3-x-Z-Image-native",
+    "ltx-2.5-mlx-q8",
+    "MiniMax-H3-Qwen3-VL-NVFP4",
+    "chatterbox-s3gen-GGUF",
+    "kasanoma-tts-twi-v0.5",
+    "s1-mini-GGUF",
+    "Qwen3-ASR-1.7B-hf-orze",
+    "kodama-ja-streaming-small",
+    "Nawah-VL-50M",
+    "polish-metrical-htr-experimental"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
