@@ -1,8 +1,34 @@
 {
   "date": "2026-08-24",
-  "products_added": [],
+  "products_added": [
+    "Qwen-Image-2512-Penis-Heretic-V2",
+    "Isla",
+    "Eastern-European-Female-Anatomy-NSFW-LoRA-v1",
+    "Roisin",
+    "Gabbi",
+    "melal",
+    "CausalForcing-Wan2.1-T2V-1.3B-Diffusers",
+    "FastVideo-Minimax-FastH3-Preview-v0.2",
+    "moss-tts-local-transformer-4.55b-voice-acting-v2-sft",
+    "audio8-tts-preview-0.1b-mx",
+    "midashenglm-gen-wer-lora",
+    "soad-mm3-vanilla-20260822-10k-adamw8e-5-randwin128-nocapdrop"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Qwen-Image-2512-Penis-Heretic-V2",
+    "Isla",
+    "Eastern-European-Female-Anatomy-NSFW-LoRA-v1",
+    "Roisin",
+    "Gabbi",
+    "melal",
+    "CausalForcing-Wan2.1-T2V-1.3B-Diffusers",
+    "FastVideo-Minimax-FastH3-Preview-v0.2",
+    "moss-tts-local-transformer-4.55b-voice-acting-v2-sft",
+    "audio8-tts-preview-0.1b-mx",
+    "midashenglm-gen-wer-lora",
+    "soad-mm3-vanilla-20260822-10k-adamw8e-5-randwin128-nocapdrop"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
