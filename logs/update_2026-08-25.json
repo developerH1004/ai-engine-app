@@ -1,11 +1,29 @@
 {
   "date": "2026-08-25",
   "products_added": [
-    "confucius4-tts-GGUF"
+    "joyai-echo-ltx25-x-Z-Image-gguf",
+    "MiniMax-H3-Fun-Controlnet-Union",
+    "Qwen3-ASR-1.7B-GGUF",
+    "soad-mm3-daron-cont128-reginst-replicate",
+    "soad-mm3-nextlat-xm-daron-continuation128-20260824-5k-adamw2e-5-bsz2-singersplit-reginst",
+    "soad-mm3-nextlat-xm-daron-randwin128-20260824-5k-adamw2e-5-bsz4-singersplit-reginst",
+    "soad-mm3-nextlat-xm-serj-randwin128-20260824-5k-adamw2e-5-bsz4-singersplit-reginst",
+    "soad-mm3-nextlat-xm-serj-continuation128-20260824-5k-adamw2e-5-bsz2-singersplit-reginst",
+    "soad-mm3-xm-20260822-10k-adamw8e-5-randwin128-nocapdrop",
+    "soad-mm3-nextlat-20260822-10k-prodigy-nocapdrop"
   ],
   "major_updated": [],
   "glossary_added": [
-    "confucius4-tts-GGUF"
+    "joyai-echo-ltx25-x-Z-Image-gguf",
+    "MiniMax-H3-Fun-Controlnet-Union",
+    "Qwen3-ASR-1.7B-GGUF",
+    "soad-mm3-daron-cont128-reginst-replicate",
+    "soad-mm3-nextlat-xm-daron-continuation128-20260824-5k-adamw2e-5-bsz2-singersplit-reginst",
+    "soad-mm3-nextlat-xm-daron-randwin128-20260824-5k-adamw2e-5-bsz4-singersplit-reginst",
+    "soad-mm3-nextlat-xm-serj-randwin128-20260824-5k-adamw2e-5-bsz4-singersplit-reginst",
+    "soad-mm3-nextlat-xm-serj-continuation128-20260824-5k-adamw2e-5-bsz2-singersplit-reginst",
+    "soad-mm3-xm-20260822-10k-adamw8e-5-randwin128-nocapdrop",
+    "soad-mm3-nextlat-20260822-10k-prodigy-nocapdrop"
   ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
