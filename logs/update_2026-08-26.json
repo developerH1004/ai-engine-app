@@ -1,8 +1,22 @@
 {
   "date": "2026-08-26",
-  "products_added": [],
+  "products_added": [
+    "10Eros-Max-h3-turbo-hybrid-beta3-w4a8",
+    "MOSS-TTS-Nano-Persian",
+    "Breeze-TTS-2",
+    "SenseVoiceSmall-GGUF-audiocpp",
+    "whisper_sanlish_mnx_lr2e5",
+    "Rukopys-OCR-4B-GGUF"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "10Eros-Max-h3-turbo-hybrid-beta3-w4a8",
+    "MOSS-TTS-Nano-Persian",
+    "Breeze-TTS-2",
+    "SenseVoiceSmall-GGUF-audiocpp",
+    "whisper_sanlish_mnx_lr2e5",
+    "Rukopys-OCR-4B-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
