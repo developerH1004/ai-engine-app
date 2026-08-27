@@ -1,8 +1,12 @@
 {
   "date": "2026-08-27",
-  "products_added": [],
+  "products_added": [
+    "MiniMax-H3-Acc-LoRAs"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "MiniMax-H3-Acc-LoRAs"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
