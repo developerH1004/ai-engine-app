@@ -1,28 +1,8 @@
 {
   "date": "2026-08-29",
-  "products_added": [
-    "minimax_h3_turbo_4step_10ErosMax_test4_pruned_curveproj1025_T8",
-    "SANA-Video_2.0_5B_720p_4step",
-    "MiniMax-H3-Acc-LoRAs-ComfyUI",
-    "Wan2.2-TI2V-5B-iOS",
-    "Breeze-TTS-2.cpp",
-    "VibeVoice-7B-GGUF",
-    "Soprano-1.1-80M-GGUF",
-    "voxtream2-ru",
-    "VibeVoice-1.5B-hf"
-  ],
+  "products_added": [],
   "major_updated": [],
-  "glossary_added": [
-    "minimax_h3_turbo_4step_10ErosMax_test4_pruned_curveproj1025_T8",
-    "SANA-Video_2.0_5B_720p_4step",
-    "MiniMax-H3-Acc-LoRAs-ComfyUI",
-    "Wan2.2-TI2V-5B-iOS",
-    "Breeze-TTS-2.cpp",
-    "VibeVoice-7B-GGUF",
-    "Soprano-1.1-80M-GGUF",
-    "voxtream2-ru",
-    "VibeVoice-1.5B-hf"
-  ],
+  "glossary_added": [],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
