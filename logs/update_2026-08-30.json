@@ -1,8 +1,34 @@
 {
   "date": "2026-08-30",
-  "products_added": [],
+  "products_added": [
+    "SenseNova-U1.5-8B-MoT-Q4_K_S-L0DownFix-GGUF",
+    "My-Stars-Phoebe",
+    "MiniMax-H3-Acc-LoRAs-sidecar",
+    "LTX-2.3-uncensored-v1.4-FP8",
+    "H3_slider_experiments",
+    "ltx2.5-kimalo-lora",
+    "chatterbox-nano-GGUF",
+    "habibi-tts-doda-darija",
+    "byt5-g2p-multilingual",
+    "saraiki-whisper-medium",
+    "gemini_whisper_ipa",
+    "azocr"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "SenseNova-U1.5-8B-MoT-Q4_K_S-L0DownFix-GGUF",
+    "My-Stars-Phoebe",
+    "MiniMax-H3-Acc-LoRAs-sidecar",
+    "LTX-2.3-uncensored-v1.4-FP8",
+    "H3_slider_experiments",
+    "ltx2.5-kimalo-lora",
+    "chatterbox-nano-GGUF",
+    "habibi-tts-doda-darija",
+    "byt5-g2p-multilingual",
+    "saraiki-whisper-medium",
+    "gemini_whisper_ipa",
+    "azocr"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
