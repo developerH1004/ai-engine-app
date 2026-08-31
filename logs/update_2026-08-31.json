@@ -1,8 +1,36 @@
 {
   "date": "2026-08-31",
-  "products_added": [],
+  "products_added": [
+    "ip-adapter-faceid-plusv2_sdxl.bin",
+    "10Eros-Max-h3-turbo-hybrid-beta4-w4a8",
+    "MiniMax-H3-Turbo-Lora-ComfyUI",
+    "MiniMax-H3-FastH3-VSA-DataFree-MLX-Q8",
+    "MiniMax-H3-FastH3-VSA-DataFree-MLX-BF16",
+    "studio-1939-old-animation-lora-minimax-h3",
+    "tekyerema-tts-eng",
+    "chatterbox-finnish-nano-GGUF",
+    "tekyerema-tts-kus",
+    "mms-1b-all-bemgen-combined-train-drodat-gdro-3e-2-dat-0.00-no-sd-0.00-42",
+    "mms-1b-all-bemgen-combined-train-droctc-gdro-3e-2-dat-5e-1-no-sd-0.00-42",
+    "mms-1b-all-bemgen-combined-train-drodat-gdro-3e-2-dat-5e-1-no-sd-0.00-42",
+    "nemotron-3.5-asr-streaming-0.6b-jordanian"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "ip-adapter-faceid-plusv2_sdxl.bin",
+    "10Eros-Max-h3-turbo-hybrid-beta4-w4a8",
+    "MiniMax-H3-Turbo-Lora-ComfyUI",
+    "MiniMax-H3-FastH3-VSA-DataFree-MLX-Q8",
+    "MiniMax-H3-FastH3-VSA-DataFree-MLX-BF16",
+    "studio-1939-old-animation-lora-minimax-h3",
+    "tekyerema-tts-eng",
+    "chatterbox-finnish-nano-GGUF",
+    "tekyerema-tts-kus",
+    "mms-1b-all-bemgen-combined-train-drodat-gdro-3e-2-dat-0.00-no-sd-0.00-42",
+    "mms-1b-all-bemgen-combined-train-droctc-gdro-3e-2-dat-5e-1-no-sd-0.00-42",
+    "mms-1b-all-bemgen-combined-train-drodat-gdro-3e-2-dat-5e-1-no-sd-0.00-42",
+    "nemotron-3.5-asr-streaming-0.6b-jordanian"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
