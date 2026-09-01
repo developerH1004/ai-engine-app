@@ -1,8 +1,28 @@
 {
   "date": "2026-09-01",
-  "products_added": [],
+  "products_added": [
+    "aros-d93f01f4-ElectricAtlas",
+    "flux2-klein-9b-uncensored-text-encoder-Q6_K-GGUF",
+    "69dtcam",
+    "MiniMax-H3-Turbo-Lora-Pruned-Fixed",
+    "Audio8-TTS-Preview-0.6b-GGUF",
+    "neutts-air-darija-v1",
+    "agirdi",
+    "full_moonshine_tiny_wup1_ep3_lr1e-4",
+    "resnet-lstm-belarus-screening"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "aros-d93f01f4-ElectricAtlas",
+    "flux2-klein-9b-uncensored-text-encoder-Q6_K-GGUF",
+    "69dtcam",
+    "MiniMax-H3-Turbo-Lora-Pruned-Fixed",
+    "Audio8-TTS-Preview-0.6b-GGUF",
+    "neutts-air-darija-v1",
+    "agirdi",
+    "full_moonshine_tiny_wup1_ep3_lr1e-4",
+    "resnet-lstm-belarus-screening"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
