@@ -1,8 +1,36 @@
 {
   "date": "2026-09-05",
-  "products_added": [],
+  "products_added": [
+    "LLaDa-Image_ComfyUI",
+    "krea2-takamichi-training",
+    "FWKV-Image-Hibiscus-LoRA",
+    "better-human-motion-h3-lora",
+    "dasllama-tts",
+    "nemotron-speech-streaming-en-0.6b-gguf",
+    "indic_whisper_hi_multi_gpu_iv_hindi_only_62427_ratio_alldata_lr_1e-4_lgid_None_epochs_100_FT",
+    "indic_whisper_hi_multi_gpu_vaani_62427_ratio_alldata_lr_1e-4_lgid_None_epochs_100_FT",
+    "indic_whisper_hi_multi_gpu_vaani_62427_ratio_alldata_lr_1e-4_lgid_en_epochs_100_FT",
+    "indic_whisper_hi_multi_gpu_iv_hindi_only_62426_ratio_alldata_lr_1e-4_lgid_hi_epochs_100_FT",
+    "parakeet-ctc-0.6b-vi-GGUF",
+    "nexora-ocr-v0.1-0.8b",
+    "vibe"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "LLaDa-Image_ComfyUI",
+    "krea2-takamichi-training",
+    "FWKV-Image-Hibiscus-LoRA",
+    "better-human-motion-h3-lora",
+    "dasllama-tts",
+    "nemotron-speech-streaming-en-0.6b-gguf",
+    "indic_whisper_hi_multi_gpu_iv_hindi_only_62427_ratio_alldata_lr_1e-4_lgid_None_epochs_100_FT",
+    "indic_whisper_hi_multi_gpu_vaani_62427_ratio_alldata_lr_1e-4_lgid_None_epochs_100_FT",
+    "indic_whisper_hi_multi_gpu_vaani_62427_ratio_alldata_lr_1e-4_lgid_en_epochs_100_FT",
+    "indic_whisper_hi_multi_gpu_iv_hindi_only_62426_ratio_alldata_lr_1e-4_lgid_hi_epochs_100_FT",
+    "parakeet-ctc-0.6b-vi-GGUF",
+    "nexora-ocr-v0.1-0.8b",
+    "vibe"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
