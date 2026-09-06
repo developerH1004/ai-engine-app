@@ -1,8 +1,22 @@
 {
   "date": "2026-09-06",
-  "products_added": [],
+  "products_added": [
+    "vdn-minimax-h3-comfyui-int8-convrot",
+    "insta-tiktok-aesthetics-h3-lora",
+    "gepard-1.1",
+    "whisper-medium-es-500-steps_removed_lengths_sin-proc-def5",
+    "whisper-medium_iv_hindi_vaani_62446_ratio_alldata_lr_1e-4_lgid_None_epochs_100_FT",
+    "HeartMuLa-GGUF"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "vdn-minimax-h3-comfyui-int8-convrot",
+    "insta-tiktok-aesthetics-h3-lora",
+    "gepard-1.1",
+    "whisper-medium-es-500-steps_removed_lengths_sin-proc-def5",
+    "whisper-medium_iv_hindi_vaani_62446_ratio_alldata_lr_1e-4_lgid_None_epochs_100_FT",
+    "HeartMuLa-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
