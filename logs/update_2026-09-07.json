@@ -1,8 +1,18 @@
 {
   "date": "2026-09-07",
-  "products_added": [],
+  "products_added": [
+    "Ideogram-4-IQ4_M",
+    "swingusinnerz_t2v_minimax_h3_v1",
+    "ZeroTTS-GGUF",
+    "dots-tts-base-gguf"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Ideogram-4-IQ4_M",
+    "swingusinnerz_t2v_minimax_h3_v1",
+    "ZeroTTS-GGUF",
+    "dots-tts-base-gguf"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
