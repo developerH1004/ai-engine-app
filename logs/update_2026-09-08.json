@@ -1,8 +1,18 @@
 {
   "date": "2026-09-08",
-  "products_added": [],
+  "products_added": [
+    "SanoTTS-GGUF",
+    "higgs-audio-v3-tts-4b-endpoint",
+    "dots-tts-edit-gguf",
+    "speecht5_finetuned_uzbek"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "SanoTTS-GGUF",
+    "higgs-audio-v3-tts-4b-endpoint",
+    "dots-tts-edit-gguf",
+    "speecht5_finetuned_uzbek"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
