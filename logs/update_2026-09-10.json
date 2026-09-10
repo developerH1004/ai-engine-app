@@ -1,8 +1,30 @@
 {
   "date": "2026-09-10",
-  "products_added": [],
+  "products_added": [
+    "Anima-2.9B",
+    "tinydit-256",
+    "natural-face-speech-h3-lora",
+    "omnivoice-badini",
+    "armenian-speecht5-sota",
+    "X2Streaming-TTS-1.7B-GGUF",
+    "VibeVoice-ASR-Streaming-7B-GGUF",
+    "orukeet",
+    "trocr-spanish-handwritten",
+    "YuE2-3B"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Anima-2.9B",
+    "tinydit-256",
+    "natural-face-speech-h3-lora",
+    "omnivoice-badini",
+    "armenian-speecht5-sota",
+    "X2Streaming-TTS-1.7B-GGUF",
+    "VibeVoice-ASR-Streaming-7B-GGUF",
+    "orukeet",
+    "trocr-spanish-handwritten",
+    "YuE2-3B"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
