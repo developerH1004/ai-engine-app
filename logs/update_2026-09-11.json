@@ -1,8 +1,24 @@
 {
   "date": "2026-09-11",
-  "products_added": [],
+  "products_added": [
+    "M4R4",
+    "sdxl-turbo-nvfp4-test",
+    "Homo-GE2PE-Persian-HF",
+    "nepali-call-center-cosyvoice-experimental",
+    "aci-yoruba-phase8",
+    "funasr-nano-coreml",
+    "YuE2-3B-GGUF"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "M4R4",
+    "sdxl-turbo-nvfp4-test",
+    "Homo-GE2PE-Persian-HF",
+    "nepali-call-center-cosyvoice-experimental",
+    "aci-yoruba-phase8",
+    "funasr-nano-coreml",
+    "YuE2-3B-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
