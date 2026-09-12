@@ -1,8 +1,32 @@
 {
   "date": "2026-09-12",
-  "products_added": [],
+  "products_added": [
+    "PS-IMAGE-1.3",
+    "inkpop-style",
+    "MiniMax-H3-T2V-NVFP4",
+    "larryvrh-Turbo-Lora",
+    "kokoro-coreml-int8",
+    "Kahya-TTS-v1.0-GGUF",
+    "tekyerema-asr-ctc-kus-v2",
+    "X-AuT",
+    "whisper-small-hi",
+    "TrOCR_Manicule_2026_Latin_Medieval",
+    "MM3-GGUF"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "PS-IMAGE-1.3",
+    "inkpop-style",
+    "MiniMax-H3-T2V-NVFP4",
+    "larryvrh-Turbo-Lora",
+    "kokoro-coreml-int8",
+    "Kahya-TTS-v1.0-GGUF",
+    "tekyerema-asr-ctc-kus-v2",
+    "X-AuT",
+    "whisper-small-hi",
+    "TrOCR_Manicule_2026_Latin_Medieval",
+    "MM3-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
