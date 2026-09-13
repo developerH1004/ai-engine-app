@@ -1,8 +1,24 @@
 {
   "date": "2026-09-13",
-  "products_added": [],
+  "products_added": [
+    "CyberRealistic",
+    "Evoke-Turbo",
+    "TaoMate-H3",
+    "supertonic-3-GGUF",
+    "Anka-TTS",
+    "AfriVoxAccent_QW3_spk_acc_12hz_lora-r16_s42_20260911_145425",
+    "quietfield"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "CyberRealistic",
+    "Evoke-Turbo",
+    "TaoMate-H3",
+    "supertonic-3-GGUF",
+    "Anka-TTS",
+    "AfriVoxAccent_QW3_spk_acc_12hz_lora-r16_s42_20260911_145425",
+    "quietfield"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
