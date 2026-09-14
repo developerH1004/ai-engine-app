@@ -5,5 +5,9 @@
   "glossary_added": [],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
-  "errors": []
+  "errors": [
+    "Perplexity Pro: {'message': 'JSON could not be generated', 'code': 504, 'hint': 'Refer to full message for details', 'details': 'b\\'{\"message\":\"Gateway Timeout\"}\\''}",
+    "Canva Magic Studio: {'message': 'JSON could not be generated', 'code': 504, 'hint': 'Refer to full message for details', 'details': 'b\\'{\"message\":\"Gateway Timeout\"}\\''}",
+    "Llama: {'message': 'JSON could not be generated', 'code': 504, 'hint': 'Refer to full message for details', 'details': 'b\\'{\"message\":\"Gateway Timeout\"}\\''}"
+  ]
 }
