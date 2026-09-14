@@ -1,13 +1,25 @@
 {
   "date": "2026-09-14",
-  "products_added": [],
+  "products_added": [
+    "z-image-turbo-mflux-q8",
+    "krea-2-turbo-mflux-q8",
+    "NOESIS-Qwen3-TTS-1.7B-Talker-Combo-LLM2-ASR2-BF16-GGUF",
+    "Breeze-TTS-2-gguf",
+    "fireredtts3-GGUF",
+    "parakeet-rnnt-0.6b-sapc12-syn",
+    "wecos-myanmar-ocr-8b-GGUF"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "z-image-turbo-mflux-q8",
+    "krea-2-turbo-mflux-q8",
+    "NOESIS-Qwen3-TTS-1.7B-Talker-Combo-LLM2-ASR2-BF16-GGUF",
+    "Breeze-TTS-2-gguf",
+    "fireredtts3-GGUF",
+    "parakeet-rnnt-0.6b-sapc12-syn",
+    "wecos-myanmar-ocr-8b-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
-  "errors": [
-    "Perplexity Pro: {'message': 'JSON could not be generated', 'code': 504, 'hint': 'Refer to full message for details', 'details': 'b\\'{\"message\":\"Gateway Timeout\"}\\''}",
-    "Canva Magic Studio: {'message': 'JSON could not be generated', 'code': 504, 'hint': 'Refer to full message for details', 'details': 'b\\'{\"message\":\"Gateway Timeout\"}\\''}",
-    "Llama: {'message': 'JSON could not be generated', 'code': 504, 'hint': 'Refer to full message for details', 'details': 'b\\'{\"message\":\"Gateway Timeout\"}\\''}"
-  ]
+  "errors": []
 }
