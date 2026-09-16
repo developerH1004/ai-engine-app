@@ -1,8 +1,30 @@
 {
   "date": "2026-09-16",
-  "products_added": [],
+  "products_added": [
+    "ffxiv-visna",
+    "SugarPalette-ANIMA",
+    "MiniMax-H3-mmh3",
+    "WarmBreeze-TTS-2-gguf",
+    "Qwen3-TTS-0.6B-ANE",
+    "antalia-1-foundation",
+    "antalia-1",
+    "Qwen3.5-4B-Agentic-Coding-GGUF",
+    "YuE2-3B-FP8",
+    "YuE2-3B-NVFP4"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "ffxiv-visna",
+    "SugarPalette-ANIMA",
+    "MiniMax-H3-mmh3",
+    "WarmBreeze-TTS-2-gguf",
+    "Qwen3-TTS-0.6B-ANE",
+    "antalia-1-foundation",
+    "antalia-1",
+    "Qwen3.5-4B-Agentic-Coding-GGUF",
+    "YuE2-3B-FP8",
+    "YuE2-3B-NVFP4"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
