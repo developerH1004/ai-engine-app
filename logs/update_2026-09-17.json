@@ -1,8 +1,22 @@
 {
   "date": "2026-09-17",
-  "products_added": [],
+  "products_added": [
+    "Krea-2-Pixel-Art",
+    "E3Postyle",
+    "FastH3-V2_GGUFs",
+    "H3-Loras",
+    "LTX-2.5-uncensored-v1.1-FP8",
+    "lfm-iqa-gguf"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Krea-2-Pixel-Art",
+    "E3Postyle",
+    "FastH3-V2_GGUFs",
+    "H3-Loras",
+    "LTX-2.5-uncensored-v1.1-FP8",
+    "lfm-iqa-gguf"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
