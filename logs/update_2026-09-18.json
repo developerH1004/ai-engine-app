@@ -1,8 +1,32 @@
 {
   "date": "2026-09-18",
-  "products_added": [],
+  "products_added": [
+    "comfyui",
+    "ryavella-flux.1-dev",
+    "asmr-trigger-audio-h3-lora",
+    "LTX-2.5-Distilled-GGUF",
+    "mellos_definitive_zootopia_lora_minimax",
+    "sarashina2.2-tts-gguf",
+    "LuxTTS-GGUF",
+    "Qwen3-TTS-12Hz-1.7B-Base-GGUF",
+    "qwen3-tts-12hz-0.6b-loom",
+    "qwen-tts-ngoc-huyen-voice",
+    "cohere-transcribe-arabic-07-2026"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "comfyui",
+    "ryavella-flux.1-dev",
+    "asmr-trigger-audio-h3-lora",
+    "LTX-2.5-Distilled-GGUF",
+    "mellos_definitive_zootopia_lora_minimax",
+    "sarashina2.2-tts-gguf",
+    "LuxTTS-GGUF",
+    "Qwen3-TTS-12Hz-1.7B-Base-GGUF",
+    "qwen3-tts-12hz-0.6b-loom",
+    "qwen-tts-ngoc-huyen-voice",
+    "cohere-transcribe-arabic-07-2026"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
