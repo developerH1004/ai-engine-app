@@ -1,8 +1,30 @@
 {
   "date": "2026-09-19",
-  "products_added": [],
+  "products_added": [
+    "barbaradunkelman",
+    "cross-stitch-realism-sdxl-lora",
+    "Anima-Light-Lavender",
+    "TaoMate_H3_3_Step_LoRA",
+    "omnivoice-mlx-q8-fp16",
+    "zipvoice-gguf",
+    "mica-audio8-tts-06b",
+    "cosyvoice3-badini-tts",
+    "Confucius4-R2T2-gguf",
+    "whisper-small-medical"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "barbaradunkelman",
+    "cross-stitch-realism-sdxl-lora",
+    "Anima-Light-Lavender",
+    "TaoMate_H3_3_Step_LoRA",
+    "omnivoice-mlx-q8-fp16",
+    "zipvoice-gguf",
+    "mica-audio8-tts-06b",
+    "cosyvoice3-badini-tts",
+    "Confucius4-R2T2-gguf",
+    "whisper-small-medical"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
