@@ -1,8 +1,30 @@
 {
   "date": "2026-09-20",
-  "products_added": [],
+  "products_added": [
+    "LTX-2.3-22B-distilled-1.1-W4A8-ConvRot",
+    "AuK-Base-and-Flash-GGUF",
+    "Qwen3TTS0.6-ar-s-ali",
+    "dgrgtgf",
+    "mms-pa_Sep19_142songs",
+    "Huihui-gemma-3n-E4B-it-abliterated-i1-GGUF",
+    "VibeVoice-ASR-Streaming-1.5B-GGUF",
+    "mms-300m-bembaspeech-bem-ft-62",
+    "mms-300m-nyagen-original-train-ft-62",
+    "mms-1b-all-nyagen-combined-ft-62"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "LTX-2.3-22B-distilled-1.1-W4A8-ConvRot",
+    "AuK-Base-and-Flash-GGUF",
+    "Qwen3TTS0.6-ar-s-ali",
+    "dgrgtgf",
+    "mms-pa_Sep19_142songs",
+    "Huihui-gemma-3n-E4B-it-abliterated-i1-GGUF",
+    "VibeVoice-ASR-Streaming-1.5B-GGUF",
+    "mms-300m-bembaspeech-bem-ft-62",
+    "mms-300m-nyagen-original-train-ft-62",
+    "mms-1b-all-nyagen-combined-ft-62"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
