@@ -1,8 +1,26 @@
 {
   "date": "2026-09-21",
-  "products_added": [],
+  "products_added": [
+    "1950sScifiMinimaxH3",
+    "amharic-bell-tts-4bit",
+    "koko-tts",
+    "Hojo-TTS-Light-NPU2",
+    "AfriVoxAccent_QW3_spk_acc_pre-wolof_12hz_lora-r16_s42_20260919_224455",
+    "paper2-dia1-dac-coreml-decoders",
+    "mms-pa_Sep20__difevalset",
+    "hayai-ocr-v2.5-nova"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "1950sScifiMinimaxH3",
+    "amharic-bell-tts-4bit",
+    "koko-tts",
+    "Hojo-TTS-Light-NPU2",
+    "AfriVoxAccent_QW3_spk_acc_pre-wolof_12hz_lora-r16_s42_20260919_224455",
+    "paper2-dia1-dac-coreml-decoders",
+    "mms-pa_Sep20__difevalset",
+    "hayai-ocr-v2.5-nova"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
