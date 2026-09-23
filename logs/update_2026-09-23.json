@@ -1,8 +1,22 @@
 {
   "date": "2026-09-23",
-  "products_added": [],
+  "products_added": [
+    "MiniMax-H3-Fun-Controlnet-Union-2.0",
+    "Kokoro-82M-CoreML-ANE",
+    "MOSS-TTSD-GGUF",
+    "VieNeu-TTS-v3-Turbo-GGUF",
+    "AfriVoxAccent_QW3_spk_acc_pre-wolof_12hz_lora-r16_s42_20260921_184450",
+    "speecht5_finetuned_flemish"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "MiniMax-H3-Fun-Controlnet-Union-2.0",
+    "Kokoro-82M-CoreML-ANE",
+    "MOSS-TTSD-GGUF",
+    "VieNeu-TTS-v3-Turbo-GGUF",
+    "AfriVoxAccent_QW3_spk_acc_pre-wolof_12hz_lora-r16_s42_20260921_184450",
+    "speecht5_finetuned_flemish"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
