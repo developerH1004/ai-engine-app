@@ -1,8 +1,16 @@
 {
   "date": "2026-09-24",
-  "products_added": [],
+  "products_added": [
+    "Qwen3.8-27B-E03-Obliterated-Omni-Audio-Bridge-GGUF",
+    "Ornith-1.5-9B-Omni-Audio-Bridge-GGUF",
+    "dacvae-tts-tr-w512"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Qwen3.8-27B-E03-Obliterated-Omni-Audio-Bridge-GGUF",
+    "Ornith-1.5-9B-Omni-Audio-Bridge-GGUF",
+    "dacvae-tts-tr-w512"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
