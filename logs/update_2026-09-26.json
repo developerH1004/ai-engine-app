@@ -1,8 +1,18 @@
 {
   "date": "2026-09-26",
-  "products_added": [],
+  "products_added": [
+    "vsqa-preview-14b-v2",
+    "amami-357m-ro",
+    "qwen3-tts-12hz-1.7b-ru-stress-gguf",
+    "mms-1b-all-nyagen-combined-train-drodat-gdro-2.5e-3-dat-0.0012-no-sd-0.00-52"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "vsqa-preview-14b-v2",
+    "amami-357m-ro",
+    "qwen3-tts-12hz-1.7b-ru-stress-gguf",
+    "mms-1b-all-nyagen-combined-train-drodat-gdro-2.5e-3-dat-0.0012-no-sd-0.00-52"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
