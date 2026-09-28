@@ -1,11 +1,35 @@
 {
   "date": "2026-09-28",
   "products_added": [
-    "Qwen3-TTS-12Hz-0.6B-Wriothesley-LoRa-64"
+    "AfriVoxAccent_QW3_spk_acc_pre-wolof_12hz_lora-r16_s42_20260927_223931",
+    "voxtral-4b-tts-2603-loom",
+    "pocket-tts-loom",
+    "moss-tts-local-transformer-v1.5-loom",
+    "SupraTTS-0.1-Beta",
+    "Qwen3-TTS-12Hz-0.6B-Zhongli-LoRa-64",
+    "Qwen3-TTS-12Hz-0.6B-Zhongli-LoRa-32",
+    "Qwen3-TTS-12Hz-0.6B-Zhongli-LoRa-16",
+    "Qwen3-TTS-12Hz-0.6B-Nefer-LoRa-64",
+    "Qwen3-TTS-12Hz-0.6B-Nefer-LoRa-32",
+    "Qwen3-TTS-12Hz-0.6B-Nefer-LoRa-16",
+    "indic-ocr-int8-onnx",
+    "glm-ocr-farsi"
   ],
   "major_updated": [],
   "glossary_added": [
-    "Qwen3-TTS-12Hz-0.6B-Wriothesley-LoRa-64"
+    "AfriVoxAccent_QW3_spk_acc_pre-wolof_12hz_lora-r16_s42_20260927_223931",
+    "voxtral-4b-tts-2603-loom",
+    "pocket-tts-loom",
+    "moss-tts-local-transformer-v1.5-loom",
+    "SupraTTS-0.1-Beta",
+    "Qwen3-TTS-12Hz-0.6B-Zhongli-LoRa-64",
+    "Qwen3-TTS-12Hz-0.6B-Zhongli-LoRa-32",
+    "Qwen3-TTS-12Hz-0.6B-Zhongli-LoRa-16",
+    "Qwen3-TTS-12Hz-0.6B-Nefer-LoRa-64",
+    "Qwen3-TTS-12Hz-0.6B-Nefer-LoRa-32",
+    "Qwen3-TTS-12Hz-0.6B-Nefer-LoRa-16",
+    "indic-ocr-int8-onnx",
+    "glm-ocr-farsi"
   ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
