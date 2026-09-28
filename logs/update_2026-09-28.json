@@ -1,8 +1,12 @@
 {
   "date": "2026-09-28",
-  "products_added": [],
+  "products_added": [
+    "Qwen3-TTS-12Hz-0.6B-Wriothesley-LoRa-64"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Qwen3-TTS-12Hz-0.6B-Wriothesley-LoRa-64"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
