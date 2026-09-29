@@ -1,8 +1,24 @@
 {
   "date": "2026-09-29",
-  "products_added": [],
+  "products_added": [
+    "Minimax-H3-Quantfunc-4bit",
+    "SLORA-LTX",
+    "SLORA",
+    "EVIRA",
+    "indic-speak-int8-onnx",
+    "hayai-ocr-v2-onnx",
+    "mms-tso-changana-maputo-v1"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Minimax-H3-Quantfunc-4bit",
+    "SLORA-LTX",
+    "SLORA",
+    "EVIRA",
+    "indic-speak-int8-onnx",
+    "hayai-ocr-v2-onnx",
+    "mms-tso-changana-maputo-v1"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
