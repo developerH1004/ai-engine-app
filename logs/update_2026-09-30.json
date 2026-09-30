@@ -1,8 +1,26 @@
 {
   "date": "2026-09-30",
-  "products_added": [],
+  "products_added": [
+    "h3-mutant-distill",
+    "LTX-2.5-QuantFunc-4bit",
+    "MyanmarTTS",
+    "voxcpm2-loom",
+    "fun-cosyvoice3-0.5b-loom",
+    "qwen3-tts-ggml",
+    "Qota-OCR",
+    "sci-image-models"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "h3-mutant-distill",
+    "LTX-2.5-QuantFunc-4bit",
+    "MyanmarTTS",
+    "voxcpm2-loom",
+    "fun-cosyvoice3-0.5b-loom",
+    "qwen3-tts-ggml",
+    "Qota-OCR",
+    "sci-image-models"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
