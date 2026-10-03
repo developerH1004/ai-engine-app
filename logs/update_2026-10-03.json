@@ -1,8 +1,28 @@
 {
   "date": "2026-10-03",
-  "products_added": [],
+  "products_added": [
+    "Qwen3-TTS-12Hz-0.6B-CustomVoice-GGUF",
+    "xtts-v2-igbo-conversational",
+    "lfm2.5-audio-1.5b-tts-loom",
+    "xtts-v2-yoruba-conversational",
+    "Articulatio-DE-Stream-TTS-v1.5-GGUF",
+    "xtts-v2-hausa-conversational",
+    "mms-tts-mlg-malaga-GGUF",
+    "Irodori-TTS-v4-Large-audiocpp",
+    "ACE-Step1.5-sft-MLX-bf16"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Qwen3-TTS-12Hz-0.6B-CustomVoice-GGUF",
+    "xtts-v2-igbo-conversational",
+    "lfm2.5-audio-1.5b-tts-loom",
+    "xtts-v2-yoruba-conversational",
+    "Articulatio-DE-Stream-TTS-v1.5-GGUF",
+    "xtts-v2-hausa-conversational",
+    "mms-tts-mlg-malaga-GGUF",
+    "Irodori-TTS-v4-Large-audiocpp",
+    "ACE-Step1.5-sft-MLX-bf16"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
