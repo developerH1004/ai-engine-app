@@ -1,8 +1,22 @@
 {
   "date": "2026-10-04",
-  "products_added": [],
+  "products_added": [
+    "pixelart8x-h3-lora",
+    "tgif-video-gen",
+    "LongLive-Plug-MiniMax-H3-cfg",
+    "kitten_tts2",
+    "chatterbox-turbo-GGUF",
+    "XTTS-v2-GGUF"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "pixelart8x-h3-lora",
+    "tgif-video-gen",
+    "LongLive-Plug-MiniMax-H3-cfg",
+    "kitten_tts2",
+    "chatterbox-turbo-GGUF",
+    "XTTS-v2-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
