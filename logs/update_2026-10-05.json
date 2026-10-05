@@ -1,11 +1,17 @@
 {
   "date": "2026-10-05",
   "products_added": [
-    "LongLive-Plug-Wan2.1-T2V-14B-cfg"
+    "PixelTune-MiniMax-H3-LoRA",
+    "negen-archive",
+    "Irodori-TTS-v4.1-Small-MF-CoreML",
+    "VoiceTut-TTS-GGUF"
   ],
   "major_updated": [],
   "glossary_added": [
-    "LongLive-Plug-Wan2.1-T2V-14B-cfg"
+    "PixelTune-MiniMax-H3-LoRA",
+    "negen-archive",
+    "Irodori-TTS-v4.1-Small-MF-CoreML",
+    "VoiceTut-TTS-GGUF"
   ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
