@@ -1,8 +1,12 @@
 {
   "date": "2026-10-05",
-  "products_added": [],
+  "products_added": [
+    "LongLive-Plug-Wan2.1-T2V-14B-cfg"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "LongLive-Plug-Wan2.1-T2V-14B-cfg"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
