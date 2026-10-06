@@ -1,8 +1,28 @@
 {
   "date": "2026-10-06",
-  "products_added": [],
+  "products_added": [
+    "Irodori-TTS-v4.1-Small-GGUF",
+    "qwen3-tts-12hz-1.7b-ru-stress-cf",
+    "moonshine-tiny-igbo-openbible",
+    "reazonspeech-nemo-v2-GGUF",
+    "parakeet-tdt_ctc-0.6b-ja-GGUF",
+    "Polina-Lumen-NumDetective",
+    "banana-blip-model",
+    "igbo-mms-tts",
+    "Ruach_Studio_Models"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Irodori-TTS-v4.1-Small-GGUF",
+    "qwen3-tts-12hz-1.7b-ru-stress-cf",
+    "moonshine-tiny-igbo-openbible",
+    "reazonspeech-nemo-v2-GGUF",
+    "parakeet-tdt_ctc-0.6b-ja-GGUF",
+    "Polina-Lumen-NumDetective",
+    "banana-blip-model",
+    "igbo-mms-tts",
+    "Ruach_Studio_Models"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
