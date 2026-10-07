@@ -1,8 +1,16 @@
 {
   "date": "2026-10-07",
-  "products_added": [],
+  "products_added": [
+    "tiny-qwenimage21-modular-pipe",
+    "FastVideo-FastH3-8-Step-V2-NVFP4-Consumer",
+    "FastVideo-FastH3-Trim-8-Step-FP8"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "tiny-qwenimage21-modular-pipe",
+    "FastVideo-FastH3-8-Step-V2-NVFP4-Consumer",
+    "FastVideo-FastH3-Trim-8-Step-FP8"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
