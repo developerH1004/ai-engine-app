@@ -1,8 +1,16 @@
 {
   "date": "2026-10-08",
-  "products_added": [],
+  "products_added": [
+    "FastVideo-FastH3-8-Step-V2-FP8",
+    "FastVideo-FastH3-Trim-8-Step-NVFP4",
+    "music-llm-45m"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "FastVideo-FastH3-8-Step-V2-FP8",
+    "FastVideo-FastH3-Trim-8-Step-NVFP4",
+    "music-llm-45m"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
