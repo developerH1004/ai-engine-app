@@ -1,22 +1,8 @@
 {
   "date": "2026-10-09",
-  "products_added": [
-    "Kandinsky-6.0-Pro-distill-5s-NVFP4",
-    "Minimax-H3-R2VA-Veda-Preview",
-    "LTX-2.5-22b-OmniGen-v12",
-    "Index-Echo-S2ST-9B-MLX",
-    "SaraTTS-BG-EN-64M",
-    "akan-twi-mms"
-  ],
+  "products_added": [],
   "major_updated": [],
-  "glossary_added": [
-    "Kandinsky-6.0-Pro-distill-5s-NVFP4",
-    "Minimax-H3-R2VA-Veda-Preview",
-    "LTX-2.5-22b-OmniGen-v12",
-    "Index-Echo-S2ST-9B-MLX",
-    "SaraTTS-BG-EN-64M",
-    "akan-twi-mms"
-  ],
+  "glossary_added": [],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
