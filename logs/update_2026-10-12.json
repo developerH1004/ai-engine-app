@@ -1,8 +1,32 @@
 {
   "date": "2026-10-12",
-  "products_added": [],
+  "products_added": [
+    "Kandinsky-6.0-Lite-distill-5s-OrbitQuant-W4A4",
+    "VoxCPM2-audiocpp-prebuilt",
+    "Qwen3-TTS-12Hz-0.6B-Base-GGUF",
+    "mecha-speech-gguf",
+    "A3S-odc",
+    "omnivoice-lora-uk",
+    "zubr-audio",
+    "ko-hand-ocr",
+    "suna-v1",
+    "YuE2-3B-MLX-Serve-8bit",
+    "ACE-Step-1.5-Turbo-MLX"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Kandinsky-6.0-Lite-distill-5s-OrbitQuant-W4A4",
+    "VoxCPM2-audiocpp-prebuilt",
+    "Qwen3-TTS-12Hz-0.6B-Base-GGUF",
+    "mecha-speech-gguf",
+    "A3S-odc",
+    "omnivoice-lora-uk",
+    "zubr-audio",
+    "ko-hand-ocr",
+    "suna-v1",
+    "YuE2-3B-MLX-Serve-8bit",
+    "ACE-Step-1.5-Turbo-MLX"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
