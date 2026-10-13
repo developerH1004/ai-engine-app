@@ -1,22 +1,8 @@
 {
   "date": "2026-10-13",
-  "products_added": [
-    "LTX-2.5-FP8",
-    "LastKV-Wan-14B",
-    "granite-speech-4.1-2b-gguf",
-    "ark-asr-0.6b-gguf",
-    "qwen3-asr-0.6b-gguf",
-    "diktatur-whisper-lb-coreml"
-  ],
+  "products_added": [],
   "major_updated": [],
-  "glossary_added": [
-    "LTX-2.5-FP8",
-    "LastKV-Wan-14B",
-    "granite-speech-4.1-2b-gguf",
-    "ark-asr-0.6b-gguf",
-    "qwen3-asr-0.6b-gguf",
-    "diktatur-whisper-lb-coreml"
-  ],
+  "glossary_added": [],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
