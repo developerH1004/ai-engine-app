@@ -1,8 +1,26 @@
 {
   "date": "2026-10-15",
-  "products_added": [],
+  "products_added": [
+    "H3-Anti-Burn-LoRA",
+    "MiniMax-H3-MXFP8-CT-AutoRound",
+    "SMD-MiniMax-H3-T2VA-8step-ComfyUI",
+    "SMD-MiniMax-H3-T2VA-4step-ComfyUI",
+    "drama-3-int4",
+    "GLM-OCR-ita-mlx-8bit",
+    "topaz-gregg-shorthand-117m-gguf",
+    "topaz-gregg-shorthand-61m-gguf"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "H3-Anti-Burn-LoRA",
+    "MiniMax-H3-MXFP8-CT-AutoRound",
+    "SMD-MiniMax-H3-T2VA-8step-ComfyUI",
+    "SMD-MiniMax-H3-T2VA-4step-ComfyUI",
+    "drama-3-int4",
+    "GLM-OCR-ita-mlx-8bit",
+    "topaz-gregg-shorthand-117m-gguf",
+    "topaz-gregg-shorthand-61m-gguf"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
