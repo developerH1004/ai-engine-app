@@ -1,8 +1,30 @@
 {
   "date": "2026-10-16",
-  "products_added": [],
+  "products_added": [
+    "LingBot-Video-Dense-1.3B-GGUF",
+    "MiniMax-H3-MXFP8-CT-AutoRound-tmp",
+    "tijaabo",
+    "piper-voices",
+    "drama-3-GGUF",
+    "drama3-small-GGUF",
+    "topaz-gregg-shorthand-61m",
+    "manga-ocr-nar-small",
+    "radiff",
+    "indra-ocr"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "LingBot-Video-Dense-1.3B-GGUF",
+    "MiniMax-H3-MXFP8-CT-AutoRound-tmp",
+    "tijaabo",
+    "piper-voices",
+    "drama-3-GGUF",
+    "drama3-small-GGUF",
+    "topaz-gregg-shorthand-61m",
+    "manga-ocr-nar-small",
+    "radiff",
+    "indra-ocr"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
