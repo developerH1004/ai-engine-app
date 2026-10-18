@@ -1,8 +1,22 @@
 {
   "date": "2026-10-18",
-  "products_added": [],
+  "products_added": [
+    "Vivy-R-Vision-3B-GGUF",
+    "cstr__cosyvoice3-0.5b-2512-GGUF",
+    "moonshine-tiny-urdu-final-pta-nhi-ab",
+    "GLM-OCR-ita-GGUF",
+    "ohmyshot-ppocrv6-small-coreml",
+    "MIDI-LLM_Llama-3.2-1B-GGUF"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Vivy-R-Vision-3B-GGUF",
+    "cstr__cosyvoice3-0.5b-2512-GGUF",
+    "moonshine-tiny-urdu-final-pta-nhi-ab",
+    "GLM-OCR-ita-GGUF",
+    "ohmyshot-ppocrv6-small-coreml",
+    "MIDI-LLM_Llama-3.2-1B-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
