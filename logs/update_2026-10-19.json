@@ -1,8 +1,22 @@
 {
   "date": "2026-10-19",
-  "products_added": [],
+  "products_added": [
+    "speecht5_finetuned_voxpopuli_pl",
+    "kikiri-de",
+    "BreezyVoice-GGUF",
+    "Granite-Vision-3.3-2B-BE-GGUF",
+    "ohmyshot-ppformulanet-plus-l-coreml",
+    "mimetic-a0"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "speecht5_finetuned_voxpopuli_pl",
+    "kikiri-de",
+    "BreezyVoice-GGUF",
+    "Granite-Vision-3.3-2B-BE-GGUF",
+    "ohmyshot-ppformulanet-plus-l-coreml",
+    "mimetic-a0"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
