@@ -1,8 +1,20 @@
 {
   "date": "2026-10-20",
-  "products_added": [],
+  "products_added": [
+    "MiniMax-H3-MXFP8-DiT-MXFP4-TE-AutoRound",
+    "qwen3-tts-0.6b-base-coreml-ane",
+    "Parakeet-TDT-0.6B-v2-English-Hebrew-Codeswitching-GGUF",
+    "whisper-tiny_to_spanish_accent_19oct_v2",
+    "manga-ocr-charspot-nano"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "MiniMax-H3-MXFP8-DiT-MXFP4-TE-AutoRound",
+    "qwen3-tts-0.6b-base-coreml-ane",
+    "Parakeet-TDT-0.6B-v2-English-Hebrew-Codeswitching-GGUF",
+    "whisper-tiny_to_spanish_accent_19oct_v2",
+    "manga-ocr-charspot-nano"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
