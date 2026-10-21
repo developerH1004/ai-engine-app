@@ -1,8 +1,18 @@
 {
   "date": "2026-10-21",
-  "products_added": [],
+  "products_added": [
+    "FastH3-Omni-Comfy-INT4mixed-INT6GPTQ",
+    "MinimaxH3-Subtitle-Control-LoRA",
+    "StarLife-V1-WSV",
+    "manga-ocr-base-CPT-flex"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "FastH3-Omni-Comfy-INT4mixed-INT6GPTQ",
+    "MinimaxH3-Subtitle-Control-LoRA",
+    "StarLife-V1-WSV",
+    "manga-ocr-base-CPT-flex"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
