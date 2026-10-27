@@ -1,8 +1,20 @@
 {
   "date": "2026-10-27",
-  "products_added": [],
+  "products_added": [
+    "ghana-voice_ahanta",
+    "ghana-voice_sehwi",
+    "ghana-voice_frafra",
+    "ghana-voice_ga",
+    "manga-ocr-charspot-small"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "ghana-voice_ahanta",
+    "ghana-voice_sehwi",
+    "ghana-voice_frafra",
+    "ghana-voice_ga",
+    "manga-ocr-charspot-small"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
