@@ -1,8 +1,18 @@
 {
   "date": "2026-10-28",
-  "products_added": [],
+  "products_added": [
+    "minimax-h3-int8-base-ref2va",
+    "Maya2-Native-GGUF",
+    "Bina-0.4-Koochik",
+    "captchaocr-ppocrv6"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "minimax-h3-int8-base-ref2va",
+    "Maya2-Native-GGUF",
+    "Bina-0.4-Koochik",
+    "captchaocr-ppocrv6"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
