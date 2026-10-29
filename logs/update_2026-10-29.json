@@ -1,8 +1,26 @@
 {
   "date": "2026-10-29",
-  "products_added": [],
+  "products_added": [
+    "FastWan2.2-TI2V-5B-GGUF",
+    "docparse",
+    "Magenta-RealTime-2-GGUF",
+    "ACE-Step-1.5-turbo-bf16",
+    "ACE-Step-1.5-planner-1.7B-bf16",
+    "ACE-Step-1.5-planner-0.6B-bf16",
+    "ACE-Step-1.5-text-encoder-bf16",
+    "ACE-Step-1.5-vae-fp32"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "FastWan2.2-TI2V-5B-GGUF",
+    "docparse",
+    "Magenta-RealTime-2-GGUF",
+    "ACE-Step-1.5-turbo-bf16",
+    "ACE-Step-1.5-planner-1.7B-bf16",
+    "ACE-Step-1.5-planner-0.6B-bf16",
+    "ACE-Step-1.5-text-encoder-bf16",
+    "ACE-Step-1.5-vae-fp32"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
