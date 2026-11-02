@@ -1,29 +1,11 @@
 {
   "date": "2026-11-02",
   "products_added": [
-    "Krea-2-Raw",
-    "Qwen-Image-2.1-Uncensored-Quantized",
-    "krea2-kroma-q6k-cpu",
-    "Moss-image-nsfw-uncensored-lora",
-    "Wan22-T2V-A14B-NF4-for-LoRA-Training",
-    "MiniMax-H3-FL2VA-DMAD-4step-int8-convrot",
-    "Ming-3.0-tts-0.5B-Pollard",
-    "MOSS-Transcribe-Diarize-GGUF",
-    "Valdam-Vision-2.5",
-    "YuE2-3B-bf16"
+    "MiniMax-H3-DMAD-4step-int8-convrot"
   ],
   "major_updated": [],
   "glossary_added": [
-    "Krea-2-Raw",
-    "Qwen-Image-2.1-Uncensored-Quantized",
-    "krea2-kroma-q6k-cpu",
-    "Moss-image-nsfw-uncensored-lora",
-    "Wan22-T2V-A14B-NF4-for-LoRA-Training",
-    "MiniMax-H3-FL2VA-DMAD-4step-int8-convrot",
-    "Ming-3.0-tts-0.5B-Pollard",
-    "MOSS-Transcribe-Diarize-GGUF",
-    "Valdam-Vision-2.5",
-    "YuE2-3B-bf16"
+    "MiniMax-H3-DMAD-4step-int8-convrot"
   ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
