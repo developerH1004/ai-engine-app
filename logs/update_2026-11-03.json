@@ -1,8 +1,22 @@
 {
   "date": "2026-11-03",
-  "products_added": [],
+  "products_added": [
+    "24",
+    "z-image-cyberrealistic-v9-gguf",
+    "tihon-tts",
+    "GSV.CPP",
+    "Audio8-TTS-Realistic-0.6b-bf16",
+    "YuE2-Vae-fp32"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "24",
+    "z-image-cyberrealistic-v9-gguf",
+    "tihon-tts",
+    "GSV.CPP",
+    "Audio8-TTS-Realistic-0.6b-bf16",
+    "YuE2-Vae-fp32"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
