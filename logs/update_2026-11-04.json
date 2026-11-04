@@ -1,8 +1,34 @@
 {
   "date": "2026-11-04",
-  "products_added": [],
+  "products_added": [
+    "P-H3-Image-GGUF",
+    "p-h3-image-turbo-lora",
+    "sakie2",
+    "sakie",
+    "Minimax-H3-Hybrid-DMAD-PDMD",
+    "rh-qwen3.6-27b-q5-k-p-gguf",
+    "dsh-qingsheng-voice-models",
+    "Higgs-Audio-v3-Studio",
+    "NVIDIA-Nemotron-3.5-Transcribe-30B-A4B",
+    "mms1b-lid-transformer-pit-fleurs-csfleurs-csyodas",
+    "mms1b-lid-transformer-pit-fleurs-csfleurs",
+    "pokot-tts-v1"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "P-H3-Image-GGUF",
+    "p-h3-image-turbo-lora",
+    "sakie2",
+    "sakie",
+    "Minimax-H3-Hybrid-DMAD-PDMD",
+    "rh-qwen3.6-27b-q5-k-p-gguf",
+    "dsh-qingsheng-voice-models",
+    "Higgs-Audio-v3-Studio",
+    "NVIDIA-Nemotron-3.5-Transcribe-30B-A4B",
+    "mms1b-lid-transformer-pit-fleurs-csfleurs-csyodas",
+    "mms1b-lid-transformer-pit-fleurs-csfleurs",
+    "pokot-tts-v1"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
