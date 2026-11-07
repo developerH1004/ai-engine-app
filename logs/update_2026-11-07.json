@@ -1,8 +1,26 @@
 {
   "date": "2026-11-07",
-  "products_added": [],
+  "products_added": [
+    "ReaZIT-QNN",
+    "minimax-h3-bunny-motion-repair",
+    "phonon-40m-es",
+    "qnvoice-filipino-voxcpm2-gguf",
+    "WeVisOne-VL-GGML",
+    "shivalipi-vlm",
+    "stable-audio-3-medium-8bit",
+    "honest-orb-ng-male"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "ReaZIT-QNN",
+    "minimax-h3-bunny-motion-repair",
+    "phonon-40m-es",
+    "qnvoice-filipino-voxcpm2-gguf",
+    "WeVisOne-VL-GGML",
+    "shivalipi-vlm",
+    "stable-audio-3-medium-8bit",
+    "honest-orb-ng-male"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
