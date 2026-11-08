@@ -1,11 +1,27 @@
 {
   "date": "2026-11-08",
   "products_added": [
-    "ThakiOCR-KOEN-G2M-Preview"
+    "umt5-xxl-encoder-phi-lattice-v2",
+    "Humanness-Voice-Podcast",
+    "scyllasband",
+    "BanG_Dream_Qwen3_TTS-GGUF",
+    "Kokoro-82M-v1.0-GGUF",
+    "manga-ocr-base-gguf",
+    "Bina-0.4-Rizeh-CoreML-INT4",
+    "gemma-4-E2B-it-heretic-image-caption-adapter",
+    "meenakshi_tamil_trocr"
   ],
   "major_updated": [],
   "glossary_added": [
-    "ThakiOCR-KOEN-G2M-Preview"
+    "umt5-xxl-encoder-phi-lattice-v2",
+    "Humanness-Voice-Podcast",
+    "scyllasband",
+    "BanG_Dream_Qwen3_TTS-GGUF",
+    "Kokoro-82M-v1.0-GGUF",
+    "manga-ocr-base-gguf",
+    "Bina-0.4-Rizeh-CoreML-INT4",
+    "gemma-4-E2B-it-heretic-image-caption-adapter",
+    "meenakshi_tamil_trocr"
   ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
