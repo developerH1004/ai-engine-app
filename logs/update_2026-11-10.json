@@ -1,8 +1,26 @@
 {
   "date": "2026-11-10",
-  "products_added": [],
+  "products_added": [
+    "minimax-h3-bunny-combat-base",
+    "qwen3-tts-06b-base-gguf",
+    "qwen3-tts-customvoice-gguf",
+    "livevoice-0.5b-GGUF",
+    "LFM3-Omni-2B-heretic-i1-GGUF",
+    "neon-inspection-autovi",
+    "mlv-mntnt-audio-aligned-speecht5-spk29-ms60",
+    "mlv-mntnt-audio-aligned-speecht5-ms60"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "minimax-h3-bunny-combat-base",
+    "qwen3-tts-06b-base-gguf",
+    "qwen3-tts-customvoice-gguf",
+    "livevoice-0.5b-GGUF",
+    "LFM3-Omni-2B-heretic-i1-GGUF",
+    "neon-inspection-autovi",
+    "mlv-mntnt-audio-aligned-speecht5-spk29-ms60",
+    "mlv-mntnt-audio-aligned-speecht5-ms60"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
