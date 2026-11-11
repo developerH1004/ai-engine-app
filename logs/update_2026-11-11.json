@@ -1,8 +1,24 @@
 {
   "date": "2026-11-11",
-  "products_added": [],
+  "products_added": [
+    "zyvideo-1.1",
+    "MiniMaxH3_RefMod",
+    "LTX-2.5-Stage1-Distill-2step-LoRA",
+    "ZONOS3-Mini-GGUF",
+    "han2ids-v0.2",
+    "mlv-mntnt-audio-aligned-speecht5-ms70",
+    "magnet-medium-8bit"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "zyvideo-1.1",
+    "MiniMaxH3_RefMod",
+    "LTX-2.5-Stage1-Distill-2step-LoRA",
+    "ZONOS3-Mini-GGUF",
+    "han2ids-v0.2",
+    "mlv-mntnt-audio-aligned-speecht5-ms70",
+    "magnet-medium-8bit"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
