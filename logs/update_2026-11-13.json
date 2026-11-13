@@ -1,8 +1,26 @@
 {
   "date": "2026-11-13",
-  "products_added": [],
+  "products_added": [
+    "MiniMax-H3-Image-GGUF",
+    "NitroFusion2-Controlnet-Union",
+    "MiniMax-H3-Duo-AIPod",
+    "HyperFlow-H3-Flash-FL2VA-MLX-Serve-8bit",
+    "CROWN-H3-Perfect-Hands-Eyes-Anatomy",
+    "kouman-tts-bau-waxal-full",
+    "mlv-mntnt-audio-aligned-speecht5-spk28",
+    "stable-audio-3-medium"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "MiniMax-H3-Image-GGUF",
+    "NitroFusion2-Controlnet-Union",
+    "MiniMax-H3-Duo-AIPod",
+    "HyperFlow-H3-Flash-FL2VA-MLX-Serve-8bit",
+    "CROWN-H3-Perfect-Hands-Eyes-Anatomy",
+    "kouman-tts-bau-waxal-full",
+    "mlv-mntnt-audio-aligned-speecht5-spk28",
+    "stable-audio-3-medium"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
