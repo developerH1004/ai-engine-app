@@ -1,11 +1,15 @@
 {
   "date": "2026-11-17",
   "products_added": [
-    "mlv-mntnt-audio-aligned-speecht5-ms80"
+    "U-VLM",
+    "ACE-Step1.5-Qwen3.5-0.8B-GGUF",
+    "SoulX-Singer-GGUF"
   ],
   "major_updated": [],
   "glossary_added": [
-    "mlv-mntnt-audio-aligned-speecht5-ms80"
+    "U-VLM",
+    "ACE-Step1.5-Qwen3.5-0.8B-GGUF",
+    "SoulX-Singer-GGUF"
   ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
