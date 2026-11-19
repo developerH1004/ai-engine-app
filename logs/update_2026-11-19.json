@@ -1,8 +1,28 @@
 {
   "date": "2026-11-19",
-  "products_added": [],
+  "products_added": [
+    "MiniMax-H3-Dual-Turbo-Lora-ComfyUI",
+    "Sega-Video-5.2-Supernova",
+    "Sega-Video-5.1-Singularity",
+    "Sega-Video-5.5-Hyperion",
+    "Sega-Video-6.1-Sol",
+    "Sega-Video-6.0-Singularity-X",
+    "Sega-Video-5.6-Valkyrie",
+    "Sega-Video-6.5-Astral-Prime",
+    "AksonOCR-Lite"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "MiniMax-H3-Dual-Turbo-Lora-ComfyUI",
+    "Sega-Video-5.2-Supernova",
+    "Sega-Video-5.1-Singularity",
+    "Sega-Video-5.5-Hyperion",
+    "Sega-Video-6.1-Sol",
+    "Sega-Video-6.0-Singularity-X",
+    "Sega-Video-5.6-Valkyrie",
+    "Sega-Video-6.5-Astral-Prime",
+    "AksonOCR-Lite"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
