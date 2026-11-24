@@ -1,36 +1,8 @@
 {
   "date": "2026-11-24",
-  "products_added": [
-    "MiniMax-H3-Image-BnB-NF4-Diffusers",
-    "Testtyu",
-    "S2-Pro-GSQ-RCO-GGUF",
-    "LvW-Ming-TTS-0.5B-GGUF",
-    "sakhiya-pro-v1",
-    "hams-tts-levantine",
-    "drama-3-GGUF_1",
-    "Drama-3-Japanese-speech-cpp-gguf",
-    "kitten-tts-reprogrammed",
-    "Turbo-Kev-Dictate-1.4B-GGUF",
-    "nemotron-3.5-asr-streaming-0.6b-pl-GGUF",
-    "indic-transcribe-flex-gguf",
-    "arabic-nougat-egyptian-receipts-json"
-  ],
+  "products_added": [],
   "major_updated": [],
-  "glossary_added": [
-    "MiniMax-H3-Image-BnB-NF4-Diffusers",
-    "Testtyu",
-    "S2-Pro-GSQ-RCO-GGUF",
-    "LvW-Ming-TTS-0.5B-GGUF",
-    "sakhiya-pro-v1",
-    "hams-tts-levantine",
-    "drama-3-GGUF_1",
-    "Drama-3-Japanese-speech-cpp-gguf",
-    "kitten-tts-reprogrammed",
-    "Turbo-Kev-Dictate-1.4B-GGUF",
-    "nemotron-3.5-asr-streaming-0.6b-pl-GGUF",
-    "indic-transcribe-flex-gguf",
-    "arabic-nougat-egyptian-receipts-json"
-  ],
+  "glossary_added": [],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
