@@ -1,8 +1,34 @@
 {
   "date": "2026-11-25",
-  "products_added": [],
+  "products_added": [
+    "rd-flow-64",
+    "h3-image-ero404-lora",
+    "MOSS-Image-LoRI-Seia",
+    "Sulphur3-INT8-ConvRot",
+    "sonabo-v2-GGUF",
+    "BgTTS-40M-Engram-Loop",
+    "canora-italian",
+    "Crossfeed-Unison",
+    "MikolAI-109M-v0.1-Polish-TTS-Preview",
+    "canora-spanish",
+    "canora-russian",
+    "canora-french"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "rd-flow-64",
+    "h3-image-ero404-lora",
+    "MOSS-Image-LoRI-Seia",
+    "Sulphur3-INT8-ConvRot",
+    "sonabo-v2-GGUF",
+    "BgTTS-40M-Engram-Loop",
+    "canora-italian",
+    "Crossfeed-Unison",
+    "MikolAI-109M-v0.1-Polish-TTS-Preview",
+    "canora-spanish",
+    "canora-russian",
+    "canora-french"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
