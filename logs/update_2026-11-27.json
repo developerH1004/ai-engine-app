@@ -1,8 +1,24 @@
 {
   "date": "2026-11-27",
-  "products_added": [],
+  "products_added": [
+    "Hiraya",
+    "MiniMax-H3-Variable-Clock",
+    "tiny-vanya",
+    "Fish-Audio-Drama-3-MLX-8bit",
+    "Chotu-TTS-v0.3",
+    "indic-ocr-GGUF",
+    "GLM-OCR-GGUF"
+  ],
   "major_updated": [],
-  "glossary_added": [],
+  "glossary_added": [
+    "Hiraya",
+    "MiniMax-H3-Variable-Clock",
+    "tiny-vanya",
+    "Fish-Audio-Drama-3-MLX-8bit",
+    "Chotu-TTS-v0.3",
+    "indic-ocr-GGUF",
+    "GLM-OCR-GGUF"
+  ],
   "products_ko_enriched": 0,
   "glossary_ko_enriched": 0,
   "errors": []
